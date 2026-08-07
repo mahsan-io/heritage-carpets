@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collections — Heritage Carpet Company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & TOKENS (shared with homepage) ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#1B1714; --ink-2:#241E19; --ink-3:#2E2620;
+  --parchment:#EDE6D6; --parchment-2:#F6F2E9;
+  --madder:#7A2E27; --madder-light:#9C4038;
+  --brass:#B08D46; --brass-light:#D4B876; --teal:#2B4A47;
+  --ink-text:#2A2420; --cream-text:#F3EEE3; --cream-text-dim:#C9BFAE;
+  --line-dark:rgba(212,184,118,0.22); --line-light:rgba(42,36,32,0.14);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;}
+}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--parchment);color:var(--ink-text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+ul{list-style:none;}
+h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.14;letter-spacing:-0.01em;}
+.container{width:100%;max-width:1320px;margin:0 auto;padding:0 32px;}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px;}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11.5px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;}
+.eyebrow::before{content:"";width:26px;height:1px;background:currentColor;opacity:0.5;}
+.eyebrow.on-dark{color:var(--brass-light);}
+.eyebrow.on-light{color:var(--madder);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 26px;font-size:12.5px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;border-radius:2px;transition:all .35s var(--ease);white-space:nowrap;}
+.btn-fill{background:var(--brass);color:var(--ink);}
+.btn-fill:hover{background:var(--brass-light);transform:translateY(-2px);}
+.btn-outline.dark{border:1px solid rgba(42,36,32,0.3);color:var(--ink-text);}
+.btn-outline.dark:hover{border-color:var(--madder);color:var(--madder);}
+.btn-sm{padding:10px 18px;font-size:11.5px;}
+.btn-text{font-size:12.5px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;border-bottom:1px solid transparent;padding-bottom:4px;transition:.3s var(--ease);}
+.btn-text:hover{border-color:currentColor;gap:12px;}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+.reveal.is-visible{opacity:1;transform:translateY(0);}
+
+/* ============ NAV ============ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:16px 0;background:rgba(27,23,20,0.94);backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--line-dark);}
+.nav .container{display:flex;align-items:center;justify-content:space-between;gap:24px;}
+.nav-logo{display:flex;align-items:center;gap:12px;color:var(--cream-text);}
+.nav-logo svg{width:34px;height:34px;flex-shrink:0;}
+.nav-logo-text{font-family:'Fraunces',serif;font-size:18px;letter-spacing:0.02em;}
+.nav-logo-text small{display:block;font-family:'Inter',sans-serif;font-size:9.5px;letter-spacing:0.24em;color:var(--brass-light);font-weight:600;margin-top:2px;}
+.nav-links{display:flex;align-items:center;gap:36px;}
+.nav-links a{font-size:13px;font-weight:500;letter-spacing:0.03em;color:var(--cream-text-dim);position:relative;padding-bottom:4px;transition:color .3s;}
+.nav-links a.current{color:var(--brass-light);}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--brass-light);transition:width .35s var(--ease);}
+.nav-links a:hover{color:var(--cream-text);}
+.nav-links a:hover::after,.nav-links a.current::after{width:100%;}
+.nav-right{display:flex;align-items:center;gap:22px;}
+.lang-toggle{font-size:12px;font-weight:600;letter-spacing:0.05em;color:var(--cream-text-dim);border:1px solid var(--line-dark);padding:8px 14px;border-radius:2px;transition:.3s;}
+.lang-toggle:hover{border-color:var(--brass-light);color:var(--brass-light);}
+.nav-cta{display:inline-flex;padding:11px 20px;font-size:12px;}
+.hamburger{display:none;width:24px;height:18px;position:relative;flex-direction:column;justify-content:space-between;}
+.hamburger span{display:block;height:1px;width:100%;background:var(--cream-text);transition:.3s var(--ease);}
+.hamburger.open span:nth-child(1){transform:translateY(8.5px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-8.5px) rotate(-45deg);}
+.mobile-menu{position:fixed;inset:0;background:var(--ink);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;opacity:0;visibility:hidden;transition:opacity .4s var(--ease);}
+.mobile-menu.open{opacity:1;visibility:visible;}
+.mobile-menu a{font-family:'Fraunces',serif;font-size:26px;color:var(--cream-text);}
+
+/* ============ PAGE HEADER ============ */
+.page-header{background:var(--ink);color:var(--cream-text);padding:170px 0 64px;}
+.breadcrumb{font-size:12.5px;color:var(--cream-text-dim);margin-bottom:18px;}
+.breadcrumb a{color:var(--cream-text-dim);transition:.3s;}
+.breadcrumb a:hover{color:var(--brass-light);}
+.page-header h1{font-size:clamp(34px,4.6vw,54px);color:var(--cream-text);margin-top:14px;}
+.page-header p{margin-top:16px;font-size:16px;color:var(--cream-text-dim);max-width:60ch;}
+
+/* ============ LAYOUT ============ */
+.plp-layout{display:grid;grid-template-columns:260px 1fr;gap:56px;padding:56px 0 120px;align-items:flex-start;}
+.filters{position:sticky;top:96px;}
+.filter-group{border-bottom:1px solid var(--line-light);padding-bottom:22px;margin-bottom:22px;}
+.filter-group h4{font-family:'Inter',sans-serif;font-size:11.5px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:var(--madder);margin-bottom:16px;}
+.filter-option{display:flex;align-items:center;gap:10px;font-size:14px;margin-bottom:11px;cursor:pointer;color:var(--ink-text);opacity:0.85;}
+.filter-option:hover{opacity:1;}
+.filter-option input{accent-color:var(--madder);width:15px;height:15px;}
+.filter-option .count{margin-left:auto;font-size:12px;opacity:0.55;}
+.color-swatches{display:flex;flex-wrap:wrap;gap:10px;}
+.swatch{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:.25s;position:relative;}
+.swatch.active{border-color:var(--ink-text);}
+.swatch::after{content:attr(data-label);position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:10px;white-space:nowrap;opacity:0;transition:.2s;pointer-events:none;}
+.swatch:hover::after{opacity:0.7;}
+.price-note{font-size:13px;opacity:0.7;line-height:1.6;}
+.clear-filters{font-size:12.5px;font-weight:600;color:var(--madder);text-decoration:underline;text-underline-offset:3px;}
+
+.plp-main-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px;}
+.result-count{font-size:14px;opacity:0.7;}
+.sort-select{border:1px solid var(--line-light);padding:10px 16px;font-size:13px;background:var(--parchment-2);border-radius:2px;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;padding:7px 12px;background:var(--ink);color:var(--cream-text);border-radius:20px;}
+.chip button{color:var(--brass-light);font-weight:700;}
+
+.mobile-filter-toggle{display:none;width:100%;padding:14px;border:1px solid var(--line-light);text-align:center;font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:24px;background:var(--parchment-2);}
+
+.product-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px 24px;}
+.product-card{background:var(--parchment-2);position:relative;transition:transform .4s var(--ease);}
+.product-card.hidden{display:none;}
+.product-media{aspect-ratio:1/1.05;position:relative;overflow:hidden;background:var(--ink);}
+.product-media .motif{position:absolute;inset:0;transition:transform .6s var(--ease);}
+.product-card:hover .motif{transform:scale(1.06);}
+.product-tag{position:absolute;top:14px;left:14px;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;color:var(--ink);background:var(--brass-light);padding:5px 10px;z-index:2;}
+.product-body{padding:20px 4px 4px;}
+.product-origin{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--madder);font-weight:700;}
+.product-name{font-size:16.5px;margin-top:8px;font-weight:500;}
+.product-meta{font-size:12.5px;opacity:0.6;margin-top:6px;}
+.product-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.product-actions .btn{flex:1;}
+
+.load-more-wrap{text-align:center;margin-top:56px;}
+.empty-state{padding:80px 20px;text-align:center;color:var(--ink-text);opacity:0.7;display:none;}
+.empty-state.show{display:block;}
+
+.cta-band{background:var(--madder);color:var(--parchment-2);text-align:center;padding:90px 0;}
+.cta-band h2{font-size:clamp(28px,4vw,42px);color:var(--parchment-2);}
+.cta-band p{margin-top:14px;font-size:16px;opacity:0.85;}
+.cta-band .btn{margin-top:32px;}
+
+footer{background:var(--ink);color:var(--cream-text-dim);padding:80px 0 32px;}
+.footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:56px;border-bottom:1px solid var(--line-dark);}
+.footer-brand p{margin-top:16px;font-size:13.5px;max-width:26ch;opacity:0.75;}
+.footer-col h5{font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass-light);font-weight:700;margin-bottom:20px;}
+.footer-col a{display:block;font-size:13.5px;margin-bottom:13px;opacity:0.8;transition:.3s;}
+.footer-col a:hover{opacity:1;color:var(--brass-light);}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding-top:26px;font-size:12.5px;opacity:0.55;}
+
+@media (max-width:980px){
+  .plp-layout{grid-template-columns:1fr;}
+  .filters{position:fixed;top:0;left:0;bottom:0;width:88%;max-width:340px;background:var(--parchment);z-index:1200;padding:100px 28px 40px;overflow-y:auto;transform:translateX(-100%);transition:transform .4s var(--ease);box-shadow:20px 0 50px rgba(0,0,0,0.25);}
+  .filters.open{transform:translateX(0);}
+  .filters-close{position:absolute;top:28px;right:28px;font-size:22px;}
+  .mobile-filter-toggle{display:block;}
+  .product-grid{grid-template-columns:repeat(2,1fr);}
+  .footer-top{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:768px){
+  .nav-links,.nav-right .lang-toggle,.nav-right .nav-cta{display:none;}
+  .hamburger{display:flex;}
+  .page-header{padding:130px 0 48px;}
+  .product-grid{grid-template-columns:1fr;}
+  .footer-top{grid-template-columns:1fr;}
+}
+.filters-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1100;opacity:0;visibility:hidden;transition:.3s;}
+.filters-overlay.open{opacity:1;visibility:visible;}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="index.html" class="nav-logo">
+      <svg viewBox="0 0 40 40" fill="none"><rect x="1" y="1" width="38" height="38" stroke="#D4B876" stroke-width="1"/><path d="M8 20h24M20 8v24" stroke="#D4B876" stroke-width="0.7"/><circle cx="20" cy="20" r="6" stroke="#D4B876" stroke-width="1"/><circle cx="20" cy="20" r="2" fill="#D4B876"/></svg>
+      <span class="nav-logo-text">Heritage<small>CARPET COMPANY · EST. 1975</small></span>
+    </a>
+    <div class="nav-links">
+      <a href="collections.html" class="current">Collections</a>
+      <a href="index.html#bespoke">Bespoke Studio</a>
+      <a href="index.html#commercial">Commercial</a>
+      <a href="index.html#heritage">Our Heritage</a>
+      <a href="index.html#showrooms">Showrooms</a>
+    </div>
+    <div class="nav-right">
+      <button class="lang-toggle" id="langToggle">EN / AR</button>
+      <a href="index.html#showrooms" class="btn btn-fill nav-cta">Book a Visit</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="collections.html">Collections</a>
+  <a href="index.html#bespoke">Bespoke Studio</a>
+  <a href="index.html#commercial">Commercial</a>
+  <a href="index.html#heritage">Our Heritage</a>
+  <a href="index.html#showrooms">Showrooms</a>
+</div>
+
+<!-- ============ PAGE HEADER ============ -->
+<header class="page-header">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Collections</div>
+    <h1>The Heritage Collection</h1>
+    <p>Handmade, machine-made, and commercial-grade carpets, curated across Persian, Turkish, Oriental, and Contemporary traditions. Browse here, then complete your purchase securely through our Shopify checkout.</p>
+  </div>
+</header>
+
+<div class="filters-overlay" id="filtersOverlay"></div>
+
+<div class="container">
+  <div class="plp-layout">
+    <!-- ============ FILTERS ============ -->
+    <aside class="filters" id="filters">
+      <button class="filters-close" id="filtersClose" aria-label="Close filters">✕</button>
+      <div class="filter-group">
+        <h4>Category</h4>
+        <div id="filterCategory"></div>
+      </div>
+      <div class="filter-group">
+        <h4>Material</h4>
+        <div id="filterMaterial"></div>
+      </div>
+      <div class="filter-group">
+        <h4>Color</h4>
+        <div class="color-swatches" id="filterColor"></div>
+      </div>
+      <div class="filter-group">
+        <h4>Size</h4>
+        <div id="filterSize"></div>
+      </div>
+      <div class="filter-group">
+        <h4>Room Type</h4>
+        <div id="filterRoom"></div>
+      </div>
+      <div class="filter-group" style="border-bottom:none;">
+        <h4>Price</h4>
+        <p class="price-note">Live pricing, availability, and secure checkout are handled on Shopify — open any piece to view current price.</p>
+      </div>
+      <button class="clear-filters" id="clearFilters">Clear all filters</button>
+    </aside>
+
+    <!-- ============ PRODUCT GRID ============ -->
+    <main>
+      <button class="mobile-filter-toggle" id="mobileFilterToggle">Filter Collections</button>
+      <div class="plp-main-head">
+        <div class="result-count" id="resultCount"></div>
+        <select class="sort-select" id="sortSelect">
+          <option value="featured">Sort: Featured</option>
+          <option value="newest">Sort: Newest</option>
+          <option value="name">Sort: Name A–Z</option>
+        </select>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="product-grid reveal" id="productGrid"></div>
+      <div class="empty-state" id="emptyState">
+        <p>No pieces match your current filters. Try clearing a few, or speak with a design consultant about a bespoke commission instead.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ============ CTA BAND ============ -->
+<section class="cta-band">
+  <div class="container">
+    <h2>Not Finding the Exact Piece?</h2>
+    <p>Our Bespoke Studio can weave a carpet to your precise dimensions, palette, and pattern.</p>
+    <a href="index.html#bespoke" class="btn btn-outline" style="border:1px solid rgba(243,238,227,0.4);color:var(--parchment-2);">Design Your Bespoke Rug</a>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="nav-logo">
+          <svg viewBox="0 0 40 40" fill="none" style="width:30px;height:30px;"><rect x="1" y="1" width="38" height="38" stroke="#D4B876" stroke-width="1"/><circle cx="20" cy="20" r="6" stroke="#D4B876" stroke-width="1"/><circle cx="20" cy="20" r="2" fill="#D4B876"/></svg>
+          <span class="nav-logo-text" style="color:var(--cream-text);">Heritage</span>
+        </a>
+        <p>Luxury woven through generations. Saudi Arabia's home for handmade and bespoke carpets since 1975.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Collections</h5>
+        <a href="collections.html?category=handmade">Handmade Carpets</a>
+        <a href="collections.html?category=machine-made">Machine-Made Rugs</a>
+        <a href="index.html#bespoke">Bespoke Studio</a>
+        <a href="collections.html?category=commercial">Commercial Flooring</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="index.html#heritage">Our Heritage</a>
+        <a href="index.html#showrooms">Showrooms</a>
+        <a href="#">Trade Professionals</a>
+        <a href="#">Journal</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="tel:+966532148055">+966 53 214 8055</a>
+        <a href="#">info@heritagecarpet.sa</a>
+        <a href="#">WhatsApp Concierge</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Heritage Carpet Company. All rights reserved.</span>
+      <span>Also available in العربية — <button class="lang-toggle" style="padding:6px 12px;">EN / AR</button></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ---- Shopify store domain ----
+  // TODO: replace with the real store domain, e.g. "https://heritage-carpet.myshopify.com"
+  const SHOPIFY_STORE = 'https://heritage-carpet.myshopify.com';
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- Nav / mobile menu ----
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', function(){
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', function(){
+    hamburger.classList.remove('open'); mobileMenu.classList.remove('open');
+  }));
+  document.querySelectorAll('#langToggle, .footer-bottom .lang-toggle').forEach(btn=>{
+    btn.addEventListener('click', function(){
+      alert('Arabic (RTL) experience is scoped for the full production build — this prototype demonstrates the English layout.');
+    });
+  });
+
+  // ---- Reveal ----
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+  }, {threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // ---- Motif generator (same visual language as homepage) ----
+  function motifSVG(type, color){
+    color = color || '#D4B876';
+    const p = '<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">';
+    const bg = '<rect width="200" height="200" fill="#1B1714"/>';
+    let inner = '';
+    if(type==='medallion'){
+      inner = '<circle cx="100" cy="100" r="80" stroke="'+color+'" stroke-width="0.6" fill="none"/><circle cx="100" cy="100" r="55" stroke="'+color+'" stroke-width="0.6" fill="none"/><path d="M100 40l28 60-28 60-28-60z" stroke="'+color+'" stroke-width="1.4" fill="none"/><circle cx="100" cy="100" r="10" fill="'+color+'" opacity="0.5"/>';
+    } else if(type==='lattice'){
+      inner = '';
+      for(let i=-2;i<10;i++){ inner += '<line x1="'+(i*24)+'" y1="0" x2="'+(i*24+200)+'" y2="200" stroke="'+color+'" stroke-width="0.5" opacity="0.6"/>'; inner += '<line x1="'+(i*24+200)+'" y1="0" x2="'+(i*24)+'" y2="200" stroke="'+color+'" stroke-width="0.5" opacity="0.6"/>'; }
+    } else if(type==='boteh'){
+      inner = '';
+      for(let x=10;x<200;x+=50){ for(let y=10;y<200;y+=50){ inner += '<path d="M'+x+' '+y+' q18 0 18 22 q0 16 -18 20 q-18 -4 -18 -20 q0 -22 18 -22z" stroke="'+color+'" stroke-width="0.9" fill="none" transform="rotate(15 '+x+' '+y+')"/>'; } }
+    } else if(type==='chevron'){
+      inner='';
+      for(let y=-20;y<220;y+=26){ inner += '<path d="M0 '+y+' L20 '+(y+13)+' L40 '+y+' L60 '+(y+13)+' L80 '+y+' L100 '+(y+13)+' L120 '+y+' L140 '+(y+13)+' L160 '+y+' L180 '+(y+13)+' L200 '+y+'" stroke="'+color+'" stroke-width="0.9" fill="none" opacity="0.7"/>'; }
+    } else if(type==='tile'){
+      inner='';
+      for(let x=0;x<=200;x+=25){ inner += '<line x1="'+x+'" y1="0" x2="'+x+'" y2="200" stroke="'+color+'" stroke-width="0.4" opacity="0.5"/>'; }
+      for(let y=0;y<=200;y+=25){ inner += '<line x1="0" y1="'+y+'" x2="200" y2="'+y+'" stroke="'+color+'" stroke-width="0.4" opacity="0.5"/>'; }
+    } else if(type==='arch'){
+      inner = '<path d="M40 200V110 A60 60 0 0 1 160 110 V200" stroke="'+color+'" stroke-width="1.2" fill="none"/><path d="M60 200V115 A40 40 0 0 1 140 115 V200" stroke="'+color+'" stroke-width="0.6" fill="none"/>';
+    } else {
+      inner = '<circle cx="100" cy="100" r="70" stroke="'+color+'" stroke-width="0.8" fill="none"/>';
+    }
+    return p+bg+inner+'</svg>';
+  }
+
+  // ---- Product data ----
+  // handle = Shopify product handle, i.e. the URL segment at /products/{handle}
+  const PRODUCTS = [
+    {name:'Isfahan Medallion Silk Rug', category:['handmade','persian'], material:'silk', color:'madder', size:'large', room:['living-room','majlis'], motif:'medallion', handle:'isfahan-medallion-silk-rug', isNew:false},
+    {name:'Tabriz Floral Wool Carpet', category:['handmade','persian'], material:'wool', color:'ivory', size:'oversized', room:['majlis','dining'], motif:'boteh', handle:'tabriz-floral-wool-carpet', isNew:false},
+    {name:'Kashan Boteh Runner', category:['handmade','persian'], material:'silk', color:'madder', size:'small', room:['hallway'], motif:'boteh', handle:'kashan-boteh-runner', isNew:true},
+    {name:'Hereke Silk Masterpiece', category:['handmade','turkish'], material:'silk', color:'gold', size:'medium', room:['living-room'], motif:'medallion', handle:'hereke-silk-masterpiece', isNew:false},
+    {name:'Konya Kilim Geometric Rug', category:['handmade','turkish'], material:'wool', color:'charcoal', size:'medium', room:['living-room','bedroom'], motif:'lattice', handle:'konya-kilim-geometric-rug', isNew:false},
+    {name:'Anatolian Tribal Wool Rug', category:['handmade','turkish','oriental'], material:'wool', color:'indigo', size:'small', room:['bedroom'], motif:'chevron', handle:'anatolian-tribal-wool-rug', isNew:true},
+    {name:'Silk Road Oriental Classic', category:['handmade','oriental'], material:'mixed', color:'madder', size:'large', room:['dining'], motif:'medallion', handle:'silk-road-oriental-classic', isNew:false},
+    {name:'Nain Fine Wool Carpet', category:['handmade','persian'], material:'wool', color:'ivory', size:'oversized', room:['majlis'], motif:'medallion', handle:'nain-fine-wool-carpet', isNew:false},
+    {name:'Abstract Ivory Contemporary Rug', category:['contemporary'], material:'wool', color:'ivory', size:'large', room:['living-room'], motif:'lattice', handle:'abstract-ivory-contemporary-rug', isNew:true},
+    {name:'Charcoal Linear Contemporary Rug', category:['contemporary'], material:'mixed', color:'charcoal', size:'medium', room:['living-room','bedroom'], motif:'chevron', handle:'charcoal-linear-contemporary-rug', isNew:false},
+    {name:'Gold Trellis Contemporary Rug', category:['contemporary'], material:'wool', color:'gold', size:'medium', room:['dining'], motif:'lattice', handle:'gold-trellis-contemporary-rug', isNew:false},
+    {name:'Everyday Trellis Machine-Made Rug', category:['machine-made'], material:'mixed', color:'charcoal', size:'large', room:['living-room'], motif:'tile', handle:'everyday-trellis-machine-made-rug', isNew:false},
+    {name:'Durable Medallion Machine-Made Rug', category:['machine-made'], material:'mixed', color:'madder', size:'medium', room:['dining','hallway'], motif:'medallion', handle:'durable-medallion-machine-made-rug', isNew:false},
+    {name:'Hospitality Broadloom Carpet Tile', category:['commercial','machine-made'], material:'mixed', color:'charcoal', size:'oversized', room:['commercial'], motif:'tile', handle:'hospitality-broadloom-carpet-tile', isNew:false},
+    {name:'Prayer Hall Custom Carpet', category:['commercial'], material:'wool', color:'indigo', size:'oversized', room:['commercial'], motif:'arch', handle:'prayer-hall-custom-carpet', isNew:true},
+    {name:'Executive Office Carpet Tile', category:['commercial','machine-made'], material:'mixed', color:'ivory', size:'large', room:['commercial'], motif:'tile', handle:'executive-office-carpet-tile', isNew:false}
+  ];
+
+  const CATEGORY_LABELS = {handmade:'Handmade', 'machine-made':'Machine-Made', persian:'Persian', turkish:'Turkish', oriental:'Oriental', contemporary:'Contemporary', commercial:'Commercial'};
+  const MATERIAL_LABELS = {silk:'Silk', wool:'Wool', mixed:'Mixed Fibers'};
+  const SIZE_LABELS = {small:'Small (up to 2×3m)', medium:'Medium (2×3–3×4m)', large:'Large (3×4–4×6m)', oversized:'Oversized (4×6m+)'};
+  const ROOM_LABELS = {'living-room':'Living Room','majlis':'Majlis','bedroom':'Bedroom','dining':'Dining Room','hallway':'Hallway','commercial':'Commercial Space'};
+  const COLOR_LABELS = {madder:'Madder Red', ivory:'Ivory', indigo:'Indigo Teal', charcoal:'Charcoal', gold:'Antique Gold'};
+  const COLOR_HEX = {madder:'#7A2E27', ivory:'#EDE6D6', indigo:'#2B4A47', charcoal:'#1B1714', gold:'#B08D46'};
+
+  const state = { category:new Set(), material:new Set(), color:new Set(), size:new Set(), room:new Set(), sort:'featured' };
+
+  // ---- Pre-check filter from ?category= query param ----
+  const params = new URLSearchParams(window.location.search);
+  const qCat = params.get('category');
+  if(qCat && CATEGORY_LABELS[qCat]) state.category.add(qCat);
+
+  function count(group, key){
+    return PRODUCTS.filter(p=>{
+      if(group==='category') return p.category.includes(key);
+      return p[group]===key;
+    }).length;
+  }
+
+  function renderCheckGroup(containerId, labels, groupKey){
+    const el = document.getElementById(containerId);
+    el.innerHTML = Object.keys(labels).map(key=>{
+      const checked = state[groupKey].has(key) ? 'checked' : '';
+      return '<label class="filter-option"><input type="checkbox" data-group="'+groupKey+'" value="'+key+'" '+checked+'> '+labels[key]+' <span class="count">'+count(groupKey,key)+'</span></label>';
+    }).join('');
+  }
+
+  function renderColorSwatches(){
+    const el = document.getElementById('filterColor');
+    el.innerHTML = Object.keys(COLOR_LABELS).map(key=>{
+      const active = state.color.has(key) ? ' active' : '';
+      return '<span class="swatch'+active+'" style="background:'+COLOR_HEX[key]+'" data-color="'+key+'" data-label="'+COLOR_LABELS[key]+'" title="'+COLOR_LABELS[key]+'"></span>';
+    }).join('');
+  }
+
+  function renderFilters(){
+    renderCheckGroup('filterCategory', CATEGORY_LABELS, 'category');
+    renderCheckGroup('filterMaterial', MATERIAL_LABELS, 'material');
+    renderColorSwatches();
+    renderCheckGroup('filterSize', SIZE_LABELS, 'size');
+    renderCheckGroup('filterRoom', ROOM_LABELS, 'room');
+  }
+
+  function matches(p){
+    const catOk = state.category.size===0 || p.category.some(c=>state.category.has(c));
+    const matOk = state.material.size===0 || state.material.has(p.material);
+    const colOk = state.color.size===0 || state.color.has(p.color);
+    const sizeOk = state.size.size===0 || state.size.has(p.size);
+    const roomOk = state.room.size===0 || p.room.some(r=>state.room.has(r));
+    return catOk && matOk && colOk && sizeOk && roomOk;
+  }
+
+  function sortProducts(list){
+    const arr = list.slice();
+    if(state.sort==='name') arr.sort((a,b)=>a.name.localeCompare(b.name));
+    else if(state.sort==='newest') arr.sort((a,b)=>(b.isNew?1:0)-(a.isNew?1:0));
+    return arr;
+  }
+
+  function renderChips(){
+    const chips = [];
+    ['category','material','color','size','room'].forEach(group=>{
+      state[group].forEach(val=>{
+        const labelMap = group==='category'?CATEGORY_LABELS: group==='material'?MATERIAL_LABELS: group==='color'?COLOR_LABELS: group==='size'?SIZE_LABELS:ROOM_LABELS;
+        chips.push('<span class="chip" data-group="'+group+'" data-val="'+val+'">'+labelMap[val]+' <button aria-label="Remove filter">✕</button></span>');
+      });
+    });
+    document.getElementById('chips').innerHTML = chips.join('');
+  }
+
+  function renderProducts(){
+    const filtered = sortProducts(PRODUCTS.filter(matches));
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = filtered.map(p=>{
+      const productUrl = SHOPIFY_STORE + '/products/' + p.handle;
+      const inquireSubject = encodeURIComponent('Inquiry: ' + p.name);
+      return '<div class="product-card">'+
+        '<div class="product-media">'+ (p.isNew ? '<span class="product-tag">New</span>' : '') +
+        '<div class="motif">'+motifSVG(p.motif, COLOR_HEX[p.color]==='#EDE6D6' ? '#B08D46' : '#D4B876')+'</div></div>'+
+        '<div class="product-body">'+
+          '<div class="product-origin">'+CATEGORY_LABELS[p.category[p.category.length-1]]+'</div>'+
+          '<div class="product-name">'+p.name+'</div>'+
+          '<div class="product-meta">'+MATERIAL_LABELS[p.material]+' · '+COLOR_LABELS[p.color]+' · '+SIZE_LABELS[p.size].split(' (')[0]+'</div>'+
+          '<div class="product-actions">'+
+            '<a class="btn btn-fill btn-sm" href="'+productUrl+'" target="_blank" rel="noopener">View on Shopify</a>'+
+            '<a class="btn btn-outline dark btn-sm" href="mailto:info@heritagecarpet.sa?subject='+inquireSubject+'">Inquire</a>'+
+          '</div>'+
+        '</div></div>';
+    }).join('');
+    document.getElementById('resultCount').textContent = 'Showing ' + filtered.length + ' of ' + PRODUCTS.length + ' pieces';
+    document.getElementById('emptyState').classList.toggle('show', filtered.length===0);
+    renderChips();
+  }
+
+  function refreshAll(){ renderFilters(); renderProducts(); }
+
+  document.querySelectorAll('.filters input[type=checkbox]').length; // noop placeholder to keep structure clear
+
+  document.getElementById('filters').addEventListener('change', function(e){
+    if(e.target.matches('input[type=checkbox]')){
+      const group = e.target.dataset.group, val = e.target.value;
+      if(e.target.checked) state[group].add(val); else state[group].delete(val);
+      refreshAll();
+    }
+  });
+  document.getElementById('filterColor').addEventListener('click', function(e){
+    const sw = e.target.closest('.swatch');
+    if(!sw) return;
+    const val = sw.dataset.color;
+    if(state.color.has(val)) state.color.delete(val); else state.color.add(val);
+    refreshAll();
+  });
+  document.getElementById('chips').addEventListener('click', function(e){
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    const chip = btn.closest('.chip');
+    state[chip.dataset.group].delete(chip.dataset.val);
+    refreshAll();
+  });
+  document.getElementById('clearFilters').addEventListener('click', function(){
+    ['category','material','color','size','room'].forEach(g=>state[g].clear());
+    refreshAll();
+  });
+  document.getElementById('sortSelect').addEventListener('change', function(e){
+    state.sort = e.target.value;
+    renderProducts();
+  });
+
+  // ---- Mobile filter drawer ----
+  const filtersEl = document.getElementById('filters');
+  const overlay = document.getElementById('filtersOverlay');
+  function openFilters(){ filtersEl.classList.add('open'); overlay.classList.add('open'); }
+  function closeFilters(){ filtersEl.classList.remove('open'); overlay.classList.remove('open'); }
+  document.getElementById('mobileFilterToggle').addEventListener('click', openFilters);
+  document.getElementById('filtersClose').addEventListener('click', closeFilters);
+  overlay.addEventListener('click', closeFilters);
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  refreshAll();
+})();
+</script>
+</body>
+</html>

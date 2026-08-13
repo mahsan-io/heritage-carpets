@@ -216,7 +216,7 @@ window.Heritage = (function(){
     if(collectionsGrid && content.collections){
       collectionsGrid.innerHTML = content.collections.map(c=>{
         const external = c.href.indexOf('http') === 0;
-        const photo = c.slug ? '<img class="motif-photo" src="Assets/collections/'+c.slug+'persian.png" alt="" loading="lazy">' : '';
+        const photo = c.slug ? '<img class="motif-photo" src="Assets/collections/'+c.slug+'.png" alt="" loading="lazy">' : '';
         return '<div class="collection-card"><div class="motif">'+motifSVG(c.motif)+photo+'</div><div class="scrim"></div>'+
           '<div class="body"><div class="num">'+c.n+'</div><h3>'+c.t+'</h3><p>'+c.d+'</p></div>'+
           '<a class="card-link" href="'+c.href+'" aria-label="'+c.t+'"'+(external?' target="_blank" rel="noopener"':'')+'></a></div>';

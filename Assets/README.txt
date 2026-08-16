@@ -74,3 +74,36 @@ Notes:
     kind of change).
   - You don't need all 25 photos at once -- upload however many you have
     ready. Anything missing just keeps showing its SVG placeholder.
+
+MULTIPLE IMAGES PER ITEM (new)
+--------------------------------
+Any collection, project, or product can now carry a whole set of photos
+that rotate automatically as a small carousel inside its existing card --
+first image shown immediately, auto-rotates every ~5s, pauses on hover,
+shows dot indicators when there's more than one, and never changes the
+card's size. Just add an `images` array to that item's entry in the page's
+data block (inside the <script> at the bottom of index.html / collections.html):
+
+  {
+    n: '02', t: 'Persian Collection', ..., slug: 'persian',
+    images: [
+      'Assets/collections/persian-01.png',
+      'Assets/collections/persian-02.png',
+      'Assets/collections/persian-03.png'
+    ],
+    href: 'collections.html?category=persian'
+  }
+
+Same idea for a project or a product -- just add `images: [...]` with
+whatever filenames you like (mixing .png/.jpg/.jpeg/.webp is fine, the
+array uses exactly what you write).
+
+If an item has no `images` array, it automatically falls back to the
+single-photo convention already documented above (collections/{slug}.png,
+projects/{slug}.jpg, products/{handle}.jpg) -- so nothing existing breaks,
+and you can upgrade items to multi-image one at a time, whenever you're
+ready, in any order.
+
+If one image in a set fails to load, it's quietly dropped from the
+rotation and the rest keep working. If every image in a set fails, the
+card falls back to its SVG placeholder, same as before.

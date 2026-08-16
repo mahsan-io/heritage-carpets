@@ -130,7 +130,7 @@ window.Heritage = (function(){
      One system, three callers. Each card can supply an `images` array; if it doesn't
      (or the array is empty), this falls back to the original single-file convention
      so existing content never breaks:
-       collections -> Assets/collections/{slug}.png
+       collections -> Assets/collections/{slug}.jpg
        projects    -> Assets/projects/{slug}.jpg
        products    -> Assets/products/{handle}.jpg
      Markup is built as a plain HTML string (matching how every other card here is
@@ -142,7 +142,7 @@ window.Heritage = (function(){
       return item.images.filter(src => typeof src === 'string' && src.trim().length > 0);
     }
     // backward-compatible single-image fallback, matching the original naming convention
-    if(kind==='collections' && item.slug) return ['Assets/collections/'+item.slug+'.png'];
+    if(kind==='collections' && item.slug) return ['Assets/collections/'+item.slug+'.jpg'];
     if(kind==='projects' && item.slug) return ['Assets/projects/'+item.slug+'.jpg'];
     if(kind==='products' && item.handle) return ['Assets/products/'+item.handle+'.jpg'];
     return [];

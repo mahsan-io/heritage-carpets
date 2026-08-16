@@ -171,97 +171,137 @@ window.Heritage = (function(){
     });
   }
 
-  function initCarousels(root){
-    root.querySelectorAll('.motif-carousel').forEach(carousel=>{
-      const slides = Array.from(carousel.querySelectorAll('.carousel-slide'));
-      const dotsEl = carousel.querySelector('.carousel-dots');
-      const dots = dotsEl ? Array.from(dotsEl.querySelectorAll('.carousel-dot')) : [];
-      if(!slides.length){ carousel.remove(); return; }
+ function initCarousels(root){
+  root.querySelectorAll('.motif-carousel').forEach(carousel=>{
+    const slides = Array.from(carousel.querySelectorAll('.carousel-slide'));
+    const dotsEl = carousel.querySelector('.carousel-dots');
+    const dots = dotsEl ? Array.from(dotsEl.querySelectorAll('.carousel-dot')) : [];
 
-      let valid = slides.map((_,i)=>i);
-      let current = 0;
+    if(!slides.length){
+      carousel.remove();
+      return;
+    }
 
-      function showSlide(i){
-        if(!valid.length) return;
-        current = i;
-        slides.forEach((s,idx)=>s.classList.toggle('active', idx===i));
-        dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
-      }
-      function next(){
-        if(valid.length < 2) return;
-        const pos = valid.indexOf(current);
-        showSlide(valid[(pos+1) % valid.length]);
-      }
-       function previous(){
-         if(valid.length < 2) return;
-         const pos = valid.indexOf(current);
-         showSlide(valid[(pos - 1 + valid.length) % valid.length]);
-      }
-      function stopAuto(){
-        if(carousel._carouselTimer){ clearInterval(carousel._carouselTimer); carousel._carouselTimer = null; }
-      }
-      function startAuto(){
-        if(reducedMotion || valid.length < 2) return;
-        stopAuto();
-        carousel._carouselTimer = setInterval(next, 4800);
-      }
+    let valid = slides.map((_,i)=>i);
+    let current = 0;
 
-      // A failed image drops out of rotation rather than showing a broken-image icon.
-      // If every image in the set fails, remove the whole carousel so the SVG motif
-      // underneath (already in the DOM) shows through.
-      slides.forEach((slideEl, i)=>{
-        const img = slideEl.querySelector('img');
-        if(!img) return;
-        img.addEventListener('error', function(){
-          const dot = dots[i];
-          slideEl.remove();
-          if(dot) dot.remove();
-          valid = valid.filter(v=>v!==i);
-          if(!valid.length){ stopAuto(); carousel.remove(); return; }
-          if(current===i) showSlide(valid[0]);
-        }, {once:true});
+    function showSlide(i){
+      if(!valid.length) return;
+
+      current = i;
+
+      slides.forEach((s,idx)=>{
+        s.classList.toggle('active', idx===i);
       });
 
-      if(slides.length > 1){
-        carousel.addEventListener('mouseenter', stopAuto);
-        carousel.addEventListener('mouseleave', startAuto);
-      }
-      if(dotsEl){
-        // stopPropagation so clicking a dot on a linked card (e.g. collection cards)
-        // switches slides instead of triggering the card's overlaying link.
-        dotsEl.addEventListener('click', function(e){
-          e.stopPropagation();
-          const dot = e.target.closest('.carousel-dot');
-          if(!dot) return;
-          showSlide(parseInt(dot.dataset.index,10));
-          startAuto();
-        });
-      }
-
-//      startAuto();
-//    });
- // }
-   const prevBtn = carousel.querySelector('[data-carousel-prev]');
-   const nextBtn = carousel.querySelector('[data-carousel-next]');
-
-   if(prevBtn){
-        prevBtn.addEventListener('click', function(e){
-          e.preventDefault();
-          e.stopPropagation();
-          previous();
-          startAuto();
-     });
-   }
-
-   if(nextBtn){
-        nextBtn.addEventListener('click', function(e){
-          e.preventDefault();
-          e.stopPropagation();
-          next();
-          startAuto();
+      dots.forEach((d,idx)=>{
+        d.classList.toggle('active', idx===i);
       });
-   }
+    }
 
+    function next(){
+      if(valid.length < 2) return;
+
+      const pos = valid.indexOf(current);
+      showSlide(valid[(pos+1) % valid.length]);
+    }
+
+    function previous(){
+      if(valid.length < 2) return;
+
+      const pos = valid.indexOf(current);
+      showSlide(valid[(pos - 1 + valid.length) % valid.length]);
+    }
+
+    function stopAuto(){
+      if(carousel._carouselTimer){
+        clearInterval(carousel._carouselTimer);
+        carousel._carouselTimer = null;
+      }
+    }
+
+    function startAuto(){
+      if(reducedMotion || valid.length < 2) return;
+
+      stopAuto();
+      carousel._carouselTimer = setInterval(next, 4800);
+    }
+
+    // Failed image handling
+    slides.forEach((slideEl, i)=>{
+      const img = slideEl.querySelector('img');
+
+      if(!img) return;
+
+      img.addEventListener('error', function(){
+        const dot = dots[i];
+
+        slideEl.remove();
+
+        if(dot) dot.remove();
+
+        valid = valid.filter(v=>v!==i);
+
+        if(!valid.length){
+          stopAuto();
+          carousel.remove();
+          return;
+        }
+
+        if(current===i){
+          showSlide(valid[0]);
+        }
+      }, {once:true});
+    });
+
+    // Pause automatic rotation while hovering
+    if(slides.length > 1){
+      carousel.addEventListener('mouseenter', stopAuto);
+      carousel.addEventListener('mouseleave', startAuto);
+    }
+
+    // Existing dots
+    if(dotsEl){
+      dotsEl.addEventListener('click', function(e){
+        e.stopPropagation();
+
+        const dot = e.target.closest('.carousel-dot');
+
+        if(!dot) return;
+
+        showSlide(parseInt(dot.dataset.index,10));
+        startAuto();
+      });
+    }
+
+    // NEW: Previous / Next buttons
+    const prevBtn = carousel.querySelector('[data-carousel-prev]');
+    const nextBtn = carousel.querySelector('[data-carousel-next]');
+
+    if(prevBtn){
+      prevBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        previous();
+        startAuto();
+      });
+    }
+
+    if(nextBtn){
+      nextBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        next();
+        startAuto();
+      });
+    }
+
+    // Keep the existing automatic rotation
+    startAuto();
+  });
+}
   /* ---------------- Language switching ---------------- */
   function setLanguage(lang, opts){
     opts = opts || {};

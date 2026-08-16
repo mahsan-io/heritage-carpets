@@ -156,6 +156,10 @@ window.Heritage = (function(){
     const dots = images.length > 1
       ? '<div class="carousel-dots">'+images.map((_,i)=>'<span class="carousel-dot'+(i===0?' active':'')+'" data-index="'+i+'"></span>').join('')+'</div>'
       : '';
+     const arrows = images.length > 1
+  ? '<button type="button" class="carousel-arrow carousel-prev" aria-label="Previous image" data-carousel-prev>‹</button>' +
+    '<button type="button" class="carousel-arrow carousel-next" aria-label="Next image" data-carousel-next>›</button>'
+  : '';
     return '<div class="motif-carousel">'+slides+dots+'</div>';
   }
 
@@ -187,6 +191,11 @@ window.Heritage = (function(){
         if(valid.length < 2) return;
         const pos = valid.indexOf(current);
         showSlide(valid[(pos+1) % valid.length]);
+      }
+       function previous(){
+         if(valid.length < 2) return;
+         const pos = valid.indexOf(current);
+         showSlide(valid[(pos - 1 + valid.length) % valid.length]);
       }
       function stopAuto(){
         if(carousel._carouselTimer){ clearInterval(carousel._carouselTimer); carousel._carouselTimer = null; }
@@ -232,6 +241,26 @@ window.Heritage = (function(){
       startAuto();
     });
   }
+   const prevBtn = carousel.querySelector('[data-carousel-prev]');
+   const nextBtn = carousel.querySelector('[data-carousel-next]');
+
+   if(prevBtn){
+        prevBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          previous();
+          startAuto();
+     });
+   }
+
+   if(nextBtn){
+        nextBtn.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          next();
+          startAuto();
+      });
+   }
 
   /* ---------------- Language switching ---------------- */
   function setLanguage(lang, opts){

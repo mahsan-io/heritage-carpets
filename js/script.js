@@ -160,7 +160,7 @@ window.Heritage = (function(){
   ? '<button type="button" class="carousel-arrow carousel-prev" aria-label="Previous image" data-carousel-prev>‹</button>' +
     '<button type="button" class="carousel-arrow carousel-next" aria-label="Next image" data-carousel-next>›</button>'
   : '';
-    return '<div class="motif-carousel">'+slides+dots+'</div>';
+   return '<div class="motif-carousel">'+slides+dots+arrows+'</div>';
   }
 
   // Stop any running rotation timers before a grid's innerHTML gets replaced (filtering/
@@ -238,9 +238,9 @@ window.Heritage = (function(){
         });
       }
 
-      startAuto();
-    });
-  }
+//      startAuto();
+//    });
+ // }
    const prevBtn = carousel.querySelector('[data-carousel-prev]');
    const nextBtn = carousel.querySelector('[data-carousel-next]');
 

@@ -1,6 +1,7 @@
 /* ======================================================================
    HERITAGE CARPET COMPANY — SHARED STYLESHEET
-   Used by index.html, collections.html, index-ar.html, collections-ar.html
+   Used by index.html, collections.html, bespoke.html — each page holds
+   both English and Arabic content blocks, toggled client-side.
    Logical properties (inset-inline-*, margin-inline-*, padding-inline-*)
    are used throughout so RTL mirroring happens automatically from the
    dir="rtl" attribute on <html> — see the RTL OVERRIDES block at the
@@ -156,6 +157,18 @@ h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.1
 .collection-card .motif{position:absolute;inset:0;transition:transform .6s var(--ease);}
 .collection-card .motif>svg{opacity:0.5;transition:opacity .5s;}
 .motif-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+
+/* Image carousel — collections / projects / products cards */
+.motif-carousel{position:absolute;inset:0;}
+.carousel-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;}
+.carousel-slide.active{opacity:1;}
+.carousel-slide img{width:100%;height:100%;object-fit:cover;display:block;}
+.carousel-dots{position:absolute;top:12px;inset-inline-end:12px;display:flex;gap:6px;z-index:4;}
+.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(243,238,227,0.55);border:1px solid rgba(0,0,0,0.18);cursor:pointer;transition:.25s var(--ease);padding:0;}
+.carousel-dot.active{background:var(--brass-light);width:16px;border-radius:3px;}
+@media (prefers-reduced-motion: reduce){
+  .carousel-slide{transition:none;}
+}
 .collection-card:hover .motif{transform:scale(1.08);}
 .collection-card:hover .motif>svg{opacity:0.7;}
 .collection-card .scrim{position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(27,23,20,0.85) 100%);}

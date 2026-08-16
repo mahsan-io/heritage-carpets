@@ -126,6 +126,113 @@ window.Heritage = (function(){
     return ''; // plain
   }
 
+  /* ---------------- Reusable image carousel (collections / projects / products) ----------------
+     One system, three callers. Each card can supply an `images` array; if it doesn't
+     (or the array is empty), this falls back to the original single-file convention
+     so existing content never breaks:
+       collections -> Assets/collections/{slug}.png
+       projects    -> Assets/projects/{slug}.jpg
+       products    -> Assets/products/{handle}.jpg
+     Markup is built as a plain HTML string (matching how every other card here is
+     rendered), then initCarousels() wires up rotation/hover/dots/error-handling
+     afterwards, once the HTML is actually in the DOM. -------------------------------- */
+
+  function resolveImages(item, kind){
+    if(Array.isArray(item.images) && item.images.length){
+      return item.images.filter(src => typeof src === 'string' && src.trim().length > 0);
+    }
+    // backward-compatible single-image fallback, matching the original naming convention
+    if(kind==='collections' && item.slug) return ['Assets/collections/'+item.slug+'.png'];
+    if(kind==='projects' && item.slug) return ['Assets/projects/'+item.slug+'.jpg'];
+    if(kind==='products' && item.handle) return ['Assets/products/'+item.handle+'.jpg'];
+    return [];
+  }
+
+  function buildCarouselMarkup(images){
+    if(!images.length) return '';
+    const slides = images.map((src,i)=>
+      '<div class="carousel-slide'+(i===0?' active':'')+'" data-index="'+i+'"><img src="'+src+'" alt="" loading="lazy"></div>'
+    ).join('');
+    const dots = images.length > 1
+      ? '<div class="carousel-dots">'+images.map((_,i)=>'<span class="carousel-dot'+(i===0?' active':'')+'" data-index="'+i+'"></span>').join('')+'</div>'
+      : '';
+    return '<div class="motif-carousel">'+slides+dots+'</div>';
+  }
+
+  // Stop any running rotation timers before a grid's innerHTML gets replaced (filtering/
+  // sorting on the collections page), so old detached carousels don't keep ticking in the background.
+  function clearCarousels(scopeEl){
+    scopeEl.querySelectorAll('.motif-carousel').forEach(c=>{
+      if(c._carouselTimer) clearInterval(c._carouselTimer);
+    });
+  }
+
+  function initCarousels(root){
+    root.querySelectorAll('.motif-carousel').forEach(carousel=>{
+      const slides = Array.from(carousel.querySelectorAll('.carousel-slide'));
+      const dotsEl = carousel.querySelector('.carousel-dots');
+      const dots = dotsEl ? Array.from(dotsEl.querySelectorAll('.carousel-dot')) : [];
+      if(!slides.length){ carousel.remove(); return; }
+
+      let valid = slides.map((_,i)=>i);
+      let current = 0;
+
+      function showSlide(i){
+        if(!valid.length) return;
+        current = i;
+        slides.forEach((s,idx)=>s.classList.toggle('active', idx===i));
+        dots.forEach((d,idx)=>d.classList.toggle('active', idx===i));
+      }
+      function next(){
+        if(valid.length < 2) return;
+        const pos = valid.indexOf(current);
+        showSlide(valid[(pos+1) % valid.length]);
+      }
+      function stopAuto(){
+        if(carousel._carouselTimer){ clearInterval(carousel._carouselTimer); carousel._carouselTimer = null; }
+      }
+      function startAuto(){
+        if(reducedMotion || valid.length < 2) return;
+        stopAuto();
+        carousel._carouselTimer = setInterval(next, 4800);
+      }
+
+      // A failed image drops out of rotation rather than showing a broken-image icon.
+      // If every image in the set fails, remove the whole carousel so the SVG motif
+      // underneath (already in the DOM) shows through.
+      slides.forEach((slideEl, i)=>{
+        const img = slideEl.querySelector('img');
+        if(!img) return;
+        img.addEventListener('error', function(){
+          const dot = dots[i];
+          slideEl.remove();
+          if(dot) dot.remove();
+          valid = valid.filter(v=>v!==i);
+          if(!valid.length){ stopAuto(); carousel.remove(); return; }
+          if(current===i) showSlide(valid[0]);
+        }, {once:true});
+      });
+
+      if(slides.length > 1){
+        carousel.addEventListener('mouseenter', stopAuto);
+        carousel.addEventListener('mouseleave', startAuto);
+      }
+      if(dotsEl){
+        // stopPropagation so clicking a dot on a linked card (e.g. collection cards)
+        // switches slides instead of triggering the card's overlaying link.
+        dotsEl.addEventListener('click', function(e){
+          e.stopPropagation();
+          const dot = e.target.closest('.carousel-dot');
+          if(!dot) return;
+          showSlide(parseInt(dot.dataset.index,10));
+          startAuto();
+        });
+      }
+
+      startAuto();
+    });
+  }
+
   /* ---------------- Language switching ---------------- */
   function setLanguage(lang, opts){
     opts = opts || {};
@@ -216,7 +323,7 @@ window.Heritage = (function(){
     if(collectionsGrid && content.collections){
       collectionsGrid.innerHTML = content.collections.map(c=>{
         const external = c.href.indexOf('http') === 0;
-        const photo = c.slug ? '<img class="motif-photo" src="Assets/collections/'+c.slug+'.png" alt="" loading="lazy">' : '';
+        const photo = buildCarouselMarkup(resolveImages(c, 'collections'));
         return '<div class="collection-card"><div class="motif">'+motifSVG(c.motif)+photo+'</div><div class="scrim"></div>'+
           '<div class="body"><div class="num">'+c.n+'</div><h3>'+c.t+'</h3><p>'+c.d+'</p></div>'+
           '<a class="card-link" href="'+c.href+'" aria-label="'+c.t+'"'+(external?' target="_blank" rel="noopener"':'')+'></a></div>';
@@ -246,7 +353,7 @@ window.Heritage = (function(){
     const projectsGrid = root.querySelector('[data-role="projects-grid"]');
     if(projectsGrid && content.projects){
       projectsGrid.innerHTML = content.projects.map(p=>{
-        const photo = p.slug ? '<img class="motif-photo" src="Assets/projects/'+p.slug+'.jpg" alt="" loading="lazy">' : '';
+        const photo = buildCarouselMarkup(resolveImages(p, 'projects'));
         return '<div class="project-item" data-cat="'+p.cat+'"><div class="motif" style="--ar:'+p.aspect+'">'+motifSVG(p.motif,'#D4B876')+photo+'</div>'+
         '<div class="p-body"><div class="p-tag">'+content.catLabel[p.cat]+'</div><div class="p-title">'+p.t+'</div></div></div>';
       }).join('');
@@ -296,6 +403,8 @@ window.Heritage = (function(){
         }
       }
     }
+
+    initCarousels(root);
   }
 
   /* ---------------- Collections / PLP page render (called once per language block) ---------------- */
@@ -374,11 +483,12 @@ window.Heritage = (function(){
       const filtered = sortProducts(PRODUCTS.filter(matches));
       const grid = root.querySelector('[data-role="product-grid"]');
       if(grid){
+        clearCarousels(grid); // stop timers from the previous filter/sort pass before discarding those cards
         grid.innerHTML = filtered.map(p=>{
           const productUrl = SHOPIFY_STORE + '/products/' + p.handle;
           const inquireSubject = encodeURIComponent(i18n.inquireSubjectPrefix + p.name);
           const swatchColor = p.color==='ivory' ? '#B08D46' : '#D4B876';
-          const photo = '<img class="motif-photo" src="Assets/products/'+p.handle+'.jpg" alt="" loading="lazy">';
+          const photo = buildCarouselMarkup(resolveImages(p, 'products'));
           return '<div class="product-card">'+
             '<div class="product-media">'+ (p.isNew ? '<span class="product-tag">'+i18n.newTag+'</span>' : '') +
             '<div class="motif">'+motifSVG(p.motif, swatchColor)+photo+'</div></div>'+
@@ -392,6 +502,7 @@ window.Heritage = (function(){
               '</div>'+
             '</div></div>';
         }).join('');
+        initCarousels(grid);
       }
       const resultCountEl = root.querySelector('[data-role="result-count"]');
       if(resultCountEl) resultCountEl.textContent = i18n.resultCount.replace('{count}', filtered.length).replace('{total}', PRODUCTS.length);
@@ -856,5 +967,5 @@ window.Heritage = (function(){
 
   document.addEventListener('DOMContentLoaded', initCommon);
 
-  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, setLanguage };
+  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
 })();

@@ -492,6 +492,30 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
   .step-dot{width:26px;height:26px;font-size:11px;}
 }
 
+@media (max-width:768px){
+  .plp-layout,
+  .plp-layout > main,
+  .product-grid,
+  .studio-layout,
+  .studio-main,
+  .studio-preview{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+
+  .plp-layout{
+    grid-template-columns:1fr;
+  }
+
+  .product-grid{
+    grid-template-columns:1fr;
+  }
+
+  .studio-layout{
+    grid-template-columns:1fr;
+  }
+}
 /* ======================================================================
    RTL OVERRIDES — things logical properties can't flip automatically:
    fixed-angle gradients, SVG transforms, and directional slide transforms.
@@ -504,52 +528,6 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
   [dir="rtl"] .filters.open{transform:translateX(0);}
 }
 
-/* ============================================================
-   MOBILE WIDTH — MATCH INDEX PAGE BEHAVIOUR
-   ============================================================ */
-
-@media (max-width:768px){
-
-  /* Collections page */
-  .plp-layout{
-    width:100%;
-    max-width:100%;
-    min-width:0;
-    grid-template-columns:1fr;
-  }
-
-  .plp-layout > main{
-    width:100%;
-    max-width:100%;
-    min-width:0;
-  }
-
-  .product-grid{
-    width:100%;
-    max-width:100%;
-    min-width:0;
-    grid-template-columns:1fr;
-  }
-
-  /* Bespoke page */
-  .studio-layout{
-    width:100%;
-    max-width:100%;
-    min-width:0;
-    grid-template-columns:1fr;
-  }
-
-  .studio-main{
-    width:100%;
-    max-width:100%;
-    min-width:0;
-  }
-
-  .studio-preview{
-    width:100%;
-    max-width:100%;
-  }
-}
 
 /* ======================================================================
    ARABIC TYPOGRAPHY — swaps the type system and removes Latin-style

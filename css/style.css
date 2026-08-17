@@ -516,3 +516,50 @@ html[lang="ar"] .timeline-year,
 html[lang="ar"] .testi-quote,
 html[lang="ar"] .journey-step .jnum{font-style:normal;}
 html[lang="ar"] *{letter-spacing:normal !important;}
+
+/* ============================================================
+   MOBILE WIDTH — MATCH INDEX PAGE BEHAVIOUR
+   ============================================================ */
+
+@media (max-width:768px){
+
+  /* Collections page */
+  .plp-layout{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    grid-template-columns:1fr;
+  }
+
+  .plp-layout > main{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+
+  .product-grid{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    grid-template-columns:1fr;
+  }
+
+  /* Bespoke page */
+  .studio-layout{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    grid-template-columns:1fr;
+  }
+
+  .studio-main{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+
+  .studio-preview{
+    width:100%;
+    max-width:100%;
+  }
+}

@@ -398,6 +398,11 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
   .projects-grid{columns:1;}
   .product-grid{grid-template-columns:1fr;}
   .hero-motif{opacity:0.1;}
+  .plp-layout,.plp-layout > main,.product-grid,.studio-layout,.studio-main,.studio-preview{
+   width:100%;max-width:100%;min-width:0;}
+  .plp-layout{grid-template-columns:1fr;}
+  .product-grid{grid-template-columns:1fr;}
+  .studio-layout{grid-template-columns:1fr;}
 }
 
 /* ============ BESPOKE STUDIO CONFIGURATOR ============ */
@@ -490,31 +495,6 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
   .option-grid{grid-template-columns:1fr;}
   .contact-grid{grid-template-columns:1fr;}
   .step-dot{width:26px;height:26px;font-size:11px;}
-}
-
-@media (max-width:768px){
-  .plp-layout,
-  .plp-layout > main,
-  .product-grid,
-  .studio-layout,
-  .studio-main,
-  .studio-preview{
-    width:100%;
-    max-width:100%;
-    min-width:0;
-  }
-
-  .plp-layout{
-    grid-template-columns:1fr;
-  }
-
-  .product-grid{
-    grid-template-columns:1fr;
-  }
-
-  .studio-layout{
-    grid-template-columns:1fr;
-  }
 }
 /* ======================================================================
    RTL OVERRIDES — things logical properties can't flip automatically:

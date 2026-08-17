@@ -504,19 +504,6 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
   [dir="rtl"] .filters.open{transform:translateX(0);}
 }
 
-/* ======================================================================
-   ARABIC TYPOGRAPHY — swaps the type system and removes Latin-style
-   letter-spacing, which breaks Arabic glyph joining.
-   ====================================================================== */
-html[lang="ar"] body{font-family:'Tajawal','Segoe UI',sans-serif;}
-html[lang="ar"] h1,html[lang="ar"] h2,html[lang="ar"] h3,html[lang="ar"] h4{font-family:'Amiri','Traditional Arabic',serif;font-weight:700;}
-html[lang="ar"] .eyebrow{font-family:'Tajawal',sans-serif;}
-html[lang="ar"] .hero-content h1 em,
-html[lang="ar"] .timeline-year,
-html[lang="ar"] .testi-quote,
-html[lang="ar"] .journey-step .jnum{font-style:normal;}
-html[lang="ar"] *{letter-spacing:normal !important;}
-
 /* ============================================================
    MOBILE WIDTH — MATCH INDEX PAGE BEHAVIOUR
    ============================================================ */
@@ -563,3 +550,16 @@ html[lang="ar"] *{letter-spacing:normal !important;}
     max-width:100%;
   }
 }
+
+/* ======================================================================
+   ARABIC TYPOGRAPHY — swaps the type system and removes Latin-style
+   letter-spacing, which breaks Arabic glyph joining.
+   ====================================================================== */
+html[lang="ar"] body{font-family:'Tajawal','Segoe UI',sans-serif;}
+html[lang="ar"] h1,html[lang="ar"] h2,html[lang="ar"] h3,html[lang="ar"] h4{font-family:'Amiri','Traditional Arabic',serif;font-weight:700;}
+html[lang="ar"] .eyebrow{font-family:'Tajawal',sans-serif;}
+html[lang="ar"] .hero-content h1 em,
+html[lang="ar"] .timeline-year,
+html[lang="ar"] .testi-quote,
+html[lang="ar"] .journey-step .jnum{font-style:normal;}
+html[lang="ar"] *{letter-spacing:normal !important;}

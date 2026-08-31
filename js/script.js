@@ -56,6 +56,12 @@ window.Heritage = (function(){
       inner = '<rect x="30" y="30" width="140" height="140" stroke="'+color+'" stroke-width="1" fill="none"/><line x1="30" y1="100" x2="170" y2="100" stroke="'+color+'" stroke-width="0.6"/><line x1="100" y1="30" x2="100" y2="100" stroke="'+color+'" stroke-width="0.6"/>';
     } else if(type==='sofa'){
       inner = '<rect x="30" y="90" width="140" height="55" rx="8" stroke="'+color+'" stroke-width="1.2" fill="none"/><rect x="20" y="80" width="24" height="70" rx="8" stroke="'+color+'" stroke-width="1.2" fill="none"/><rect x="156" y="80" width="24" height="70" rx="8" stroke="'+color+'" stroke-width="1.2" fill="none"/><line x1="50" y1="90" x2="150" y2="90" stroke="'+color+'" stroke-width="0.6"/>';
+    } else if(type==='lamp'){
+      inner = '<path d="M70 70 L130 70 L115 110 L85 110 Z" stroke="'+color+'" stroke-width="1.2" fill="none"/><line x1="100" y1="110" x2="100" y2="165" stroke="'+color+'" stroke-width="1.2"/><path d="M75 170 Q100 155 125 170" stroke="'+color+'" stroke-width="1.2" fill="none"/>';
+    } else if(type==='vase'){
+      inner = '<path d="M85 60 L115 60 L120 95 Q135 125 120 155 L80 155 Q65 125 80 95 Z" stroke="'+color+'" stroke-width="1.2" fill="none"/><line x1="85" y1="75" x2="115" y2="75" stroke="'+color+'" stroke-width="0.6"/>';
+    } else if(type==='frame'){
+      inner = '<rect x="55" y="45" width="90" height="110" stroke="'+color+'" stroke-width="1.4" fill="none"/><rect x="68" y="58" width="64" height="84" stroke="'+color+'" stroke-width="0.6" fill="none"/><path d="M78 130 L95 105 L110 125 L122 112" stroke="'+color+'" stroke-width="0.9" fill="none"/>';
     } else {
       inner = '<circle cx="100" cy="100" r="70" stroke="'+color+'" stroke-width="0.8" fill="none"/>';
     }
@@ -276,6 +282,546 @@ function buildCarouselMarkup(images){
     startAuto();
   });
 }
+
+  /* ---------------- Product detail page (product.html) ----------------
+     Reads ?handle=... from the URL and renders the matching product from
+     HeritageData. Called once per language block, like every other page. */
+  function renderProductPage(config, root){
+    root = root || document;
+    const lang = root.getAttribute('data-lang') || 'en';
+    const L = config.labels;
+    const i18n = config.i18n;
+    const D = window.HeritageData;
+    if(!D) return;
+
+    const handle = new URLSearchParams(window.location.search).get('handle');
+    const product = handle ? D.find(handle, lang) : null;
+
+    const stage = root.querySelector('[data-role="pdp"]');
+    const missing = root.querySelector('[data-role="pdp-missing"]');
+    if(!stage) return;
+
+    if(!product){
+      stage.hidden = true;
+      if(missing) missing.hidden = false;
+      return;
+    }
+    if(missing) missing.hidden = true;
+    stage.hidden = false;
+
+    const detail = D.detailFor(product, lang);
+    const images = resolveImages(product, 'products');
+    const shopUrl = SHOPIFY_STORE + '/products/' + product.handle;
+
+    // ---- breadcrumb + title ----
+    const catKey = product.category[product.category.length-1];
+    const setText = (role, text) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = text; };
+    setText('pdp-crumb', L.category[catKey] || '');
+    setText('pdp-origin', L.category[catKey] || '');
+    setText('pdp-name', product.name);
+
+    // ---- gallery: main image + thumbnails ----
+    const galleryMain = root.querySelector('[data-role="pdp-gallery-main"]');
+    const galleryThumbs = root.querySelector('[data-role="pdp-gallery-thumbs"]');
+    if(galleryMain){
+      const swatchColor = product.color==='ivory' ? '#B08D46' : '#D4B876';
+      galleryMain.innerHTML = motifSVG(product.motif, swatchColor) +
+        images.map((src,i)=>'<img class="pdp-main-img'+(i===0?' active':'')+'" data-index="'+i+'" src="'+src+'" alt="'+product.name+'">').join('');
+      if(galleryThumbs){
+        galleryThumbs.innerHTML = images.map((src,i)=>
+          '<button type="button" class="pdp-thumb'+(i===0?' active':'')+'" data-index="'+i+'" aria-label="'+(i+1)+'"><img src="'+src+'" alt="" loading="lazy"></button>'
+        ).join('');
+      }
+      // any image that fails drops out of the gallery; the SVG motif stays underneath
+      galleryMain.querySelectorAll('.pdp-main-img').forEach(img=>{
+        img.addEventListener('error', function(){
+          const idx = img.dataset.index;
+          const thumb = galleryThumbs && galleryThumbs.querySelector('.pdp-thumb[data-index="'+idx+'"]');
+          if(thumb) thumb.remove();
+          const wasActive = img.classList.contains('active');
+          img.remove();
+          if(wasActive){
+            const first = galleryMain.querySelector('.pdp-main-img');
+            if(first) first.classList.add('active');
+            const firstThumb = galleryThumbs && galleryThumbs.querySelector('.pdp-thumb');
+            if(firstThumb) firstThumb.classList.add('active');
+          }
+        }, {once:true});
+      });
+      if(galleryThumbs){
+        galleryThumbs.addEventListener('click', function(e){
+          const btn = e.target.closest('.pdp-thumb');
+          if(!btn) return;
+          const i = btn.dataset.index;
+          galleryThumbs.querySelectorAll('.pdp-thumb').forEach(b=>b.classList.toggle('active', b===btn));
+          galleryMain.querySelectorAll('.pdp-main-img').forEach(im=>im.classList.toggle('active', im.dataset.index===i));
+        });
+      }
+    }
+
+    // ---- sale badge / price note ----
+    const saleEl = root.querySelector('[data-role="pdp-sale"]');
+    if(saleEl){
+      if(product.sale){
+        saleEl.hidden = false;
+        saleEl.textContent = i18n.saleBadge.replace('{percent}', product.sale.percent);
+      } else {
+        saleEl.hidden = true;
+      }
+    }
+
+    // ---- spec table ----
+    const specEl = root.querySelector('[data-role="pdp-specs"]');
+    if(specEl){
+      const rows = [];
+      const push = (k,v)=>{ if(v) rows.push([k,v]); };
+      push(i18n.specLabels.category, L.category[catKey]);
+      push(i18n.specLabels.material, L.material[product.material]);
+      push(i18n.specLabels.color, L.color[product.color]);
+      if(product.size && L.size[product.size]) push(i18n.specLabels.size, L.size[product.size]);
+      push(i18n.specLabels.origin, detail.origin);
+      push(i18n.specLabels.construction, detail.construction);
+      push(i18n.specLabels.pile, detail.pile);
+      push(i18n.specLabels.knots, detail.knots);
+      if(product.room && product.room.length){
+        push(i18n.specLabels.room, product.room.map(r=>L.room[r]).filter(Boolean).join(', '));
+      }
+      specEl.innerHTML = rows.map(r=>
+        '<div class="spec-row"><span class="spec-key">'+r[0]+'</span><span class="spec-val">'+r[1]+'</span></div>'
+      ).join('');
+    }
+
+    // ---- story + care ----
+    setText('pdp-story', detail.story);
+    const careEl = root.querySelector('[data-role="pdp-care"]');
+    if(careEl) careEl.innerHTML = detail.care.map(c=>'<li>'+c+'</li>').join('');
+
+    // ---- actions ----
+    const buyBtn = root.querySelector('[data-role="pdp-buy"]');
+    if(buyBtn) buyBtn.setAttribute('href', shopUrl);
+    const inqBtn = root.querySelector('[data-role="pdp-inquire"]');
+    if(inqBtn) inqBtn.setAttribute('href', 'mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(i18n.inquireSubjectPrefix + product.name));
+    const waBtn = root.querySelector('[data-role="pdp-whatsapp"]');
+    if(waBtn) waBtn.setAttribute('href', 'https://wa.me/966532148055?text='+encodeURIComponent(i18n.waPrefix + product.name));
+    const roomBtn = root.querySelector('[data-role="pdp-room"]');
+    if(roomBtn) roomBtn.setAttribute('href', 'room.html?handle='+encodeURIComponent(product.handle));
+
+    // ---- related: same category, excluding this one ----
+    const relatedEl = root.querySelector('[data-role="pdp-related"]');
+    if(relatedEl){
+      const related = (D.products[lang]||D.products.en)
+        .filter(p => p.handle !== product.handle && p.category.some(c => product.category.indexOf(c) !== -1))
+        .slice(0,4);
+      relatedEl.innerHTML = related.map(p=>{
+        const url = 'product.html?handle='+encodeURIComponent(p.handle);
+        const sc = p.color==='ivory' ? '#B08D46' : '#D4B876';
+        return '<div class="product-card"><div class="product-media">'+
+          '<div class="motif">'+motifSVG(p.motif, sc)+buildCarouselMarkup(resolveImages(p,'products').slice(0,1))+'</div>'+
+          '<a class="product-media-link" href="'+url+'" aria-label="'+p.name+'"></a></div>'+
+          '<div class="product-body"><div class="product-name"><a href="'+url+'">'+p.name+'</a></div></div></div>';
+      }).join('');
+      initCarousels(relatedEl);
+    }
+
+    // Feed the title back into the per-language title attributes rather than setting
+    // document.title directly — setLanguage() runs after this on DOMContentLoaded and
+    // would otherwise overwrite it with the page's generic title, and this way the
+    // title also stays correct when the visitor switches language.
+    const brand = (lang==='ar') ? 'شركة التراث للسجاد' : 'Heritage Carpet Company';
+    document.documentElement.setAttribute('data-title-'+lang, product.name + ' — ' + brand);
+    if(document.documentElement.getAttribute('lang') === lang){
+      document.title = product.name + ' — ' + brand;
+    }
+  }
+
+  /* ---------------- Offers / sale page (offers.html) ----------------
+     Reads every product carrying a `sale` object from HeritageData. Add or
+     remove a sale by editing that one field in js/data.js — this page and the
+     badges on the collection grid both follow automatically. */
+  function renderOffersPage(config, root){
+    root = root || document;
+    const lang = root.getAttribute('data-lang') || 'en';
+    const L = config.labels, i18n = config.i18n;
+    const D = window.HeritageData;
+    if(!D) return;
+
+    const items = D.onSale(lang);
+    const grid = root.querySelector('[data-role="offers-grid"]');
+    const empty = root.querySelector('[data-role="offers-empty"]');
+    const countEl = root.querySelector('[data-role="offers-count"]');
+
+    if(countEl) countEl.textContent = i18n.count.replace('{n}', items.length);
+    if(empty) empty.hidden = items.length > 0;
+    if(!grid) return;
+
+    // Group by the campaign note so several promotions can run side by side.
+    const groups = {};
+    items.forEach(p=>{
+      const key = (p.sale && p.sale.note) || 'general';
+      (groups[key] = groups[key] || []).push(p);
+    });
+
+    grid.innerHTML = Object.keys(groups).map(key=>{
+      const g = groups[key];
+      const meta = i18n.campaigns[key] || i18n.campaigns.general;
+      const cards = g.map(p=>{
+        const url = 'product.html?handle='+encodeURIComponent(p.handle);
+        const sc = p.color==='ivory' ? '#B08D46' : '#D4B876';
+        const metaParts = [];
+        if(L.material[p.material]) metaParts.push(L.material[p.material]);
+        if(p.size && L.size[p.size]) metaParts.push(L.size[p.size].split(' (')[0].split('(')[0]);
+        return '<div class="product-card">'+
+          '<div class="product-media"><span class="product-tag sale">-'+p.sale.percent+'%</span>'+
+          '<div class="motif">'+motifSVG(p.motif, sc)+buildCarouselMarkup(resolveImages(p,'products'))+'</div>'+
+          '<a class="product-media-link" href="'+url+'" aria-label="'+p.name+'"></a></div>'+
+          '<div class="product-body">'+
+            '<div class="product-origin">'+(L.category[p.category[p.category.length-1]]||'')+'</div>'+
+            '<div class="product-name"><a href="'+url+'">'+p.name+'</a></div>'+
+            '<div class="product-meta">'+metaParts.join(' \u00b7 ')+'</div>'+
+            '<div class="product-actions"><a class="btn btn-fill btn-sm" href="'+url+'">'+i18n.viewDetails+'</a></div>'+
+          '</div></div>';
+      }).join('');
+      return '<div class="offer-group">'+
+        '<div class="offer-head">'+
+          '<div class="eyebrow on-light">'+meta.kicker+'</div>'+
+          '<h2>'+meta.title+'</h2>'+
+          '<p>'+meta.blurb+'</p>'+
+          (g[0].sale.until ? '<div class="offer-until" data-until="'+g[0].sale.until+'"></div>' : '')+
+        '</div>'+
+        '<div class="product-grid">'+cards+'</div>'+
+      '</div>';
+    }).join('');
+
+    // "Ends in N days" — computed live so nothing goes stale in the markup.
+    root.querySelectorAll('.offer-until').forEach(el=>{
+      const end = new Date(el.dataset.until + 'T23:59:59');
+      const days = Math.ceil((end - new Date()) / 86400000);
+      el.textContent = days > 0 ? i18n.endsIn.replace('{n}', days) : i18n.ended;
+      el.classList.toggle('expired', days <= 0);
+    });
+
+    initCarousels(grid);
+  }
+
+  /* ---------------- Showroom appointment booking (visit.html) ----------------
+     There is no backend on a static site, so the picked slot is handed off to
+     WhatsApp or email as a fully written request rather than silently
+     "booked" — the page says so plainly. Slots come from each showroom's real
+     opening hours and Friday is handled separately. */
+  function renderBookingPage(config, root){
+    root = root || document;
+    const i18n = config.i18n;
+    const state = { showroom:null, date:null, slot:null, name:'', phone:'', notes:'' };
+
+    const showroomsEl = root.querySelector('[data-role="book-showrooms"]');
+    const datesEl     = root.querySelector('[data-role="book-dates"]');
+    const slotsEl     = root.querySelector('[data-role="book-slots"]');
+    const summaryEl   = root.querySelector('[data-role="book-summary"]');
+    const confirmBtn  = root.querySelector('[data-role="book-confirm"]');
+    const emailBtn    = root.querySelector('[data-role="book-email"]');
+    if(!showroomsEl) return;
+
+    // ---- showroom chooser ----
+    showroomsEl.innerHTML = config.showrooms.map(s=>
+      '<div class="option-card" data-showroom="'+s.key+'"><h4>'+s.label+'<span class="check"></span></h4><p>'+s.hours+'</p></div>'
+    ).join('');
+
+    // ---- next 14 days ----
+    function buildDates(){
+      const out = [];
+      const today = new Date(); today.setHours(0,0,0,0);
+      for(let i=1;i<=14;i++){
+        const d = new Date(today.getTime() + i*86400000);
+        out.push(d);
+      }
+      return out;
+    }
+    const dates = buildDates();
+
+    function dayKey(d){ return d.toISOString().slice(0,10); }
+    function isFriday(d){ return d.getDay() === 5; }
+
+    function renderDates(){
+      datesEl.innerHTML = dates.map(d=>{
+        const key = dayKey(d);
+        const sel = state.date === key ? ' selected' : '';
+        return '<button type="button" class="date-chip'+sel+'" data-date="'+key+'">'+
+          '<span class="date-dow">'+i18n.days[d.getDay()]+'</span>'+
+          '<span class="date-num">'+d.getDate()+'</span>'+
+          '<span class="date-mon">'+i18n.months[d.getMonth()]+'</span>'+
+        '</button>';
+      }).join('');
+    }
+
+    function slotsFor(dateKey, showroomKey){
+      const sr = config.showrooms.filter(s=>s.key===showroomKey)[0];
+      if(!sr) return [];
+      const d = new Date(dateKey + 'T00:00:00');
+      return isFriday(d) ? sr.slotsFri : sr.slots;
+    }
+
+    function renderSlots(){
+      if(!state.date || !state.showroom){
+        slotsEl.innerHTML = '<p class="slot-hint">'+i18n.pickFirst+'</p>';
+        return;
+      }
+      const list = slotsFor(state.date, state.showroom);
+      if(!list.length){
+        slotsEl.innerHTML = '<p class="slot-hint">'+i18n.noSlots+'</p>';
+        return;
+      }
+      slotsEl.innerHTML = list.map(t=>
+        '<button type="button" class="slot-chip'+(state.slot===t?' selected':'')+'" data-slot="'+t+'">'+t+'</button>'
+      ).join('');
+    }
+
+    function labelFor(key){
+      const s = config.showrooms.filter(x=>x.key===key)[0];
+      return s ? s.label : '';
+    }
+
+    function prettyDate(key){
+      if(!key) return i18n.notSelected;
+      const d = new Date(key+'T00:00:00');
+      return i18n.days[d.getDay()] + ', ' + d.getDate() + ' ' + i18n.months[d.getMonth()];
+    }
+
+    function renderSummary(){
+      if(!summaryEl) return;
+      const rows = [
+        [i18n.sumLabels.showroom, state.showroom ? labelFor(state.showroom) : i18n.notSelected],
+        [i18n.sumLabels.date,     prettyDate(state.date)],
+        [i18n.sumLabels.time,     state.slot || i18n.notSelected],
+        [i18n.sumLabels.name,     state.name || i18n.notSelected],
+        [i18n.sumLabels.phone,    state.phone || i18n.notSelected]
+      ];
+      summaryEl.innerHTML = rows.map(r=>
+        '<div class="preview-summary-row" style="color:var(--ink-text);"><span style="opacity:0.6;">'+r[0]+'</span><span style="font-weight:600;">'+r[1]+'</span></div>'
+      ).join('');
+      const ready = !!(state.showroom && state.date && state.slot && state.name.trim());
+      if(confirmBtn) confirmBtn.classList.toggle('is-disabled', !ready);
+      if(emailBtn) emailBtn.classList.toggle('is-disabled', !ready);
+      if(ready){
+        const lines = [
+          i18n.sumLabels.showroom+': '+labelFor(state.showroom),
+          i18n.sumLabels.date+': '+prettyDate(state.date),
+          i18n.sumLabels.time+': '+state.slot,
+          i18n.sumLabels.name+': '+state.name,
+          i18n.sumLabels.phone+': '+(state.phone||'-'),
+          i18n.sumLabels.notes+': '+(state.notes||'-')
+        ].join('\n');
+        const body = i18n.requestIntro + '\n\n' + lines;
+        if(confirmBtn) confirmBtn.setAttribute('href','https://wa.me/966532148055?text='+encodeURIComponent(body));
+        if(emailBtn) emailBtn.setAttribute('href','mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(i18n.emailSubject)+'&body='+encodeURIComponent(body));
+      } else {
+        if(confirmBtn) confirmBtn.setAttribute('href','#');
+        if(emailBtn) emailBtn.setAttribute('href','#');
+      }
+    }
+
+    showroomsEl.addEventListener('click', function(e){
+      const card = e.target.closest('[data-showroom]');
+      if(!card) return;
+      state.showroom = card.dataset.showroom;
+      state.slot = null;
+      showroomsEl.querySelectorAll('.option-card').forEach(c=>c.classList.toggle('selected', c===card));
+      renderSlots(); renderSummary();
+    });
+    datesEl.addEventListener('click', function(e){
+      const btn = e.target.closest('[data-date]');
+      if(!btn) return;
+      state.date = btn.dataset.date;
+      state.slot = null;
+      renderDates(); renderSlots(); renderSummary();
+    });
+    slotsEl.addEventListener('click', function(e){
+      const btn = e.target.closest('[data-slot]');
+      if(!btn) return;
+      state.slot = btn.dataset.slot;
+      renderSlots(); renderSummary();
+    });
+    ['name','phone','notes'].forEach(f=>{
+      const el = root.querySelector('[data-role="book-'+f+'"]');
+      if(el) el.addEventListener('input', function(){ state[f] = el.value; renderSummary(); });
+    });
+    [confirmBtn, emailBtn].forEach(btn=>{
+      if(!btn) return;
+      btn.addEventListener('click', function(e){
+        if(btn.classList.contains('is-disabled')){ e.preventDefault(); }
+      });
+    });
+
+    renderDates(); renderSlots(); renderSummary();
+  }
+
+  /* ---------------- Room visualizer (room.html) ----------------
+     Photo-based, not tracked AR: the visitor supplies a room photo (camera or
+     library), the rug is composited onto it on a canvas, and they can move,
+     scale, rotate and perspective-tilt it, then download or send the result.
+     Everything stays on the device — no upload. */
+  function renderRoomVisualizer(config, root){
+    root = root || document;
+    const lang = root.getAttribute('data-lang') || 'en';
+    const i18n = config.i18n;
+    const D = window.HeritageData;
+
+    const canvas = root.querySelector('[data-role="room-canvas"]');
+    if(!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext('2d');
+
+    const fileInput  = root.querySelector('[data-role="room-file"]');
+    const dropZone   = root.querySelector('[data-role="room-drop"]');
+    const rugSelect  = root.querySelector('[data-role="room-rug"]');
+    const stageWrap  = root.querySelector('[data-role="room-stage"]');
+    const controls   = root.querySelector('[data-role="room-controls"]');
+    const dlBtn      = root.querySelector('[data-role="room-download"]');
+    const resetBtn   = root.querySelector('[data-role="room-reset"]');
+
+    const scaleInput = root.querySelector('[data-role="room-scale"]');
+    const rotInput   = root.querySelector('[data-role="room-rotate"]');
+    const perspInput = root.querySelector('[data-role="room-perspective"]');
+    const opacInput  = root.querySelector('[data-role="room-opacity"]');
+
+    const view = { room:null, rug:null, x:0.5, y:0.68, scale:0.55, rot:0, persp:0.55, opacity:1 };
+
+    // populate the rug chooser from the shared catalog
+    if(rugSelect && D){
+      const list = (D.products[lang] || D.products.en).filter(p=>p.category.indexOf('accessories')===-1 && p.category.indexOf('furniture')===-1);
+      rugSelect.innerHTML = list.map(p=>'<option value="'+p.handle+'">'+p.name+'</option>').join('');
+      const preset = new URLSearchParams(window.location.search).get('handle');
+      if(preset && list.some(p=>p.handle===preset)) rugSelect.value = preset;
+    }
+
+    function loadImage(src){
+      return new Promise((res, rej)=>{
+        const im = new Image();
+        im.onload = ()=>res(im);
+        im.onerror = rej;
+        im.src = src;
+      });
+    }
+
+    function loadRug(handle){
+      if(!D) return Promise.reject();
+      const p = D.find(handle, lang) || D.find(handle, 'en');
+      if(!p) return Promise.reject();
+      const imgs = resolveImages(p, 'products');
+      if(!imgs.length) return Promise.reject();
+      // try each candidate in order so a missing file doesn't dead-end the tool
+      return imgs.reduce((chain, src)=>chain.catch(()=>loadImage(src)), Promise.reject());
+    }
+
+    function draw(){
+      if(!view.room) return;
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0,0,W,H);
+      ctx.drawImage(view.room, 0, 0, W, H);
+      if(!view.rug) return;
+
+      const rugW = W * view.scale;
+      const ratio = view.rug.naturalHeight / view.rug.naturalWidth;
+      const rugH = rugW * ratio;
+
+      ctx.save();
+      ctx.globalAlpha = view.opacity;
+      ctx.translate(W * view.x, H * view.y);
+      ctx.rotate(view.rot * Math.PI / 180);
+      // flatten vertically to fake a floor plane, and taper the far edge
+      ctx.transform(1, 0, 0, Math.max(0.12, view.persp), 0, 0);
+      ctx.shadowColor = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur = rugW * 0.05;
+      ctx.shadowOffsetY = rugH * 0.04;
+      ctx.drawImage(view.rug, -rugW/2, -rugH/2, rugW, rugH);
+      ctx.restore();
+    }
+
+    function fitCanvasTo(img){
+      const maxW = 1200;
+      const w = Math.min(img.naturalWidth, maxW);
+      const h = Math.round(w * img.naturalHeight / img.naturalWidth);
+      canvas.width = w; canvas.height = h;
+    }
+
+    function useRoomFile(file){
+      if(!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = function(e){
+        loadImage(e.target.result).then(img=>{
+          view.room = img;
+          fitCanvasTo(img);
+          if(stageWrap) stageWrap.hidden = false;
+          if(controls) controls.hidden = false;
+          if(dropZone) dropZone.classList.add('has-room');
+          return rugSelect ? loadRug(rugSelect.value).then(r=>{ view.rug = r; }).catch(()=>{}) : null;
+        }).then(draw).catch(()=>{});
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if(dropZone && fileInput){
+      dropZone.addEventListener('click', ()=>fileInput.click());
+      ['dragover','dragleave','drop'].forEach(ev=>{
+        dropZone.addEventListener(ev, function(e){
+          e.preventDefault();
+          dropZone.classList.toggle('dragover', ev==='dragover');
+        });
+      });
+      dropZone.addEventListener('drop', e=>useRoomFile(e.dataTransfer.files[0]));
+      fileInput.addEventListener('change', ()=>useRoomFile(fileInput.files[0]));
+    }
+    if(rugSelect){
+      rugSelect.addEventListener('change', function(){
+        loadRug(rugSelect.value).then(r=>{ view.rug = r; draw(); }).catch(()=>{});
+      });
+    }
+
+    const bind = (el, key, transform)=>{
+      if(!el) return;
+      el.addEventListener('input', function(){
+        view[key] = transform ? transform(el.value) : parseFloat(el.value);
+        draw();
+      });
+    };
+    bind(scaleInput, 'scale', v=>parseFloat(v)/100);
+    bind(rotInput,   'rot',   v=>parseFloat(v));
+    bind(perspInput, 'persp', v=>parseFloat(v)/100);
+    bind(opacInput,  'opacity', v=>parseFloat(v)/100);
+
+    // drag to position the rug
+    let dragging = false;
+    function pointTo(e){
+      const r = canvas.getBoundingClientRect();
+      const cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+      const cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+      view.x = Math.min(1, Math.max(0, cx / r.width));
+      view.y = Math.min(1, Math.max(0, cy / r.height));
+      draw();
+    }
+    canvas.addEventListener('pointerdown', function(e){ if(!view.rug) return; dragging = true; canvas.setPointerCapture(e.pointerId); pointTo(e); });
+    canvas.addEventListener('pointermove', function(e){ if(dragging) pointTo(e); });
+    canvas.addEventListener('pointerup',   function(){ dragging = false; });
+    canvas.addEventListener('pointercancel', function(){ dragging = false; });
+
+    if(resetBtn){
+      resetBtn.addEventListener('click', function(){
+        view.x=0.5; view.y=0.68; view.scale=0.55; view.rot=0; view.persp=0.55; view.opacity=1;
+        if(scaleInput) scaleInput.value = 55;
+        if(rotInput) rotInput.value = 0;
+        if(perspInput) perspInput.value = 55;
+        if(opacInput) opacInput.value = 100;
+        draw();
+      });
+    }
+    if(dlBtn){
+      dlBtn.addEventListener('click', function(){
+        if(!view.room) return;
+        try{
+          dlBtn.setAttribute('href', canvas.toDataURL('image/jpeg', 0.9));
+          dlBtn.setAttribute('download', 'heritage-room-preview.jpg');
+        }catch(err){ /* canvas export unavailable — leave the link inert */ }
+      });
+    }
+  }
 
   /* ---------------- Language switching ---------------- */
   function setLanguage(lang, opts){
@@ -529,19 +1075,29 @@ function buildCarouselMarkup(images){
       if(grid){
         clearCarousels(grid); // stop timers from the previous filter/sort pass before discarding those cards
         grid.innerHTML = filtered.map(p=>{
-          const productUrl = SHOPIFY_STORE + '/products/' + p.handle;
+          const detailUrl = 'product.html?handle=' + encodeURIComponent(p.handle);
           const inquireSubject = encodeURIComponent(i18n.inquireSubjectPrefix + p.name);
           const swatchColor = p.color==='ivory' ? '#B08D46' : '#D4B876';
           const photo = buildCarouselMarkup(resolveImages(p, 'products'));
+          // Meta line is built from whatever fields the item actually has, so furniture and
+          // accessories (which have no rug "size") don't break the card.
+          const metaParts = [];
+          if(L.material[p.material]) metaParts.push(L.material[p.material]);
+          if(L.color[p.color]) metaParts.push(L.color[p.color]);
+          if(p.size && L.size[p.size]) metaParts.push(L.size[p.size].split(' (')[0].split('(')[0]);
+          const badge = p.sale
+            ? '<span class="product-tag sale">-'+p.sale.percent+'%</span>'
+            : (p.isNew ? '<span class="product-tag">'+i18n.newTag+'</span>' : '');
           return '<div class="product-card">'+
-            '<div class="product-media">'+ (p.isNew ? '<span class="product-tag">'+i18n.newTag+'</span>' : '') +
-            '<div class="motif">'+motifSVG(p.motif, swatchColor)+photo+'</div></div>'+
+            '<div class="product-media">'+ badge +
+            '<div class="motif">'+motifSVG(p.motif, swatchColor)+photo+'</div>'+
+            '<a class="product-media-link" href="'+detailUrl+'" aria-label="'+p.name+'"></a></div>'+
             '<div class="product-body">'+
               '<div class="product-origin">'+L.category[p.category[p.category.length-1]]+'</div>'+
-              '<div class="product-name">'+p.name+'</div>'+
-              '<div class="product-meta">'+L.material[p.material]+' \u00b7 '+L.color[p.color]+' \u00b7 '+L.size[p.size].split(' (')[0].split('(')[0]+'</div>'+
+              '<div class="product-name"><a href="'+detailUrl+'">'+p.name+'</a></div>'+
+              '<div class="product-meta">'+metaParts.join(' \u00b7 ')+'</div>'+
               '<div class="product-actions">'+
-                '<a class="btn btn-fill btn-sm" href="'+productUrl+'" target="_blank" rel="noopener">'+i18n.viewOnShopify+'</a>'+
+                '<a class="btn btn-fill btn-sm" href="'+detailUrl+'">'+(i18n.viewDetails || i18n.viewOnShopify)+'</a>'+
                 '<a class="btn btn-outline dark btn-sm" href="mailto:info@heritagecarpet.sa?subject='+inquireSubject+'">'+i18n.inquire+'</a>'+
               '</div>'+
             '</div></div>';
@@ -1011,5 +1567,5 @@ function buildCarouselMarkup(images){
 
   document.addEventListener('DOMContentLoaded', initCommon);
 
-  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
+  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
 })();

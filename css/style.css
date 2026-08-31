@@ -109,8 +109,94 @@ h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.1
 .nav-links a:hover{color:var(--cream-text);}
 .nav-links a:hover::after,.nav-links a.current::after{width:100%;}
 .nav-right{display:flex;align-items:center;gap:22px;}
-.lang-toggle{font-size:12px;font-weight:600;letter-spacing:0.05em;color:var(--cream-text-dim);border:1px solid var(--line-dark);padding:8px 14px;border-radius:2px;transition:.3s;display:inline-block;}
-.lang-toggle:hover{border-color:var(--brass-light);color:var(--brass-light);}
+/*.lang-toggle{font-size:12px;font-weight:600;letter-spacing:0.05em;color:var(--cream-text-dim);border:1px solid var(--line-dark);padding:8px 14px;border-radius:2px;transition:.3s;display:inline-block;}
+.lang-toggle:hover{border-color:var(--brass-light);color:var(--brass-light);}*/
+/* Luxury Language Toggle */
+.lang-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+
+    width: 58px;
+    height: 28px;
+    padding: 2px;
+
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid var(--line-dark);
+    border-radius: 20px;
+
+    cursor: pointer;
+    overflow: hidden;
+
+    transition: border-color 0.3s ease,
+                background 0.3s ease;
+}
+
+/* Language labels */
+.lang-option {
+    position: relative;
+    z-index: 2;
+
+    width: 50%;
+    text-align: center;
+
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+
+    color: var(--cream-text-dim);
+
+    transition: color 0.3s ease;
+}
+
+/* Brass circular indicator */
+.lang-indicator {
+    position: absolute;
+    z-index: 1;
+
+    top: 3px;
+    left: 3px;
+
+    width: 20px;
+    height: 20px;
+
+    border-radius: 50%;
+
+    background: var(--brass-light);
+
+    box-shadow:
+        0 0 8px rgba(190, 160, 90, 0.25),
+        inset 0 0 2px rgba(255,255,255,0.35);
+
+    transition: transform 0.35s cubic-bezier(.4, 0, .2, 1);
+}
+
+/* English active */
+.lang-toggle:not(.ar-active) .lang-en {
+    color: #17130d;
+}
+
+/* Arabic active */
+.lang-toggle.ar-active .lang-ar {
+    color: #17130d;
+}
+
+/* Slide indicator to AR */
+.lang-toggle.ar-active .lang-indicator {
+    transform: translateX(30px);
+}
+
+/* Hover */
+.lang-toggle:hover {
+    border-color: var(--brass-light);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.lang-toggle:hover .lang-indicator {
+    box-shadow:
+        0 0 12px rgba(190, 160, 90, 0.35),
+        inset 0 0 2px rgba(255,255,255,0.4);
+}
 .nav-cta{display:inline-flex;padding:11px 20px;font-size:12px;}
 .hamburger{display:none;width:24px;height:18px;position:relative;flex-direction:column;justify-content:space-between;}
 .hamburger span{display:block;height:1px;width:100%;background:var(--cream-text);transition:.3s var(--ease);}

@@ -824,7 +824,7 @@ function buildCarouselMarkup(images){
   }
 
   /* ---------------- Language switching ---------------- */
-  function setLanguage(lang, opts){
+/*  function setLanguage(lang, opts){
     opts = opts || {};
     document.documentElement.setAttribute('lang', lang);
     document.documentElement.setAttribute('dir', lang==='ar' ? 'rtl' : 'ltr');
@@ -837,7 +837,7 @@ function buildCarouselMarkup(images){
     if(!opts.skipScroll) window.scrollTo(0,0);
   }
 
-/*  function initLanguageSwitch(){
+  function initLanguageSwitch(){
     let stored = null;
     try{ stored = localStorage.getItem('heritage-lang'); }catch(e){}
     const initialLang = stored || document.documentElement.getAttribute('lang') || 'en';
@@ -850,33 +850,78 @@ function buildCarouselMarkup(images){
       });
     });
   }*/
-   function initLanguageSwitch(){
-    let stored = null;
+/* ---------------- Language switching ---------------- */
+function setLanguage(lang, opts){
+    opts = opts || {};
 
-    try { 
-        stored = localStorage.getItem('heritage-lang'); 
+    // Set document language and direction
+    document.documentElement.setAttribute('lang', lang);
+    document.documentElement.setAttribute(
+        'dir',
+        lang === 'ar' ? 'rtl' : 'ltr'
+    );
+
+    // Show only the selected language blocks
+    document.querySelectorAll('.lang-block').forEach(block => {
+        block.hidden = block.getAttribute('data-lang') !== lang;
+    });
+
+    // Update page title
+    const title = document.documentElement.getAttribute('data-title-' + lang);
+    if(title) document.title = title;
+
+    // Save selected language
+    try {
+        localStorage.setItem('heritage-lang', lang);
     } catch(e) {}
 
-    const initialLang = stored || 
-        document.documentElement.getAttribute('lang') || 'en';
+    // Update all language switches
+    document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+        btn.classList.toggle('ar-active', lang === 'ar');
+        btn.setAttribute(
+            'aria-label',
+            lang === 'ar' ? 'Switch to English' : 'Switch to Arabic'
+        );
+    });
 
+    // Scroll to top when language is manually changed
+    if(!opts.skipScroll) {
+        window.scrollTo(0, 0);
+    }
+}
+
+
+/* ---------------- Initialize language switch ---------------- */
+function initLanguageSwitch(){
+
+    let stored = null;
+
+    try {
+        stored = localStorage.getItem('heritage-lang');
+    } catch(e) {}
+
+    const initialLang =
+        stored ||
+        document.documentElement.getAttribute('lang') ||
+        'en';
+
+    // Apply initial language
     setLanguage(initialLang, {skipScroll:true});
 
+    // Add click event
     document.querySelectorAll('[data-lang-switch]').forEach(btn => {
-
-        // Set initial visual state
-        btn.classList.toggle('ar-active', initialLang === 'ar');
 
         btn.addEventListener('click', function(){
 
-            const current = document.documentElement.getAttribute('lang');
-            const newLang = current === 'ar' ? 'en' : 'ar';
+            const current =
+                document.documentElement.getAttribute('lang');
+
+            const newLang =
+                current === 'ar' ? 'en' : 'ar';
 
             setLanguage(newLang);
-
-            // Move the brass indicator
-            btn.classList.toggle('ar-active', newLang === 'ar');
         });
+
     });
 }
 

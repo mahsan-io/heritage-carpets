@@ -116,6 +116,7 @@ h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.1
     position: relative;
     display: inline-flex;
     align-items: center;
+    direction: ltr;
 
     width: 58px;
     height: 28px;
@@ -136,6 +137,9 @@ h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.1
 .lang-option {
     position: relative;
     z-index: 2;
+   
+    direction: ltr;
+    unicode-bidi: isolate;
 
     width: 50%;
     text-align: center;

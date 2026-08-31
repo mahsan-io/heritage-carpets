@@ -111,96 +111,174 @@ h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.1
 .nav-right{display:flex;align-items:center;gap:22px;}
 /*.lang-toggle{font-size:12px;font-weight:600;letter-spacing:0.05em;color:var(--cream-text-dim);border:1px solid var(--line-dark);padding:8px 14px;border-radius:2px;transition:.3s;display:inline-block;}
 .lang-toggle:hover{border-color:var(--brass-light);color:var(--brass-light);}*/
-/* Luxury Language Toggle */
+/* =========================================
+   LANGUAGE TOGGLE
+   Always stays LTR even when page is RTL
+========================================= */
+
 .lang-toggle {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    direction: ltr;
+    position: relative !important;
 
-    width: 58px;
-    height: 28px;
-    padding: 2px;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
 
-    background: rgba(255, 255, 255, 0.025);
-    border: 1px solid var(--line-dark);
-    border-radius: 20px;
+    direction: ltr !important;
+    writing-mode: horizontal-tb !important;
+
+    box-sizing: border-box;
+
+    width: 58px !important;
+    height: 28px !important;
+
+    padding: 3px !important;
+    margin: 0;
+
+    border: 1px solid rgba(190, 160, 90, 0.28) !important;
+    border-radius: 20px !important;
+
+    background: rgba(10, 8, 5, 0.55) !important;
 
     cursor: pointer;
+
     overflow: hidden;
 
-    transition: border-color 0.3s ease,
-                background 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+
+    transition:
+        border-color 0.3s ease,
+        background 0.3s ease;
 }
 
-/* Language labels */
+
+/* =========================================
+   LANGUAGE TEXT
+========================================= */
+
 .lang-option {
-    position: relative;
-    z-index: 2;
-   
-    direction: ltr;
-    unicode-bidi: isolate;
+    position: relative !important;
+    z-index: 2 !important;
 
-    width: 50%;
-    text-align: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+    flex: 0 0 50% !important;
+
+    width: 50% !important;
+    height: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    direction: ltr !important;
+    writing-mode: horizontal-tb !important;
+
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    letter-spacing: 0.03em !important;
 
     color: var(--cream-text-dim);
 
     transition: color 0.3s ease;
 }
 
-/* Brass circular indicator */
+
+/* =========================================
+   BRASS CIRCLE
+========================================= */
+
 .lang-indicator {
-    position: absolute;
-    z-index: 1;
+    position: absolute !important;
+    z-index: 1 !important;
 
-    top: 3px;
-    left: 3px;
+    top: 3px !important;
+    left: 3px !important;
+    right: auto !important;
 
-    width: 20px;
-    height: 20px;
+    width: 20px !important;
+    height: 20px !important;
 
-    border-radius: 50%;
+    margin: 0 !important;
+    padding: 0 !important;
 
-    background: var(--brass-light);
+    border-radius: 50% !important;
+
+    background: var(--brass-light) !important;
 
     box-shadow:
-        0 0 8px rgba(190, 160, 90, 0.25),
-        inset 0 0 2px rgba(255,255,255,0.35);
+        0 0 7px rgba(190, 160, 90, 0.30),
+        inset 0 0 2px rgba(255, 255, 255, 0.35);
 
-    transition: transform 0.35s cubic-bezier(.4, 0, .2, 1);
+    transform: translateX(0) !important;
+
+    transition:
+        transform 0.35s cubic-bezier(.4, 0, .2, 1),
+        box-shadow 0.3s ease;
 }
 
-/* English active */
+
+/* =========================================
+   EN ACTIVE
+========================================= */
+
 .lang-toggle:not(.ar-active) .lang-en {
-    color: #17130d;
+    color: #17130d !important;
 }
 
-/* Arabic active */
+.lang-toggle:not(.ar-active) .lang-ar {
+    color: var(--cream-text-dim) !important;
+}
+
+
+/* =========================================
+   AR ACTIVE
+========================================= */
+
+.lang-toggle.ar-active .lang-en {
+    color: var(--cream-text-dim) !important;
+}
+
 .lang-toggle.ar-active .lang-ar {
-    color: #17130d;
+    color: #17130d !important;
 }
 
-/* Slide indicator to AR */
+
+/* Move brass circle to AR */
+
 .lang-toggle.ar-active .lang-indicator {
-    transform: translateX(30px);
+    transform: translateX(30px) !important;
 }
 
-/* Hover */
+
+/* =========================================
+   HOVER
+========================================= */
+
 .lang-toggle:hover {
-    border-color: var(--brass-light);
-    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--brass-light) !important;
+    background: rgba(10, 8, 5, 0.75) !important;
 }
 
 .lang-toggle:hover .lang-indicator {
     box-shadow:
-        0 0 12px rgba(190, 160, 90, 0.35),
-        inset 0 0 2px rgba(255,255,255,0.4);
+        0 0 11px rgba(190, 160, 90, 0.40),
+        inset 0 0 2px rgba(255, 255, 255, 0.4);
 }
+
+
+/* =========================================
+   FOCUS
+========================================= */
+
+.lang-toggle:focus-visible {
+    outline: 1px solid var(--brass-light);
+    outline-offset: 3px;
+}
+
 .nav-cta{display:inline-flex;padding:11px 20px;font-size:12px;}
 .hamburger{display:none;width:24px;height:18px;position:relative;flex-direction:column;justify-content:space-between;}
 .hamburger span{display:block;height:1px;width:100%;background:var(--cream-text);transition:.3s var(--ease);}

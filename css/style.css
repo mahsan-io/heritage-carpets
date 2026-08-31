@@ -728,8 +728,23 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
 .preview-dims{margin-top:14px;text-align:center;font-size:13px;color:var(--brass-light);font-weight:600;letter-spacing:0.03em;}
 .preview-summary{margin-top:26px;border-top:1px solid var(--line-dark);padding-top:20px;}
 .preview-summary-row{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:8px 0;color:var(--cream-text-dim);border-bottom:1px solid rgba(212,184,118,0.1);}
-.preview-summary-row span:first-child{opacity:0.65;}
-.preview-summary-row span:last-child{color:var(--cream-text);font-weight:500;text-align:end;}
+/* Review panel rows need dark text */
+.review-panel .preview-summary-row {
+  color: var(--ink-text);
+  border-bottom-color: var(--line-light);
+}
+
+.review-panel .preview-summary-row span:first-child {
+  color: var(--ink-text);
+  opacity: 0.65;
+}
+
+.review-panel .preview-summary-row span:last-child {
+  color: var(--ink-text);
+  font-weight: 600;
+}
+/*.preview-summary-row span:first-child{opacity:0.65;}
+.preview-summary-row span:last-child{color:var(--cream-text);font-weight:500;text-align:end;}*/
 
 .studio-main{min-width:0;}
 .step-progress{display:flex;align-items:center;margin-bottom:48px;flex-wrap:wrap;gap:6px 0;}
@@ -792,58 +807,9 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
 .contact-grid .field-full{grid-column:1/-1;}
 .contact-grid label{display:block;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--madder);margin-bottom:10px;}
 .contact-grid select.field-input{appearance:auto;}
-/*.review-panel{margin-top:36px;background:var(--parchment-2);border:1px solid var(--line-light);padding:24px 26px;}
-.review-panel h4{font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--madder);margin-bottom:14px;}*/
-/* ============ REVIEW PANEL & CONTRAST FIX ============ */
+.review-panel{margin-top:36px;background:var(--parchment-2);border:1px solid var(--line-light);padding:24px 26px;}
+.review-panel h4{font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:var(--madder);margin-bottom:14px;}
 
-.review-panel {
-  margin-top: 36px;
-  background: var(--parchment-2);
-  border: 1px solid var(--line-light);
-  padding: 24px 26px;
-}
-
-.review-panel h4 {
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--madder);
-  margin-bottom: 14px;
-}
-
-/* Individual Row Alignment & Contrast Rules */
-.review-panel .review-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--line-light);
-}
-
-.review-panel .review-row:last-child {
-  border-bottom: none;
-}
-
-/* Left Label (Room, Material, etc.) */
-.review-panel .review-label,
-.review-panel .review-row > *:first-child {
-  font-size: 13.5px;
-  color: var(--ink-text) !important;
-  opacity: 0.65;
-  font-weight: 500;
-  text-align: start;
-}
-
-/* Right Value (Living Room, Indigo Teal, test, etc.) */
-.review-panel .review-value,
-.review-panel .review-row > *:last-child {
-  font-size: 14px;
-  color: var(--ink-text) !important; /* Forces solid dark ink color */
-  opacity: 1 !important;              /* Removes inherited transparency */
-  font-weight: 600;
-  text-align: end;
-  margin-inline-start: auto;
-}
 .send-note{margin-top:18px;font-size:12.5px;opacity:0.6;line-height:1.6;}
 .submit-success{display:none;text-align:center;padding:60px 20px;}
 .submit-success.show{display:block;}

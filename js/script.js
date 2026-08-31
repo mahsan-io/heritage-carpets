@@ -837,7 +837,7 @@ function buildCarouselMarkup(images){
     if(!opts.skipScroll) window.scrollTo(0,0);
   }
 
-  function initLanguageSwitch(){
+/*  function initLanguageSwitch(){
     let stored = null;
     try{ stored = localStorage.getItem('heritage-lang'); }catch(e){}
     const initialLang = stored || document.documentElement.getAttribute('lang') || 'en';
@@ -849,7 +849,36 @@ function buildCarouselMarkup(images){
         setLanguage(current === 'ar' ? 'en' : 'ar');
       });
     });
-  }
+  }*/
+   function initLanguageSwitch(){
+    let stored = null;
+
+    try { 
+        stored = localStorage.getItem('heritage-lang'); 
+    } catch(e) {}
+
+    const initialLang = stored || 
+        document.documentElement.getAttribute('lang') || 'en';
+
+    setLanguage(initialLang, {skipScroll:true});
+
+    document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+
+        // Set initial visual state
+        btn.classList.toggle('ar-active', initialLang === 'ar');
+
+        btn.addEventListener('click', function(){
+
+            const current = document.documentElement.getAttribute('lang');
+            const newLang = current === 'ar' ? 'en' : 'ar';
+
+            setLanguage(newLang);
+
+            // Move the brass indicator
+            btn.classList.toggle('ar-active', newLang === 'ar');
+        });
+    });
+}
 
   /* ---------------- Common chrome: nav, hamburger, reveal, logo fallback, year ---------------- */
   function initCommon(){

@@ -195,10 +195,31 @@ function buildCarouselMarkup(images){
     let current = 0;
     function showSlide(i){
       if(!valid.length) return;
+      const prev = current;
       current = i;
       slides.forEach((s,idx)=>{
         s.classList.toggle('active', idx===i);
       });
+      // Both slides are semi-transparent midway through a crossfade, so their combined
+      // opacity dips below 1 and the SVG motif underneath flashes through. Keeping the
+      // outgoing slide fully opaque beneath the incoming one closes that gap.
+      if(prev !== i && slides[prev]){
+        const out = slides[prev];
+        // clear any slide still held from an earlier, faster switch so only ever
+        // one slide sits beneath the active one
+        slides.forEach(s=>{
+          if(s !== out && s.classList.contains('holding')){
+            if(s._holdTimer){ clearTimeout(s._holdTimer); s._holdTimer = null; }
+            s.classList.remove('holding');
+          }
+        });
+        out.classList.add('holding');
+        if(out._holdTimer) clearTimeout(out._holdTimer);
+        out._holdTimer = setTimeout(function(){
+          out.classList.remove('holding');
+          out._holdTimer = null;
+        }, 700); // just past the .6s fade
+      }
       dots.forEach((d,idx)=>{
         d.classList.toggle('active', idx===i);
       });
@@ -354,7 +375,18 @@ function buildCarouselMarkup(images){
           if(!btn) return;
           const i = btn.dataset.index;
           galleryThumbs.querySelectorAll('.pdp-thumb').forEach(b=>b.classList.toggle('active', b===btn));
+          // same crossfade gap as the card carousels: hold the outgoing image opaque
+          // beneath the incoming one so the motif underneath never flashes through
+          const outgoing = galleryMain.querySelector('.pdp-main-img.active');
           galleryMain.querySelectorAll('.pdp-main-img').forEach(im=>im.classList.toggle('active', im.dataset.index===i));
+          if(outgoing && outgoing.dataset.index !== i){
+            outgoing.classList.add('holding');
+            if(outgoing._holdTimer) clearTimeout(outgoing._holdTimer);
+            outgoing._holdTimer = setTimeout(function(){
+              outgoing.classList.remove('holding');
+              outgoing._holdTimer = null;
+            }, 550); // just past the .45s fade
+          }
         });
       }
     }

@@ -236,8 +236,11 @@ h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif;font-weight:500;line-height:1.1
 
 /* Image carousel — collections / projects / products cards */
 .motif-carousel{position:absolute;inset:0;}
-.carousel-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;}
-.carousel-slide.active{opacity:1;}
+.carousel-slide{position:absolute;inset:0;opacity:0;z-index:1;transition:opacity .6s ease;}
+/* .holding is the slide being faded away: it stays fully opaque directly beneath the
+   incoming slide, so nothing behind the carousel is ever visible mid-transition. */
+.carousel-slide.holding{opacity:1;z-index:1;transition:none;}
+.carousel-slide.active{opacity:1;z-index:2;}
 .carousel-slide img{width:100%;height:100%;object-fit:cover;display:block;}
 .carousel-dots{position:absolute;top:12px;inset-inline-end:12px;display:flex;gap:6px;z-index:4;}
 .carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(243,238,227,0.55);border:1px solid rgba(0,0,0,0.18);cursor:pointer;transition:.25s var(--ease);padding:0;}
@@ -456,8 +459,9 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
 .pdp-gallery{position:sticky;top:96px;min-width:0;}
 .pdp-main{position:relative;aspect-ratio:1/1.05;background:var(--ink);overflow:hidden;}
 .pdp-main svg{position:absolute;inset:0;width:100%;height:100%;}
-.pdp-main-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s var(--ease);}
-.pdp-main-img.active{opacity:1;}
+.pdp-main-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:1;transition:opacity .45s var(--ease);}
+.pdp-main-img.holding{opacity:1;z-index:1;transition:none;}
+.pdp-main-img.active{opacity:1;z-index:2;}
 .pdp-thumbs{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
 .pdp-thumb{width:76px;height:76px;padding:0;border:1.5px solid transparent;overflow:hidden;background:var(--ink);transition:.25s var(--ease);}
 .pdp-thumb img{width:100%;height:100%;object-fit:cover;}

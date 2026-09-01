@@ -654,15 +654,25 @@ function buildCarouselMarkup(images){
     renderDates(); renderSlots(); renderSummary();
   }
 
-  /* ---------------- Room visualizer (room.html) ----------------
+/* ---------------- Room visualizer (room.html) ----------------
      Photo-based, not tracked AR: the visitor supplies a room photo (camera or
-     library), the rug is composited onto it on a canvas, and they can move,
-     scale, rotate and perspective-tilt it, then download or send the result.
-     Everything stays on the device — no upload. */
+     library), the piece is composited onto it on a canvas, and they can move,
+     scale, rotate and perspective-tilt it, then download the result.
+     Everything stays on the device — no upload.
+
+     Robustness notes (these were real failure modes, not hypotheticals):
+       * If a product photo is missing, we fall back to rendering the piece's
+         SVG motif as the rug, so the tool works before any photography exists.
+       * The controls are always visible and simply disabled until a room photo
+         is loaded, rather than hidden — a half-failed load used to leave the
+         panel empty with no explanation.
+       * Download uses toBlob + object URL and reports tainted-canvas failures
+         (which happen when the page is opened over file:// instead of http)
+         instead of silently doing nothing. */
   function renderRoomVisualizer(config, root){
     root = root || document;
     const lang = root.getAttribute('data-lang') || 'en';
-    const i18n = config.i18n;
+    const i18n = config.i18n || {};
     const D = window.HeritageData;
 
     const canvas = root.querySelector('[data-role="room-canvas"]');
@@ -676,57 +686,79 @@ function buildCarouselMarkup(images){
     const controls   = root.querySelector('[data-role="room-controls"]');
     const dlBtn      = root.querySelector('[data-role="room-download"]');
     const resetBtn   = root.querySelector('[data-role="room-reset"]');
+    const changeBtn  = root.querySelector('[data-role="room-change"]');
+    const statusEl   = root.querySelector('[data-role="room-status"]');
 
     const scaleInput = root.querySelector('[data-role="room-scale"]');
     const rotInput   = root.querySelector('[data-role="room-rotate"]');
     const perspInput = root.querySelector('[data-role="room-perspective"]');
     const opacInput  = root.querySelector('[data-role="room-opacity"]');
 
-    const view = { room:null, rug:null, x:0.5, y:0.68, scale:0.55, rot:0, persp:0.55, opacity:1 };
+    const DEFAULTS = { x:0.5, y:0.68, scale:0.55, rot:0, persp:0.55, opacity:1 };
+    const view = Object.assign({ room:null, rug:null }, DEFAULTS);
 
-    // populate the rug chooser from the shared catalog
-    if(rugSelect && D){
-      const list = (D.products[lang] || D.products.en).filter(p=>p.category.indexOf('accessories')===-1 && p.category.indexOf('furniture')===-1);
-      rugSelect.innerHTML = list.map(p=>'<option value="'+p.handle+'">'+p.name+'</option>').join('');
-      const preset = new URLSearchParams(window.location.search).get('handle');
-      if(preset && list.some(p=>p.handle===preset)) rugSelect.value = preset;
+    function say(msg, kind){
+      if(!statusEl) return;
+      statusEl.textContent = msg || '';
+      statusEl.className = 'room-status' + (kind ? ' ' + kind : '');
+    }
+
+    // Controls stay visible at all times; they are only disabled until there is
+    // a room photo to composite onto, so the panel is never mysteriously empty.
+    function setEnabled(on){
+      if(controls){
+        controls.hidden = false;
+        controls.classList.toggle('is-locked', !on);
+        controls.querySelectorAll('input,button,a').forEach(el=>{
+          if(on){ el.removeAttribute('aria-disabled'); }
+          else { el.setAttribute('aria-disabled','true'); }
+        });
+      }
     }
 
     function loadImage(src){
       return new Promise((res, rej)=>{
         const im = new Image();
         im.onload = ()=>res(im);
-        im.onerror = rej;
+        im.onerror = ()=>rej(new Error('load failed: '+src));
         im.src = src;
       });
     }
 
+    // The piece's own SVG motif, used when no photograph is available.
+    function motifImage(product){
+      const color = product.color === 'ivory' ? '#B08D46' : '#D4B876';
+      const svg = motifSVG(product.motif, color);
+      return loadImage('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+    }
+
     function loadRug(handle){
-      if(!D) return Promise.reject();
+      if(!D) return Promise.reject(new Error('no catalog'));
       const p = D.find(handle, lang) || D.find(handle, 'en');
-      if(!p) return Promise.reject();
+      if(!p) return Promise.reject(new Error('unknown handle'));
       const imgs = resolveImages(p, 'products');
-      if(!imgs.length) return Promise.reject();
-      // try each candidate in order so a missing file doesn't dead-end the tool
-      return imgs.reduce((chain, src)=>chain.catch(()=>loadImage(src)), Promise.reject());
+      // try each photo in turn, then fall back to the motif so the tool always works
+      let chain = Promise.reject(new Error('start'));
+      imgs.forEach(src=>{ chain = chain.catch(()=>loadImage(src)); });
+      return chain
+        .then(img=>({img:img, fallback:false}))
+        .catch(()=>motifImage(p).then(img=>({img:img, fallback:true})));
     }
 
     function draw(){
-      if(!view.room) return;
       const W = canvas.width, H = canvas.height;
       ctx.clearRect(0,0,W,H);
-      ctx.drawImage(view.room, 0, 0, W, H);
+      if(view.room) ctx.drawImage(view.room, 0, 0, W, H);
       if(!view.rug) return;
 
       const rugW = W * view.scale;
-      const ratio = view.rug.naturalHeight / view.rug.naturalWidth;
+      const ratio = (view.rug.naturalHeight || view.rug.height || 1) / (view.rug.naturalWidth || view.rug.width || 1);
       const rugH = rugW * ratio;
 
       ctx.save();
       ctx.globalAlpha = view.opacity;
       ctx.translate(W * view.x, H * view.y);
       ctx.rotate(view.rot * Math.PI / 180);
-      // flatten vertically to fake a floor plane, and taper the far edge
       ctx.transform(1, 0, 0, Math.max(0.12, view.persp), 0, 0);
       ctx.shadowColor = 'rgba(0,0,0,0.45)';
       ctx.shadowBlur = rugW * 0.05;
@@ -737,29 +769,56 @@ function buildCarouselMarkup(images){
 
     function fitCanvasTo(img){
       const maxW = 1200;
-      const w = Math.min(img.naturalWidth, maxW);
-      const h = Math.round(w * img.naturalHeight / img.naturalWidth);
+      const w = Math.min(img.naturalWidth || maxW, maxW);
+      const h = Math.round(w * (img.naturalHeight || 800) / (img.naturalWidth || 1200));
       canvas.width = w; canvas.height = h;
     }
 
+    function refreshRug(){
+      if(!rugSelect) return Promise.resolve();
+      return loadRug(rugSelect.value).then(r=>{
+        view.rug = r.img;
+        if(r.fallback) say(i18n.motifFallback || 'Showing the pattern outline — no photograph uploaded for this piece yet.', 'warn');
+        else if(view.room) say('');
+        draw();
+      }).catch(()=>{
+        view.rug = null;
+        say(i18n.rugFailed || 'Could not load that piece.', 'warn');
+      });
+    }
+
     function useRoomFile(file){
-      if(!file || !file.type.startsWith('image/')) return;
+      if(!file){ return; }
+      if(!file.type || !file.type.startsWith('image/')){
+        say(i18n.notImage || 'That file is not an image — please choose a photo.', 'warn');
+        return;
+      }
+      say(i18n.loading || 'Loading your photo…');
       const reader = new FileReader();
+      reader.onerror = ()=>say(i18n.readFailed || 'Could not read that file.', 'warn');
       reader.onload = function(e){
         loadImage(e.target.result).then(img=>{
           view.room = img;
           fitCanvasTo(img);
           if(stageWrap) stageWrap.hidden = false;
-          if(controls) controls.hidden = false;
           if(dropZone) dropZone.classList.add('has-room');
-          return rugSelect ? loadRug(rugSelect.value).then(r=>{ view.rug = r; }).catch(()=>{}) : null;
-        }).then(draw).catch(()=>{});
+          setEnabled(true);
+          say('');
+          return refreshRug();
+        }).then(draw).catch(()=>{
+          say(i18n.photoFailed || 'That photo could not be opened. Try another image.', 'warn');
+        });
       };
       reader.readAsDataURL(file);
     }
 
     if(dropZone && fileInput){
-      dropZone.addEventListener('click', ()=>fileInput.click());
+      dropZone.addEventListener('click', function(e){
+        // the file input lives inside the drop zone; without this guard its own
+        // click bubbles back here and re-triggers the picker
+        if(e.target === fileInput) return;
+        fileInput.click();
+      });
       ['dragover','dragleave','drop'].forEach(ev=>{
         dropZone.addEventListener(ev, function(e){
           e.preventDefault();
@@ -767,44 +826,61 @@ function buildCarouselMarkup(images){
         });
       });
       dropZone.addEventListener('drop', e=>useRoomFile(e.dataTransfer.files[0]));
-      fileInput.addEventListener('change', ()=>useRoomFile(fileInput.files[0]));
+      fileInput.addEventListener('click', e=>e.stopPropagation());
+      fileInput.addEventListener('change', function(){ useRoomFile(fileInput.files[0]); });
     }
-    if(rugSelect){
-      rugSelect.addEventListener('change', function(){
-        loadRug(rugSelect.value).then(r=>{ view.rug = r; draw(); }).catch(()=>{});
-      });
+    if(changeBtn && fileInput){
+      changeBtn.addEventListener('click', function(){ fileInput.click(); });
     }
+    if(rugSelect) rugSelect.addEventListener('change', refreshRug);
 
     const bind = (el, key, transform)=>{
       if(!el) return;
-      el.addEventListener('input', function(){
+      const handler = function(){
         view[key] = transform ? transform(el.value) : parseFloat(el.value);
         draw();
-      });
+      };
+      el.addEventListener('input', handler);
+      el.addEventListener('change', handler); // some mobile browsers only fire change
     };
     bind(scaleInput, 'scale', v=>parseFloat(v)/100);
     bind(rotInput,   'rot',   v=>parseFloat(v));
     bind(perspInput, 'persp', v=>parseFloat(v)/100);
     bind(opacInput,  'opacity', v=>parseFloat(v)/100);
 
-    // drag to position the rug
+    // drag to position
     let dragging = false;
     function pointTo(e){
       const r = canvas.getBoundingClientRect();
+      if(!r.width || !r.height) return;
       const cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
       const cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
       view.x = Math.min(1, Math.max(0, cx / r.width));
       view.y = Math.min(1, Math.max(0, cy / r.height));
       draw();
     }
-    canvas.addEventListener('pointerdown', function(e){ if(!view.rug) return; dragging = true; canvas.setPointerCapture(e.pointerId); pointTo(e); });
+    canvas.addEventListener('pointerdown', function(e){
+      if(!view.rug || !view.room) return;
+      dragging = true;
+      if(canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
+      pointTo(e);
+    });
     canvas.addEventListener('pointermove', function(e){ if(dragging) pointTo(e); });
     canvas.addEventListener('pointerup',   function(){ dragging = false; });
     canvas.addEventListener('pointercancel', function(){ dragging = false; });
+    // wheel to resize, so desktop users aren't forced to the slider
+    canvas.addEventListener('wheel', function(e){
+      if(!view.rug || !view.room) return;
+      e.preventDefault();
+      const next = Math.min(1.2, Math.max(0.15, view.scale + (e.deltaY > 0 ? -0.03 : 0.03)));
+      view.scale = next;
+      if(scaleInput) scaleInput.value = Math.round(next*100);
+      draw();
+    }, {passive:false});
 
     if(resetBtn){
       resetBtn.addEventListener('click', function(){
-        view.x=0.5; view.y=0.68; view.scale=0.55; view.rot=0; view.persp=0.55; view.opacity=1;
+        Object.assign(view, DEFAULTS);
         if(scaleInput) scaleInput.value = 55;
         if(rotInput) rotInput.value = 0;
         if(perspInput) perspInput.value = 55;
@@ -812,15 +888,51 @@ function buildCarouselMarkup(images){
         draw();
       });
     }
+
     if(dlBtn){
-      dlBtn.addEventListener('click', function(){
-        if(!view.room) return;
+      dlBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        if(!view.room){ say(i18n.needPhoto || 'Add a room photo first.', 'warn'); return; }
+        const finish = (url)=>{
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'heritage-room-preview.jpg';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          say(i18n.downloaded || 'Preview saved.', 'ok');
+        };
         try{
-          dlBtn.setAttribute('href', canvas.toDataURL('image/jpeg', 0.9));
-          dlBtn.setAttribute('download', 'heritage-room-preview.jpg');
-        }catch(err){ /* canvas export unavailable — leave the link inert */ }
+          if(canvas.toBlob){
+            canvas.toBlob(function(blob){
+              if(!blob){ say(i18n.downloadFailed || 'Could not export the image.', 'warn'); return; }
+              const url = URL.createObjectURL(blob);
+              finish(url);
+              setTimeout(()=>URL.revokeObjectURL(url), 10000);
+            }, 'image/jpeg', 0.92);
+          } else {
+            finish(canvas.toDataURL('image/jpeg', 0.92));
+          }
+        }catch(err){
+          // SecurityError here means the canvas is tainted — almost always because
+          // the page was opened from the file system rather than served over http.
+          say(i18n.taintedCanvas || 'Export blocked by the browser. Open the site over http(s) rather than as a local file, then try again.', 'warn');
+        }
       });
     }
+
+    // populate the piece chooser from the shared catalog
+    if(rugSelect && D){
+      const list = (D.products[lang] || D.products.en)
+        .filter(p=>p.category.indexOf('accessories')===-1 && p.category.indexOf('furniture')===-1);
+      rugSelect.innerHTML = list.map(p=>'<option value="'+p.handle+'">'+p.name+'</option>').join('');
+      const preset = new URLSearchParams(window.location.search).get('handle');
+      if(preset && list.some(p=>p.handle===preset)) rugSelect.value = preset;
+    }
+
+    setEnabled(false);
+    say(i18n.startHint || '');
+    refreshRug();
   }
 
   /* ---------------- Language switching ---------------- */

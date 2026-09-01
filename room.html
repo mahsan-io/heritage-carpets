@@ -29,12 +29,8 @@
         <a href="room.html">Design Your Room</a>
     </div>
     <div class="nav-right">
-       <button type="button" class="lang-toggle" data-lang-switch aria-label="Switch language">
-    <span class="lang-option lang-en">EN</span>
-    <span class="lang-option lang-ar">AR</span>
-    <span class="lang-indicator"></span>
-</button>
-    <!--  <a href="visit.html" class="btn btn-fill nav-cta">Book a Visit</a>-->
+      <button type="button" class="lang-toggle" data-lang-switch>EN / AR</button>
+      <a href="visit.html" class="btn btn-fill nav-cta">Book a Visit</a>
       <button class="hamburger" data-role="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -62,7 +58,7 @@
     <div class="room-stage-wrap">
       <div class="room-drop" data-role="room-drop">
         <strong>Take or choose a photo of your room</strong>
-        <p>Shoot from standing height, with the floor filling the lower half of the frame.</p>
+        <p>Shoot from standing height, with the floor filling the lower half of the frame. Nothing is uploaded — the photo stays on your device.</p>
         <input type="file" accept="image/*" capture="environment" data-role="room-file" style="display:none;">
       </div>
       <div class="room-canvas-wrap" data-role="room-stage" hidden>
@@ -75,16 +71,18 @@
         <label>Piece</label>
         <select data-role="room-rug"></select>
       </div>
-      <div data-role="room-controls" hidden>
+      <div class="room-controls is-locked" data-role="room-controls">
         <div class="room-field"><label>Size</label><input type="range" min="15" max="120" value="55" data-role="room-scale"></div>
         <div class="room-field"><label>Rotation</label><input type="range" min="-45" max="45" value="0" data-role="room-rotate"></div>
         <div class="room-field"><label>Floor angle</label><input type="range" min="12" max="100" value="55" data-role="room-perspective"></div>
         <div class="room-field"><label>Opacity</label><input type="range" min="30" max="100" value="100" data-role="room-opacity"></div>
         <div class="room-actions">
           <a class="btn btn-fill" data-role="room-download" href="#">Download Preview</a>
+          <button type="button" class="btn btn-outline dark" data-role="room-change">Change Photo</button>
           <button type="button" class="btn btn-outline dark" data-role="room-reset">Reset</button>
         </div>
       </div>
+      <p class="room-status" data-role="room-status"></p>
       <p class="room-note">Drag the rug on the photo to reposition it. This is a visual guide, not a measured fit — a consultant can confirm the right size for your room.</p>
     </aside>
   </div>
@@ -155,11 +153,7 @@
         <a href="room.html">صمم غرفتك</a>
     </div>
     <div class="nav-right">
-       <button type="button" class="lang-toggle" data-lang-switch aria-label="Switch language">
-    <span class="lang-option lang-en">EN</span>
-    <span class="lang-option lang-ar">AR</span>
-    <span class="lang-indicator"></span>
-</button>
+      <button type="button" class="lang-toggle" data-lang-switch>EN / AR</button>
       <a href="visit.html" class="btn btn-fill nav-cta">احجز زيارة</a>
       <button class="hamburger" data-role="hamburger" aria-label="القائمة"><span></span><span></span><span></span></button>
     </div>
@@ -188,7 +182,7 @@
     <div class="room-stage-wrap">
       <div class="room-drop" data-role="room-drop">
         <strong>التقط أو اختر صورة لغرفتك</strong>
-        <p>صوّر من مستوى الوقوف، بحيث تملأ الأرضية النصف السفلي من الإطار.</p>
+        <p>صوّر من مستوى الوقوف، بحيث تملأ الأرضية النصف السفلي من الإطار. لا تُرفع أي صورة — تبقى على جهازك.</p>
         <input type="file" accept="image/*" capture="environment" data-role="room-file" style="display:none;">
       </div>
       <div class="room-canvas-wrap" data-role="room-stage" hidden>
@@ -201,16 +195,18 @@
         <label>القطعة</label>
         <select data-role="room-rug"></select>
       </div>
-      <div data-role="room-controls" hidden>
+      <div class="room-controls is-locked" data-role="room-controls">
         <div class="room-field"><label>المقاس</label><input type="range" min="15" max="120" value="55" data-role="room-scale"></div>
         <div class="room-field"><label>الدوران</label><input type="range" min="-45" max="45" value="0" data-role="room-rotate"></div>
         <div class="room-field"><label>زاوية الأرضية</label><input type="range" min="12" max="100" value="55" data-role="room-perspective"></div>
         <div class="room-field"><label>الشفافية</label><input type="range" min="30" max="100" value="100" data-role="room-opacity"></div>
         <div class="room-actions">
           <a class="btn btn-fill" data-role="room-download" href="#">تنزيل المعاينة</a>
+          <button type="button" class="btn btn-outline dark" data-role="room-change">تغيير الصورة</button>
           <button type="button" class="btn btn-outline dark" data-role="room-reset">إعادة الضبط</button>
         </div>
       </div>
+      <p class="room-status" data-role="room-status"></p>
       <p class="room-note">اسحب السجادة على الصورة لتغيير موضعها. هذه معاينة بصرية وليست قياسًا دقيقًا — يمكن لأحد المستشارين تأكيد المقاس المناسب لغرفتك.</p>
     </aside>
   </div>
@@ -266,10 +262,38 @@
 <script src="js/data.js"></script>
 <script src="js/script.js"></script>
 <script>
-  Heritage.renderRoomVisualizer({}, document.querySelector('.lang-block[data-lang="en"]'));
+  Heritage.renderRoomVisualizer({
+    i18n: {
+      startHint:'Add a room photo to begin.',
+      loading:'Loading your photo…',
+      needPhoto:'Add a room photo first.',
+      notImage:'That file is not an image — please choose a photo.',
+      readFailed:'Could not read that file.',
+      photoFailed:'That photo could not be opened. Try another image.',
+      rugFailed:'Could not load that piece.',
+      motifFallback:'Showing the pattern outline — no photograph has been uploaded for this piece yet.',
+      downloaded:'Preview saved to your downloads.',
+      downloadFailed:'Could not export the image.',
+      taintedCanvas:'Export was blocked by the browser. This happens when the page is opened as a local file — open it over http(s) and try again.'
+    }
+  }, document.querySelector('.lang-block[data-lang="en"]'));
 </script>
 <script>
-  Heritage.renderRoomVisualizer({}, document.querySelector('.lang-block[data-lang="ar"]'));
+  Heritage.renderRoomVisualizer({
+    i18n: {
+      startHint:'أضف صورة لغرفتك للبدء.',
+      loading:'جارٍ تحميل صورتك…',
+      needPhoto:'أضف صورة لغرفتك أولاً.',
+      notImage:'هذا الملف ليس صورة — يرجى اختيار صورة.',
+      readFailed:'تعذّرت قراءة الملف.',
+      photoFailed:'تعذّر فتح هذه الصورة. جرّب صورة أخرى.',
+      rugFailed:'تعذّر تحميل هذه القطعة.',
+      motifFallback:'يتم عرض مخطط النقش — لم تُرفع صورة فوتوغرافية لهذه القطعة بعد.',
+      downloaded:'تم حفظ المعاينة في التنزيلات.',
+      downloadFailed:'تعذّر تصدير الصورة.',
+      taintedCanvas:'تم حظر التصدير من المتصفح. يحدث ذلك عند فتح الصفحة كملف محلي — افتحها عبر http(s) ثم أعد المحاولة.'
+    }
+  }, document.querySelector('.lang-block[data-lang="ar"]'));
 </script>
 </body>
 </html>

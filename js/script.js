@@ -501,6 +501,7 @@ function buildCarouselMarkup(images){
     });
 
     initCarousels(grid);
+    revealNow(grid);
   }
 
   /* ---------------- Showroom appointment booking (visit.html) ----------------
@@ -596,7 +597,7 @@ function buildCarouselMarkup(images){
         [i18n.sumLabels.phone,    state.phone || i18n.notSelected]
       ];
       summaryEl.innerHTML = rows.map(r=>
-        '<div class="preview-summary-row" style="color:var(--ink-text);"><span style="opacity:0.6;">'+r[0]+'</span><span style="font-weight:600;">'+r[1]+'</span></div>'
+        '<div class="preview-summary-row summary-light"><span>'+r[0]+'</span><span>'+r[1]+'</span></div>'
       ).join('');
       const ready = !!(state.showroom && state.date && state.slot && state.name.trim());
       if(confirmBtn) confirmBtn.classList.toggle('is-disabled', !ready);
@@ -654,7 +655,7 @@ function buildCarouselMarkup(images){
     renderDates(); renderSlots(); renderSummary();
   }
 
-/* ---------------- Room visualizer (room.html) ----------------
+  /* ---------------- Room visualizer (room.html) ----------------
      Photo-based, not tracked AR: the visitor supplies a room photo (camera or
      library), the piece is composited onto it on a canvas, and they can move,
      scale, rotate and perspective-tilt it, then download the result.
@@ -848,33 +849,104 @@ function buildCarouselMarkup(images){
     bind(perspInput, 'persp', v=>parseFloat(v)/100);
     bind(opacInput,  'opacity', v=>parseFloat(v)/100);
 
-    // drag to position
+    /* ---- Direct manipulation on the canvas ----
+       One finger  : drag to reposition
+       Two fingers : pinch to resize, twist to rotate, and a vertical two-finger
+                     drag adjusts the floor angle
+       Wheel       : resize on desktop
+       The sliders stay in sync so the two ways of working never disagree. */
+    const pointers = new Map();
+    let gesture = null;          // snapshot taken when the 2nd finger lands
     let dragging = false;
-    function pointTo(e){
+
+    function localPoint(e){
       const r = canvas.getBoundingClientRect();
-      if(!r.width || !r.height) return;
-      const cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-      const cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-      view.x = Math.min(1, Math.max(0, cx / r.width));
-      view.y = Math.min(1, Math.max(0, cy / r.height));
-      draw();
+      if(!r.width || !r.height) return null;
+      return { x:(e.clientX - r.left) / r.width, y:(e.clientY - r.top) / r.height, r:r };
     }
+
+    function syncSliders(){
+      if(scaleInput) scaleInput.value = Math.round(view.scale * 100);
+      if(rotInput)   rotInput.value   = Math.round(view.rot);
+      if(perspInput) perspInput.value = Math.round(view.persp * 100);
+    }
+
+    function twoFingerState(){
+      const pts = Array.from(pointers.values());
+      const a = pts[0], b = pts[1];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      return {
+        dist: Math.hypot(dx, dy),
+        angle: Math.atan2(dy, dx) * 180 / Math.PI,
+        midY: (a.y + b.y) / 2
+      };
+    }
+
     canvas.addEventListener('pointerdown', function(e){
       if(!view.rug || !view.room) return;
-      dragging = true;
-      if(canvas.setPointerCapture) canvas.setPointerCapture(e.pointerId);
-      pointTo(e);
+      canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+
+      if(pointers.size === 1){
+        dragging = true;
+        const p = localPoint(e);
+        if(p){ view.x = Math.min(1, Math.max(0, p.x)); view.y = Math.min(1, Math.max(0, p.y)); draw(); }
+      } else if(pointers.size === 2){
+        dragging = false;                     // hand over to the pinch/rotate gesture
+        const st = twoFingerState();
+        gesture = { dist:st.dist, angle:st.angle, midY:st.midY,
+                    scale:view.scale, rot:view.rot, persp:view.persp };
+      }
     });
-    canvas.addEventListener('pointermove', function(e){ if(dragging) pointTo(e); });
-    canvas.addEventListener('pointerup',   function(){ dragging = false; });
-    canvas.addEventListener('pointercancel', function(){ dragging = false; });
+
+    canvas.addEventListener('pointermove', function(e){
+      if(!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+      e.preventDefault();
+
+      if(pointers.size >= 2 && gesture){
+        const st = twoFingerState();
+        if(gesture.dist > 0){
+          view.scale = Math.min(1.6, Math.max(0.10, gesture.scale * (st.dist / gesture.dist)));
+        }
+        let delta = st.angle - gesture.angle;
+        while(delta > 180) delta -= 360;
+        while(delta < -180) delta += 360;
+        view.rot = Math.max(-180, Math.min(180, gesture.rot + delta));
+        // two fingers sliding up/down together flattens or lifts the floor plane
+        const rect = canvas.getBoundingClientRect();
+        if(rect.height){
+          const dy = (st.midY - gesture.midY) / rect.height;
+          view.persp = Math.min(1, Math.max(0.12, gesture.persp + dy));
+        }
+        syncSliders();
+        draw();
+      } else if(dragging){
+        const p = localPoint(e);
+        if(p){ view.x = Math.min(1, Math.max(0, p.x)); view.y = Math.min(1, Math.max(0, p.y)); draw(); }
+      }
+    }, {passive:false});
+
+    function endPointer(e){
+      pointers.delete(e.pointerId);
+      if(pointers.size < 2) gesture = null;
+      if(pointers.size === 0) dragging = false;
+      if(pointers.size === 1){
+        // lifting one finger of a pinch shouldn't teleport the rug: resume dragging
+        // from wherever the remaining finger is, not from a stale position
+        dragging = true;
+      }
+    }
+    canvas.addEventListener('pointerup', endPointer);
+    canvas.addEventListener('pointercancel', endPointer);
+    canvas.addEventListener('pointerleave', function(e){ if(pointers.has(e.pointerId)) endPointer(e); });
+
     // wheel to resize, so desktop users aren't forced to the slider
     canvas.addEventListener('wheel', function(e){
       if(!view.rug || !view.room) return;
       e.preventDefault();
-      const next = Math.min(1.2, Math.max(0.15, view.scale + (e.deltaY > 0 ? -0.03 : 0.03)));
-      view.scale = next;
-      if(scaleInput) scaleInput.value = Math.round(next*100);
+      view.scale = Math.min(1.6, Math.max(0.10, view.scale + (e.deltaY > 0 ? -0.03 : 0.03)));
+      syncSliders();
       draw();
     }, {passive:false});
 
@@ -930,112 +1002,98 @@ function buildCarouselMarkup(images){
       if(preset && list.some(p=>p.handle===preset)) rugSelect.value = preset;
     }
 
+    // On touch devices tell people to use the photo directly — the sliders stay as a
+    // fine-tune fallback, but pinch/twist on the image is the primary interaction.
+    const coarsePointer = window.matchMedia && window.matchMedia('(hover: none)').matches;
+    if(coarsePointer){
+      const note = root.querySelector('.room-note');
+      if(note){
+        note.textContent = i18n.touchHint || (lang === 'ar'
+          ? 'اسحب بإصبع واحد لتحريك السجادة، وقرّب أو باعد بإصبعين لتغيير المقاس، ولفّهما للدوران، واسحبهما لأعلى أو لأسفل لضبط زاوية الأرضية. هذه معاينة بصرية وليست قياسًا دقيقًا.'
+          : 'Drag with one finger to move the rug. Pinch with two fingers to resize, twist to rotate, and slide two fingers up or down to set the floor angle. This is a visual guide, not a measured fit.');
+      }
+    }
+
     setEnabled(false);
     say(i18n.startHint || '');
     refreshRug();
   }
 
+  /* ---------------- Scroll-reveal safety net ----------------
+     .reveal starts at opacity:0 and is switched on by an IntersectionObserver.
+     Two situations break that and leave real content invisible:
+       1. Content that is already below the fold on a small screen — on phones the
+          product grid starts under the viewport, so nothing reported an
+          intersection and the grid stayed at opacity 0 even though every card
+          was in the DOM. (This was the "products only appear after I touch a
+          filter" bug — interacting forced a layout change that woke the observer.)
+       2. Anything inside the hidden language block, which can never intersect
+          at all until that block is shown.
+     revealInView() force-reveals anything currently on screen, and revealNow()
+     is used for grids we render ourselves, which must never be hidden. -------- */
+  function revealNow(el){
+    if(el) el.classList.add('is-visible');
+  }
+
+  function revealInView(scope){
+    scope = scope || document;
+    const h = window.innerHeight || 800;
+    scope.querySelectorAll('.reveal').forEach(el=>{
+      if(el.classList.contains('is-visible')) return;
+      let top = 0;
+      try { top = el.getBoundingClientRect().top; } catch(e) { top = 0; }
+      // generous margin: better a missed animation than invisible content
+      if(top < h * 1.5) el.classList.add('is-visible');
+    });
+  }
+
   /* ---------------- Language switching ---------------- */
-/*  function setLanguage(lang, opts){
+  function setLanguage(lang, opts){
     opts = opts || {};
     document.documentElement.setAttribute('lang', lang);
-    document.documentElement.setAttribute('dir', lang==='ar' ? 'rtl' : 'ltr');
-    document.querySelectorAll('.lang-block').forEach(block=>{
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+    document.querySelectorAll('.lang-block').forEach(block => {
       block.hidden = block.getAttribute('data-lang') !== lang;
     });
-    const title = document.documentElement.getAttribute('data-title-'+lang);
+
+    const title = document.documentElement.getAttribute('data-title-' + lang);
     if(title) document.title = title;
-    try{ localStorage.setItem('heritage-lang', lang); }catch(e){}
-    if(!opts.skipScroll) window.scrollTo(0,0);
+
+    try { localStorage.setItem('heritage-lang', lang); } catch(e) {}
+
+    // Drive the EN/AR pill: the brass indicator position is CSS-driven off this class.
+    document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+      btn.classList.toggle('ar-active', lang === 'ar');
+      btn.setAttribute('aria-label', lang === 'ar' ? 'Switch to English' : 'Switch to Arabic');
+    });
+
+    // Elements inside a hidden block can never trigger the IntersectionObserver, so
+    // anything already on screen in the block we just revealed would stay at opacity 0.
+    revealInView(document.querySelector('.lang-block[data-lang="'+lang+'"]'));
+
+    if(!opts.skipScroll) window.scrollTo(0, 0);
   }
 
   function initLanguageSwitch(){
     let stored = null;
-    try{ stored = localStorage.getItem('heritage-lang'); }catch(e){}
+    try { stored = localStorage.getItem('heritage-lang'); } catch(e) {}
+
     const initialLang = stored || document.documentElement.getAttribute('lang') || 'en';
     setLanguage(initialLang, {skipScroll:true});
 
-    document.querySelectorAll('[data-lang-switch]').forEach(btn=>{
+    document.querySelectorAll('[data-lang-switch]').forEach(btn => {
+      // The nav toggles are the EN/AR pill (they contain .lang-option spans); the footer
+      // ones are plain "EN / AR" text buttons. Without this flag the pill's fixed 58px
+      // sizing would squash the footer text, so mark them for the plain-button styling.
+      if(!btn.querySelector('.lang-option')) btn.classList.add('lang-toggle-text');
+
       btn.addEventListener('click', function(){
         const current = document.documentElement.getAttribute('lang');
         setLanguage(current === 'ar' ? 'en' : 'ar');
       });
     });
-  }*/
-/* ---------------- Language switching ---------------- */
-function setLanguage(lang, opts){
-    opts = opts || {};
-
-    // Set document language and direction
-    document.documentElement.setAttribute('lang', lang);
-    document.documentElement.setAttribute(
-        'dir',
-        lang === 'ar' ? 'rtl' : 'ltr'
-    );
-
-    // Show only the selected language blocks
-    document.querySelectorAll('.lang-block').forEach(block => {
-        block.hidden = block.getAttribute('data-lang') !== lang;
-    });
-
-    // Update page title
-    const title = document.documentElement.getAttribute('data-title-' + lang);
-    if(title) document.title = title;
-
-    // Save selected language
-    try {
-        localStorage.setItem('heritage-lang', lang);
-    } catch(e) {}
-
-    // Update all language switches
-    document.querySelectorAll('[data-lang-switch]').forEach(btn => {
-        btn.classList.toggle('ar-active', lang === 'ar');
-        btn.setAttribute(
-            'aria-label',
-            lang === 'ar' ? 'Switch to English' : 'Switch to Arabic'
-        );
-    });
-
-    // Scroll to top when language is manually changed
-    if(!opts.skipScroll) {
-        window.scrollTo(0, 0);
-    }
-}
-
-
-/* ---------------- Initialize language switch ---------------- */
-function initLanguageSwitch(){
-
-    let stored = null;
-
-    try {
-        stored = localStorage.getItem('heritage-lang');
-    } catch(e) {}
-
-    const initialLang =
-        stored ||
-        document.documentElement.getAttribute('lang') ||
-        'en';
-
-    // Apply initial language
-    setLanguage(initialLang, {skipScroll:true});
-
-    // Add click event
-    document.querySelectorAll('[data-lang-switch]').forEach(btn => {
-
-        btn.addEventListener('click', function(){
-
-            const current =
-                document.documentElement.getAttribute('lang');
-
-            const newLang =
-                current === 'ar' ? 'en' : 'ar';
-
-            setLanguage(newLang);
-        });
-
-    });
-}
+  }
 
   /* ---------------- Common chrome: nav, hamburger, reveal, logo fallback, year ---------------- */
   function initCommon(){
@@ -1072,15 +1130,31 @@ function initLanguageSwitch(){
       img.addEventListener('error', function(){ img.remove(); }, {once:true});
     });
 
+    // threshold must be 0, not a fraction. intersectionRatio is visibleArea/totalArea,
+    // so an element taller than ~10x the viewport can never reach 0.1 — which is exactly
+    // what happened to the single-column product grid on phones (22 cards ≈ 10,000px tall,
+    // max ratio ≈ 0.076). It stayed at opacity 0 until a filter shortened the grid enough
+    // to cross the threshold, which looked like "products only appear after filtering".
     const io = new IntersectionObserver((entries)=>{
       entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); } });
-    }, {threshold:0.1});
+    }, {threshold:0, rootMargin:'0px 0px -40px 0px'});
     document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
     document.querySelectorAll('.section-head').forEach(el=>{ el.classList.add('reveal'); io.observe(el); });
+
+    // Belt and braces: reveal anything already on screen right now, so content can never
+    // be stranded at opacity 0 if the observer misbehaves or is unsupported.
+    revealInView(document);
 
     document.querySelectorAll('[data-role="year"]').forEach(el=>{ el.textContent = new Date().getFullYear(); });
 
     initLanguageSwitch();
+
+    // Final safety sweep once layout has settled, then again on resize/orientation
+    // change — phones report a very different viewport after the URL bar collapses.
+    revealInView(document);
+    window.addEventListener('load', function(){ revealInView(document); });
+    window.addEventListener('resize', function(){ revealInView(document); }, {passive:true});
+    window.addEventListener('orientationchange', function(){ revealInView(document); });
   }
 
   /* ---------------- Home page render (called once per language block) ---------------- */
@@ -1289,6 +1363,7 @@ function initLanguageSwitch(){
             '</div></div>';
         }).join('');
         initCarousels(grid);
+        revealNow(grid); // content we just rendered must never sit at opacity 0
       }
       const resultCountEl = root.querySelector('[data-role="result-count"]');
       if(resultCountEl) resultCountEl.textContent = i18n.resultCount.replace('{count}', filtered.length).replace('{total}', PRODUCTS.length);
@@ -1500,7 +1575,7 @@ function initLanguageSwitch(){
       const colorLabel = state.customHex ? state.customHex.toUpperCase() : (state.color ? (config.colors.find(c=>c.key===state.color)||{}).label : dash);
       const patternLabel = state.pattern ? (config.patterns.find(p=>p.key===state.pattern)||{}).label : dash;
       const rows = [[L.room,roomLabel],[L.shape,shapeLabel],[L.dimensions,dims],[L.material,materialLabel],[L.color,colorLabel],[L.pattern,patternLabel],[L.notes, state.notes||dash]];
-      el.innerHTML = rows.map(r=>'<div class="preview-summary-row" style="color:var(--ink-text);"><span style="opacity:0.6;">'+r[0]+'</span><span style="font-weight:600;">'+r[1]+'</span></div>').join('');
+      el.innerHTML = rows.map(r=>'<div class="preview-summary-row summary-light"><span>'+r[0]+'</span><span>'+r[1]+'</span></div>').join('');
     }
 
     function buildMailto(){

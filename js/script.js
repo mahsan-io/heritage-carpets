@@ -1187,6 +1187,67 @@ function buildCarouselMarkup(images){
     window.addEventListener('load', function(){ revealInView(document); });
     window.addEventListener('resize', function(){ revealInView(document); }, {passive:true});
     window.addEventListener('orientationchange', function(){ revealInView(document); });
+
+    initScrollButton();
+  }
+
+  /* ---------------- Scroll to bottom / back to top ----------------
+     A single button that flips direction rather than two competing ones: it
+     points down while you are in the top half of the page and up once you pass
+     halfway. Injected here so no page markup has to change, and it hides itself
+     entirely on pages too short to scroll. */
+  const SCROLL_FAB_LABELS = {
+    en: {down:'Scroll to bottom', up:'Back to top'},
+    ar: {down:'انتقل إلى الأسفل', up:'العودة إلى الأعلى'}
+  };
+
+  function initScrollButton(){
+    if(document.querySelector('.scroll-fab')) return;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'scroll-fab';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v16"/><path d="M5 13l7 7 7-7"/></svg>';
+    document.body.appendChild(btn);
+
+    let goingUp = false;
+
+    function maxScroll(){
+      return Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    }
+
+    function update(){
+      const max = maxScroll();
+      // nothing to scroll — keep the button out of the way entirely
+      if(max < 240){
+        btn.classList.remove('is-ready');
+        return;
+      }
+      btn.classList.add('is-ready');
+      const y = window.scrollY || document.documentElement.scrollTop || 0;
+      goingUp = y > max / 2;
+      btn.classList.toggle('is-up', goingUp);
+      const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar' : 'en';
+      const label = SCROLL_FAB_LABELS[lang][goingUp ? 'up' : 'down'];
+      btn.setAttribute('aria-label', label);
+      btn.setAttribute('title', label);
+    }
+
+    btn.addEventListener('click', function(){
+      window.scrollTo({
+        top: goingUp ? 0 : maxScroll(),
+        behavior: reducedMotion ? 'auto' : 'smooth'
+      });
+    });
+
+    window.addEventListener('scroll', update, {passive:true});
+    window.addEventListener('resize', update, {passive:true});
+    window.addEventListener('load', update);
+    // language switch changes the label, and switching blocks changes page height
+    document.querySelectorAll('[data-lang-switch]').forEach(b=>{
+      b.addEventListener('click', function(){ setTimeout(update, 60); });
+    });
+    update();
   }
 
   /* ---------------- Home page render (called once per language block) ---------------- */

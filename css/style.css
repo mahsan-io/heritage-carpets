@@ -13,23 +13,23 @@
 .lang-block[hidden]{display:none !important;}
 
 :root{
-  --ink:#1B1714;
-  --ink-2:#241E19;
-  --ink-3:#2E2620;
-  --parchment:#EDE6D6;
-  --parchment-2:#F6F2E9;
-  --madder:#7A2E27;
-  --madder-light:#9C4038;
-  --brass:#B08D46;
-  --brass-light:#D4B876;
-  --teal:#2B4A47;
-  --ink-text:#2A2420;
-  --cream-text:#F3EEE3;
-  --cream-text-dim:#C9BFAE;
-  --line-dark:rgba(212,184,118,0.22);
-  --line-light:rgba(42,36,32,0.14);
-  --shadow:0 20px 50px rgba(20,15,10,0.25);
-  --ease:cubic-bezier(.22,.61,.36,1);
+  --ink:#595556;
+  --ink-2:#4E4A4C;
+  --ink-3:#686466;
+  --parchment:#FFFFFF;
+  --parchment-2:#F7F7F7;
+  --madder:#B7CC33;
+  --madder-light:#C8D94F;
+  --brass:#B7CC33;
+  --brass-light:#D5E27A;
+  --teal:#595556;
+  --ink-text:#595556;
+  --cream-text:#FFFFFF;
+  --cream-text-dim:#D9D7D8;
+  --line-dark: rgba(255, 255, 255, 0.18);
+  --line-light: rgba(89, 85, 86, 0.16);
+  --shadow: 0 20px 50px rgba(40, 38, 39, 0.20);
+  --ease: cubic-bezier(.22,.61,.36,1);
   --whatsapp:#25D366;
 }
 

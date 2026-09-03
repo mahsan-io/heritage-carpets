@@ -31,9 +31,9 @@ window.Heritage = (function(){
 
   /* ---------------- Reusable SVG motif generator (collections/projects tiles) ---------------- */
   function motifSVG(type, color){
-    color = color || '#B08D46';
+    color = color || '#B7CC33';
     const p = '<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">';
-    const bg = '<rect width="200" height="200" fill="#1B1714"/>';
+    const bg = '<rect width="200" height="200" fill="#2F2D2E"/>';
     let inner = '';
     if(type==='medallion'){
       inner = '<circle cx="100" cy="100" r="80" stroke="'+color+'" stroke-width="0.6" fill="none"/><circle cx="100" cy="100" r="55" stroke="'+color+'" stroke-width="0.6" fill="none"/><path d="M100 40l28 60-28 60-28-60z" stroke="'+color+'" stroke-width="1.4" fill="none"/><circle cx="100" cy="100" r="10" fill="'+color+'" opacity="0.5"/>';
@@ -345,7 +345,7 @@ function buildCarouselMarkup(images){
     const galleryMain = root.querySelector('[data-role="pdp-gallery-main"]');
     const galleryThumbs = root.querySelector('[data-role="pdp-gallery-thumbs"]');
     if(galleryMain){
-      const swatchColor = product.color==='ivory' ? '#B08D46' : '#D4B876';
+      const swatchColor = product.color==='ivory' ? '#B7CC33' : '#C9DC5E';
       galleryMain.innerHTML = motifSVG(product.motif, swatchColor) +
         images.map((src,i)=>'<img class="pdp-main-img'+(i===0?' active':'')+'" data-index="'+i+'" src="'+src+'" alt="'+product.name+'">').join('');
       if(galleryThumbs){
@@ -446,7 +446,7 @@ function buildCarouselMarkup(images){
         .slice(0,4);
       relatedEl.innerHTML = related.map(p=>{
         const url = 'product.html?handle='+encodeURIComponent(p.handle);
-        const sc = p.color==='ivory' ? '#B08D46' : '#D4B876';
+        const sc = p.color==='ivory' ? '#B7CC33' : '#C9DC5E';
         return '<div class="product-card"><div class="product-media">'+
           '<div class="motif">'+motifSVG(p.motif, sc)+buildCarouselMarkup(resolveImages(p,'products').slice(0,1))+'</div>'+
           '<a class="product-media-link" href="'+url+'" aria-label="'+p.name+'"></a></div>'+
@@ -498,7 +498,7 @@ function buildCarouselMarkup(images){
       const meta = i18n.campaigns[key] || i18n.campaigns.general;
       const cards = g.map(p=>{
         const url = 'product.html?handle='+encodeURIComponent(p.handle);
-        const sc = p.color==='ivory' ? '#B08D46' : '#D4B876';
+        const sc = p.color==='ivory' ? '#B7CC33' : '#C9DC5E';
         const metaParts = [];
         if(L.material[p.material]) metaParts.push(L.material[p.material]);
         if(p.size && L.size[p.size]) metaParts.push(L.size[p.size].split(' (')[0].split('(')[0]);
@@ -760,7 +760,7 @@ function buildCarouselMarkup(images){
 
     // The piece's own SVG motif, used when no photograph is available.
     function motifImage(product){
-      const color = product.color === 'ivory' ? '#B08D46' : '#D4B876';
+      const color = product.color === 'ivory' ? '#B7CC33' : '#C9DC5E';
       const svg = motifSVG(product.motif, color);
       return loadImage('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
     }
@@ -1236,7 +1236,7 @@ function buildCarouselMarkup(images){
     if(projectsGrid && content.projects){
       projectsGrid.innerHTML = content.projects.map(p=>{
         const photo = buildCarouselMarkup(resolveImages(p, 'projects'));
-        return '<div class="project-item" data-cat="'+p.cat+'"><div class="motif" style="--ar:'+p.aspect+'">'+motifSVG(p.motif,'#D4B876')+photo+'</div>'+
+        return '<div class="project-item" data-cat="'+p.cat+'"><div class="motif" style="--ar:'+p.aspect+'">'+motifSVG(p.motif,'#C9DC5E')+photo+'</div>'+
         '<div class="p-body"><div class="p-tag">'+content.catLabel[p.cat]+'</div><div class="p-title">'+p.t+'</div></div></div>';
       }).join('');
     }
@@ -1369,7 +1369,7 @@ function buildCarouselMarkup(images){
         grid.innerHTML = filtered.map(p=>{
           const detailUrl = 'product.html?handle=' + encodeURIComponent(p.handle);
           const inquireSubject = encodeURIComponent(i18n.inquireSubjectPrefix + p.name);
-          const swatchColor = p.color==='ivory' ? '#B08D46' : '#D4B876';
+          const swatchColor = p.color==='ivory' ? '#B7CC33' : '#C9DC5E';
           const photo = buildCarouselMarkup(resolveImages(p, 'products'));
           // Meta line is built from whatever fields the item actually has, so furniture and
           // accessories (which have no rug "size") don't break the card.
@@ -1553,11 +1553,11 @@ function buildCarouselMarkup(images){
             '<div class="color-option'+(!state.customHex && state.color===c.key?' selected':'')+'" data-field="color" data-value="'+c.key+'">'+
             '<div class="swatch-lg" style="background:'+c.hex+'"></div><span>'+c.label+'</span></div>'
           ).join('')+'</div>'+
-          '<div class="custom-color-row"><input type="color" id="'+uid('customColorInput')+'" value="'+(effHex||'#B08D46')+'">'+
+          '<div class="custom-color-row"><input type="color" id="'+uid('customColorInput')+'" value="'+(effHex||'#B7CC33')+'">'+
           '<div><div style="font-size:13px;font-weight:600;">'+i18n.customColorLabel+'</div>'+
           '<div class="hex-readout" id="'+uid('hexReadout')+'">'+(state.customHex ? state.customHex.toUpperCase() : i18n.notSelected)+'</div></div></div>';
       } else if(s===4){
-        const effHex = state.customHex || (config.colors.find(c=>c.key===state.color)||{}).hex || '#B08D46';
+        const effHex = state.customHex || (config.colors.find(c=>c.key===state.color)||{}).hex || '#B7CC33';
         html = '<div class="eyebrow on-light step-kicker">'+i18n.stepOfLabel.replace('{n}',5)+'</div>'+
           '<h2>'+i18n.stepTitle[4]+'</h2><p class="step-intro">'+i18n.stepIntro[4]+'</p>'+
           '<div class="option-grid">'+config.patterns.map(p=>
@@ -1767,7 +1767,7 @@ function buildCarouselMarkup(images){
       const dimsEl = root.querySelector('[data-role="preview-dims"]');
       if(!canvas) return;
 
-      const baseHex = state.customHex || (config.colors.find(c=>c.key===state.color) || {}).hex || '#C9BFAE';
+      const baseHex = state.customHex || (config.colors.find(c=>c.key===state.color) || {}).hex || '#C7C6C5';
       const borderHex = shade(baseHex, isDarkColor(baseHex) ? 0.28 : -0.22);
       const contrastHex = isDarkColor(baseHex) ? 'rgba(255,255,255,0.55)' : 'rgba(20,15,10,0.45)';
 

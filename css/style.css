@@ -89,7 +89,8 @@
 
   /* ---- Primary brand pattern: mihrab arches (same arch as the logo's A).
      Used as a watermark; apply with the .has-arch-pattern utility below. ---- */
-  --pattern-arch:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 470 300' fill='none'> <g stroke='%23B7CC33' stroke-width='15' stroke-linecap='round' stroke-linejoin='round'> <path d='M78 300 V246 C78 232 84 226 91 221 C99 214 107 205 114 194 C121 205 129 214 137 221 C144 226 150 232 150 246 V300'/> <path d='M303 300 V186 C303 160 315 152 328 145 C345 134 360 110 372 78 C384 110 399 134 416 145 C429 152 441 160 441 186 V300'/> </g> </svg>");
+  --pattern-arch:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 400' fill='none'><g fill='%23B7CC33' stroke='none'><g transform='translate(266.7,186.0) scale(0.27549) translate(0,922) scale(0.1,-0.1)'><path d='M3926 9209 c-125 -48 -484 -264 -696 -417 -537 -389 -919 -771 -1257 -1259 -93 -133 -254 -432 -331 -613 -51 -121 -136 -384 -157 -486 -9 -43 -20 -96 -26 -117 -28 -107 -69 -709 -57 -853 l3 -43 -65 -11 c-375 -65 -724 -238 -955 -475 -196 -200 -308 -419 -363 -710 -16 -83 -17 -241 -17 -2015 l0 -1925 28 -60 c53 -112 114 -170 215 -202 45 -14 91 -18 212 -18 140 0 161 2 218 24 86 33 162 103 204 189 l33 67 2 1888 c1 1373 4 1906 13 1955 15 87 68 195 134 271 62 72 84 90 168 137 141 80 245 100 590 113 223 8 227 9 291 39 80 37 141 96 174 170 34 73 35 162 4 352 -46 280 -29 687 40 965 139 553 468 1068 1033 1612 206 199 453 396 578 461 l48 25 43 -19 c50 -22 245 -163 337 -243 387 -335 705 -701 954 -1100 206 -328 328 -678 366 -1051 16 -155 12 -483 -7 -643 -10 -78 -18 -182 -18 -232 0 -81 3 -95 29 -143 40 -72 110 -134 182 -162 51 -20 86 -24 270 -31 317 -12 408 -27 551 -95 151 -72 261 -200 319 -374 18 -53 19 -138 24 -1980 l5 -1925 26 -56 c36 -75 86 -130 156 -167 82 -43 160 -55 311 -50 119 4 133 7 200 38 132 60 198 162 214 324 13 142 2 3683 -12 3786 -30 222 -103 419 -226 605 -75 116 -250 291 -369 372 -207 139 -465 241 -720 283 l-70 11 -1 212 c-2 377 -41 671 -129 978 -170 589 -514 1134 -1042 1649 -237 232 -398 365 -718 597 -124 90 -378 242 -529 318 -79 40 -160 53 -210 34z'/></g><g transform='translate(526.0,30.0) scale(0.44469) translate(0,922) scale(0.1,-0.1)'><path d='M3926 9209 c-125 -48 -484 -264 -696 -417 -537 -389 -919 -771 -1257 -1259 -93 -133 -254 -432 -331 -613 -51 -121 -136 -384 -157 -486 -9 -43 -20 -96 -26 -117 -28 -107 -69 -709 -57 -853 l3 -43 -65 -11 c-375 -65 -724 -238 -955 -475 -196 -200 -308 -419 -363 -710 -16 -83 -17 -241 -17 -2015 l0 -1925 28 -60 c53 -112 114 -170 215 -202 45 -14 91 -18 212 -18 140 0 161 2 218 24 86 33 162 103 204 189 l33 67 2 1888 c1 1373 4 1906 13 1955 15 87 68 195 134 271 62 72 84 90 168 137 141 80 245 100 590 113 223 8 227 9 291 39 80 37 141 96 174 170 34 73 35 162 4 352 -46 280 -29 687 40 965 139 553 468 1068 1033 1612 206 199 453 396 578 461 l48 25 43 -19 c50 -22 245 -163 337 -243 387 -335 705 -701 954 -1100 206 -328 328 -678 366 -1051 16 -155 12 -483 -7 -643 -10 -78 -18 -182 -18 -232 0 -81 3 -95 29 -143 40 -72 110 -134 182 -162 51 -20 86 -24 270 -31 317 -12 408 -27 551 -95 151 -72 261 -200 319 -374 18 -53 19 -138 24 -1980 l5 -1925 26 -56 c36 -75 86 -130 156 -167 82 -43 160 -55 311 -50 119 4 133 7 200 38 132 60 198 162 214 324 13 142 2 3683 -12 3786 -30 222 -103 419 -226 605 -75 116 -250 291 -369 372 -207 139 -465 241 -720 283 l-70 11 -1 212 c-2 377 -41 671 -129 978 -170 589 -514 1134 -1042 1649 -237 232 -398 365 -718 597 -124 90 -378 242 -529 318 -79 40 -160 53 -210 34z'/></g></g></svg>");
+  --pattern-arch-single:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 490 400' fill='none'><g fill='%23B7CC33' stroke='none'><g transform='translate(116.0,30.0) scale(0.44469) translate(0,922) scale(0.1,-0.1)'><path d='M3926 9209 c-125 -48 -484 -264 -696 -417 -537 -389 -919 -771 -1257 -1259 -93 -133 -254 -432 -331 -613 -51 -121 -136 -384 -157 -486 -9 -43 -20 -96 -26 -117 -28 -107 -69 -709 -57 -853 l3 -43 -65 -11 c-375 -65 -724 -238 -955 -475 -196 -200 -308 -419 -363 -710 -16 -83 -17 -241 -17 -2015 l0 -1925 28 -60 c53 -112 114 -170 215 -202 45 -14 91 -18 212 -18 140 0 161 2 218 24 86 33 162 103 204 189 l33 67 2 1888 c1 1373 4 1906 13 1955 15 87 68 195 134 271 62 72 84 90 168 137 141 80 245 100 590 113 223 8 227 9 291 39 80 37 141 96 174 170 34 73 35 162 4 352 -46 280 -29 687 40 965 139 553 468 1068 1033 1612 206 199 453 396 578 461 l48 25 43 -19 c50 -22 245 -163 337 -243 387 -335 705 -701 954 -1100 206 -328 328 -678 366 -1051 16 -155 12 -483 -7 -643 -10 -78 -18 -182 -18 -232 0 -81 3 -95 29 -143 40 -72 110 -134 182 -162 51 -20 86 -24 270 -31 317 -12 408 -27 551 -95 151 -72 261 -200 319 -374 18 -53 19 -138 24 -1980 l5 -1925 26 -56 c36 -75 86 -130 156 -167 82 -43 160 -55 311 -50 119 4 133 7 200 38 132 60 198 162 214 324 13 142 2 3683 -12 3786 -30 222 -103 419 -226 605 -75 116 -250 291 -369 372 -207 139 -465 241 -720 283 l-70 11 -1 212 c-2 377 -41 671 -129 978 -170 589 -514 1134 -1042 1649 -237 232 -398 365 -718 597 -124 90 -378 242 -529 318 -79 40 -160 53 -210 34z'/></g></g></svg>");
 
   /* ---- Type stacks ---- */
   --font-display:'TrajanBrand','Cinzel',Georgia,'Times New Roman',serif;
@@ -456,15 +457,15 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
   inset:0;
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
-  background-position:left bottom;
+  background-position:right bottom;
   background-size:auto 88%;
-  opacity:0.10;
+  opacity:0.13;
   pointer-events:none;
   z-index:0;
 }
 .has-arch-pattern > *{position:relative;z-index:1;}
 /* mirror the motif so it hugs the same visual edge in Arabic */
-[dir="rtl"] .has-arch-pattern::before{background-position:right bottom;transform:scaleX(-1);}
+[dir="rtl"] .has-arch-pattern::before{background-position:right bottom;transform:none;}
 
 /* Footer carries the pattern by default — no markup change needed. */
 footer{position:relative;overflow:hidden;}
@@ -474,13 +475,14 @@ footer::before{
   inset:0;
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
-  background-position:left bottom;
-  background-size:auto 92%;
-  opacity:0.09;
+  background-position:right bottom;
+  background-size:auto 86%;
+  opacity:0.13;
   pointer-events:none;
   z-index:0;
 }
-[dir="rtl"] footer::before{background-position:right bottom;transform:scaleX(-1);}
+/* stays in the bottom-right corner in both reading directions */
+[dir="rtl"] footer::before{background-position:right bottom;transform:none;}
 footer > *{position:relative;z-index:1;}
 @media (max-width:768px){
   footer::before{background-size:auto 55%;opacity:0.07;}

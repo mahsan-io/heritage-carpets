@@ -960,7 +960,7 @@ footer::before{
   inset-inline:0;
   bottom:0;
   height:var(--arch-height);
-  background-repeat:repeat-x;
+ /* background-repeat:repeat-x;*/
   background-position:bottom center;
   background-size:auto var(--arch-height);
   opacity:var(--arch-opacity);

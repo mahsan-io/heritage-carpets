@@ -939,43 +939,73 @@ html[lang="ar"] .journey-step .jnum{font-style:normal;}
 html[lang="ar"] *{letter-spacing:normal !important;}
 
 /* ======================================================================
-   ARCH PATTERN — the brand's primary pattern.
-   A seamless repeating band of mihrab arches drawn as an inline SVG data
-   URI, so it needs no image file and scales without loss. Applied to the
-   footer as a watermark; .arch-pattern / .arch-pattern-light are reusable
-   on any section. Tune with --arch-opacity and --arch-height.
+   ARCH PATTERN
+   Single arch watermark positioned at the bottom-right.
+   Uses: Assets/pattern-arch.svg
    ====================================================================== */
+
 .arch-pattern,
-.arch-pattern-light{
-  position:relative;
-  overflow:hidden;
-  --arch-opacity:0.16;
-  --arch-height:320px;
+.arch-pattern-light {
+  position: relative;
+  overflow: hidden;
+
+  --arch-opacity: 0.16;
+  --arch-height: 320px;
 }
+
+/* Single arch — bottom right */
 .arch-pattern::before,
 .arch-pattern-light::before,
-footer::before{
-  content:"";
-  position:absolute;
-  inset-inline:0;
-  bottom:0;
-  height:var(--arch-height);
- /* background-repeat:repeat-x;*/
-  background-position:bottom center;
-  background-size:auto var(--arch-height);
-  opacity:var(--arch-opacity);
-  pointer-events:none;
-  z-index:0;
+footer::before {
+  content: "";
+  position: absolute;
+
+  right: 0;
+  bottom: 0;
+
+  width: 320px;
+  height: var(--arch-height);
+
+  background-image: url("Assets/pattern-arch.svg");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: 320px auto;
+
+  opacity: var(--arch-opacity);
+
+  pointer-events: none;
+  z-index: 0;
 }
-.arch-pattern::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 320' fill='none'%3E%3Cg stroke='%23B7CC33' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M80 320 V250.5 C80 238.4 84.2 231.6 91.2 229.7 C94.0 196.9 104.2 168.7 120 150 C135.8 168.7 146.0 196.9 148.8 229.7 C155.8 231.6 160 238.4 160 250.5 V320'/%3E%3Cpath d='M299 320 V205.5 C299 185.6 308.0 174.4 323.0 171.3 C329.0 117.3 351.0 70.8 385 40 C419.0 70.8 441.0 117.3 447.0 171.3 C462.0 174.4 471 185.6 471 205.5 V320'/%3E%3Cpath d='M580 320 V228.0 C580 212.0 586.3 203.0 596.7 200.5 C600.9 157.1 616.3 119.8 640 95 C663.7 119.8 679.1 157.1 683.3 200.5 C693.7 203.0 700 212.0 700 228.0 V320'/%3E%3Cpath d='M786 320 V261.9 C786 251.8 789.6 246.2 795.5 244.6 C797.9 217.2 806.6 193.6 820 178 C833.4 193.6 842.1 217.2 844.5 244.6 C850.4 246.2 854 251.8 854 261.9 V320'/%3E%3C/g%3E%3C/svg%3E");}
-.arch-pattern-light::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 320' fill='none'%3E%3Cg stroke='%23595556' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M80 320 V250.5 C80 238.4 84.2 231.6 91.2 229.7 C94.0 196.9 104.2 168.7 120 150 C135.8 168.7 146.0 196.9 148.8 229.7 C155.8 231.6 160 238.4 160 250.5 V320'/%3E%3Cpath d='M299 320 V205.5 C299 185.6 308.0 174.4 323.0 171.3 C329.0 117.3 351.0 70.8 385 40 C419.0 70.8 441.0 117.3 447.0 171.3 C462.0 174.4 471 185.6 471 205.5 V320'/%3E%3Cpath d='M580 320 V228.0 C580 212.0 586.3 203.0 596.7 200.5 C600.9 157.1 616.3 119.8 640 95 C663.7 119.8 679.1 157.1 683.3 200.5 C693.7 203.0 700 212.0 700 228.0 V320'/%3E%3Cpath d='M786 320 V261.9 C786 251.8 789.6 246.2 795.5 244.6 C797.9 217.2 806.6 193.6 820 178 C833.4 193.6 842.1 217.2 844.5 244.6 C850.4 246.2 854 251.8 854 261.9 V320'/%3E%3C/g%3E%3C/svg%3E");}
+
+
+/* Keep page content above the watermark */
 .arch-pattern > *,
-.arch-pattern-light > *{position:relative;z-index:1;}
+.arch-pattern-light > *,
+footer > * {
+  position: relative;
+  z-index: 1;
+}
+
 
 /* Footer carries the pattern by default */
-footer{position:relative;overflow:hidden;--arch-opacity:0.16;--arch-height:320px;}
-footer::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 320' fill='none'%3E%3Cg stroke='%23B7CC33' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M80 320 V250.5 C80 238.4 84.2 231.6 91.2 229.7 C94.0 196.9 104.2 168.7 120 150 C135.8 168.7 146.0 196.9 148.8 229.7 C155.8 231.6 160 238.4 160 250.5 V320'/%3E%3Cpath d='M299 320 V205.5 C299 185.6 308.0 174.4 323.0 171.3 C329.0 117.3 351.0 70.8 385 40 C419.0 70.8 441.0 117.3 447.0 171.3 C462.0 174.4 471 185.6 471 205.5 V320'/%3E%3Cpath d='M580 320 V228.0 C580 212.0 586.3 203.0 596.7 200.5 C600.9 157.1 616.3 119.8 640 95 C663.7 119.8 679.1 157.1 683.3 200.5 C693.7 203.0 700 212.0 700 228.0 V320'/%3E%3Cpath d='M786 320 V261.9 C786 251.8 789.6 246.2 795.5 244.6 C797.9 217.2 806.6 193.6 820 178 C833.4 193.6 842.1 217.2 844.5 244.6 C850.4 246.2 854 251.8 854 261.9 V320'/%3E%3C/g%3E%3C/svg%3E");}
-footer > *{position:relative;z-index:1;}
-@media (max-width:768px){
-  footer{--arch-height:200px;--arch-opacity:0.13;}
+footer {
+  position: relative;
+  overflow: hidden;
+
+  --arch-opacity: 0.16;
+  --arch-height: 320px;
+}
+
+
+/* Mobile */
+@media (max-width: 768px) {
+  footer {
+    --arch-height: 200px;
+    --arch-opacity: 0.13;
+  }
+
+  footer::before {
+    width: 200px;
+    background-size: 200px auto;
+  }
 }

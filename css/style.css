@@ -968,8 +968,8 @@ footer::before {
 
  background-image: url("../Assets/pattern-arch.svg");
   background-repeat: no-repeat;
-  background-position: right bottom;
-  background-size: 320px auto;
+  background-position: right -150px bottom;
+  background-size: 400px auto;
 
   opacity: var(--arch-opacity);
 

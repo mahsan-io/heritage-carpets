@@ -489,6 +489,40 @@ footer > *{position:relative;z-index:1;}
   .has-arch-pattern::before{background-size:auto 55%;}
 }
 
+/* ============ SCROLL BUTTON (down / back to top) ============
+   One button that flips direction: arrow down while you are in the top half of
+   the page, arrow up once past halfway. Injected by script.js, so no page markup
+   needs to change. Sits directly above the WhatsApp button and uses the same
+   inset-inline-end so it mirrors correctly in Arabic. */
+.scroll-fab{
+  position:fixed;
+  inset-inline-end:22px;
+  bottom:92px;                /* clears the 58px WhatsApp button + its 22px offset */
+  z-index:1290;
+  width:46px;height:46px;
+  border-radius:50%;
+  background:var(--ink);
+  color:var(--brass-light);
+  border:1px solid var(--line-dark);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 18px rgba(20,15,10,0.28);
+  opacity:0;visibility:hidden;transform:translateY(8px);
+  transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s,background .3s,color .3s;
+}
+.scroll-fab.is-ready{opacity:1;visibility:visible;transform:translateY(0);}
+.scroll-fab:hover{background:var(--brass);color:var(--ink);border-color:var(--brass);}
+.scroll-fab:focus-visible{outline:2px solid var(--brass-light);outline-offset:3px;}
+.scroll-fab svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--ease);}
+.scroll-fab.is-up svg{transform:rotate(180deg);}
+@media (max-width:768px){
+  .scroll-fab{inset-inline-end:16px;bottom:78px;width:42px;height:42px;}
+  .scroll-fab svg{width:18px;height:18px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .scroll-fab,.scroll-fab svg{transition:none;}
+}
+
 /* ============ FOOTER ============ */
 footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
 .footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr;gap:40px;padding-bottom:64px;border-bottom:1px solid var(--line-dark);}

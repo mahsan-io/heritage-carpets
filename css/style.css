@@ -966,7 +966,7 @@ footer::before {
   width: 320px;
   height: var(--arch-height);
 
-  background-image: url("Assets/pattern-arch.svg");
+ background-image: url("../Assets/pattern-arch.svg");
   background-repeat: no-repeat;
   background-position: right bottom;
   background-size: 320px auto;

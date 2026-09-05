@@ -435,17 +435,17 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
 /* ============ WHATSAPP FLOATING BUTTON ============ */
 .wa-float{
   position:fixed;inset-inline-end:22px;bottom:22px;z-index:1300;
-  width:58px;height:58px;border-radius:50%;
+  width:48px;height:48px;border-radius:50%;
   background:var(--whatsapp);color:#fff;
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 8px 24px rgba(20,15,10,0.32);
   transition:transform .3s var(--ease), box-shadow .3s var(--ease);
 }
-.wa-float svg{width:30px;height:30px;fill:#fff;display:block;}
+.wa-float svg{width:24px;height:24px;fill:#fff;display:block;}
 .wa-float:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 12px 30px rgba(20,15,10,0.4);}
 .wa-float:focus-visible{outline:3px solid var(--brass-light);outline-offset:3px;}
 .wa-float .wa-label{
-  position:absolute;inset-inline-end:70px;white-space:nowrap;
+  position:absolute;inset-inline-end:58px;white-space:nowrap;
   background:var(--ink);color:var(--cream-text);
   font-size:12.5px;font-weight:600;letter-spacing:0.03em;
   padding:9px 14px;border-radius:3px;
@@ -454,8 +454,8 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
 }
 .wa-float:hover .wa-label{opacity:1;}
 @media (max-width:768px){
-  .wa-float{width:52px;height:52px;inset-inline-end:16px;bottom:16px;}
-  .wa-float svg{width:27px;height:27px;}
+  .wa-float{width:44px;height:44px;inset-inline-end:16px;bottom:16px;}
+  .wa-float svg{width:22px;height:22px;}
   .wa-float .wa-label{display:none;}
 }
 
@@ -511,7 +511,7 @@ footer > *{position:relative;z-index:1;}
 .scroll-fab{
   position:fixed;
   inset-inline-end:22px;
-  bottom:92px;                /* clears the 58px WhatsApp button + its 22px offset */
+  bottom:82px;                /* clears the 48px WhatsApp button + its 22px offset */
   z-index:1290;
   width:46px;height:46px;
   border-radius:50%;
@@ -530,7 +530,7 @@ footer > *{position:relative;z-index:1;}
   stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--ease);}
 .scroll-fab.is-up svg{transform:rotate(180deg);}
 @media (max-width:768px){
-  .scroll-fab{inset-inline-end:16px;bottom:78px;width:42px;height:42px;}
+  .scroll-fab{inset-inline-end:16px;bottom:70px;width:42px;height:42px;}
   .scroll-fab svg{width:18px;height:18px;}
 }
 @media (prefers-reduced-motion: reduce){
@@ -635,7 +635,7 @@ footer > *{position:relative;z-index:1;}
 .clients-track{
   display:flex;
   align-items:center;
-  gap:56px;
+  gap:64px;
   width:max-content;
   animation:clientsScroll 36s linear infinite;
 }
@@ -644,18 +644,18 @@ footer > *{position:relative;z-index:1;}
 @keyframes clientsScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 .client-logo{
   flex-shrink:0;
-  width:104px;height:104px;
+  width:136px;height:136px;
   border-radius:50%;
   background:var(--parchment);
   border:1px solid var(--line-light);
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
-  padding:20px;
+  padding:24px;
 }
 .client-logo img{width:100%;height:100%;object-fit:contain;}
 @media (max-width:768px){
-  .client-logo{width:76px;height:76px;padding:14px;}
-  .clients-track{gap:34px;}
+  .client-logo{width:98px;height:98px;padding:18px;}
+  .clients-track{gap:40px;}
 }
 @media (prefers-reduced-motion: reduce){
   .clients-track{animation:none;}

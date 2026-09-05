@@ -30,6 +30,71 @@ window.Heritage = (function(){
   };
 
   /* ---------------- Reusable SVG motif generator (collections/projects tiles) ---------------- */
+  /* ---------------- Shared phone field (country code + local number) ----------------
+     Used by the Bespoke Studio wizard, the Projects enquiry form, and Book a Visit —
+     one list, one markup builder, so all three stay consistent and a country only
+     needs to be added here once. Saudi Arabia is first and selected by default. */
+  const COUNTRY_CODES = [
+    {code:'+966', flag:'\u{1F1F8}\u{1F1E6}', name:'Saudi Arabia'},
+    {code:'+971', flag:'\u{1F1E6}\u{1F1EA}', name:'United Arab Emirates'},
+    {code:'+974', flag:'\u{1F1F6}\u{1F1E6}', name:'Qatar'},
+    {code:'+965', flag:'\u{1F1F0}\u{1F1FC}', name:'Kuwait'},
+    {code:'+973', flag:'\u{1F1E7}\u{1F1ED}', name:'Bahrain'},
+    {code:'+968', flag:'\u{1F1F4}\u{1F1F2}', name:'Oman'},
+    {code:'+20',  flag:'\u{1F1EA}\u{1F1EC}', name:'Egypt'},
+    {code:'+962', flag:'\u{1F1EF}\u{1F1F4}', name:'Jordan'},
+    {code:'+961', flag:'\u{1F1F1}\u{1F1E7}', name:'Lebanon'},
+    {code:'+964', flag:'\u{1F1EE}\u{1F1F6}', name:'Iraq'},
+    {code:'+967', flag:'\u{1F1FE}\u{1F1EA}', name:'Yemen'},
+    {code:'+970', flag:'\u{1F1F5}\u{1F1F8}', name:'Palestine'},
+    {code:'+963', flag:'\u{1F1F8}\u{1F1FE}', name:'Syria'},
+    {code:'+218', flag:'\u{1F1F1}\u{1F1FE}', name:'Libya'},
+    {code:'+212', flag:'\u{1F1F2}\u{1F1E6}', name:'Morocco'},
+    {code:'+216', flag:'\u{1F1F9}\u{1F1F3}', name:'Tunisia'},
+    {code:'+213', flag:'\u{1F1E9}\u{1F1FF}', name:'Algeria'},
+    {code:'+249', flag:'\u{1F1F8}\u{1F1E9}', name:'Sudan'},
+    {code:'+90',  flag:'\u{1F1F9}\u{1F1F7}', name:'Turkey'},
+    {code:'+92',  flag:'\u{1F1F5}\u{1F1F0}', name:'Pakistan'},
+    {code:'+91',  flag:'\u{1F1EE}\u{1F1F3}', name:'India'},
+    {code:'+880', flag:'\u{1F1E7}\u{1F1E9}', name:'Bangladesh'},
+    {code:'+94',  flag:'\u{1F1F1}\u{1F1F0}', name:'Sri Lanka'},
+    {code:'+977', flag:'\u{1F1F3}\u{1F1F5}', name:'Nepal'},
+    {code:'+63',  flag:'\u{1F1F5}\u{1F1ED}', name:'Philippines'},
+    {code:'+62',  flag:'\u{1F1EE}\u{1F1E9}', name:'Indonesia'},
+    {code:'+60',  flag:'\u{1F1F2}\u{1F1FE}', name:'Malaysia'},
+    {code:'+86',  flag:'\u{1F1E8}\u{1F1F3}', name:'China'},
+    {code:'+81',  flag:'\u{1F1EF}\u{1F1F5}', name:'Japan'},
+    {code:'+82',  flag:'\u{1F1F0}\u{1F1F7}', name:'South Korea'},
+    {code:'+44',  flag:'\u{1F1EC}\u{1F1E7}', name:'United Kingdom'},
+    {code:'+1',   flag:'\u{1F1FA}\u{1F1F8}', name:'United States / Canada'},
+    {code:'+33',  flag:'\u{1F1EB}\u{1F1F7}', name:'France'},
+    {code:'+49',  flag:'\u{1F1E9}\u{1F1EA}', name:'Germany'},
+    {code:'+39',  flag:'\u{1F1EE}\u{1F1F9}', name:'Italy'},
+    {code:'+34',  flag:'\u{1F1EA}\u{1F1F8}', name:'Spain'},
+    {code:'+31',  flag:'\u{1F1F3}\u{1F1F1}', name:'Netherlands'},
+    {code:'+41',  flag:'\u{1F1E8}\u{1F1ED}', name:'Switzerland'},
+    {code:'+61',  flag:'\u{1F1E6}\u{1F1FA}', name:'Australia'},
+    {code:'+27',  flag:'\u{1F1FF}\u{1F1E6}', name:'South Africa'},
+    {code:'+234', flag:'\u{1F1F3}\u{1F1EC}', name:'Nigeria'},
+    {code:'+254', flag:'\u{1F1F0}\u{1F1EA}', name:'Kenya'}
+  ];
+
+  function countryOptionsHTML(selectedCode){
+    const sel = selectedCode || '+966';
+    return COUNTRY_CODES.map(c=>
+      '<option value="'+c.code+'" title="'+c.name+'"'+(c.code===sel?' selected':'')+'>'+c.flag+' '+c.code+'</option>'
+    ).join('');
+  }
+
+  // codeAttr/numberAttr are full attribute strings (e.g. 'data-f="phone"' or 'id="x"'),
+  // since the three forms that use this identify their fields differently.
+  function phoneFieldHTML(codeAttr, numberAttr, selectedCode, numberValue){
+    return '<div class="phone-field">'+
+      '<select class="phone-code" '+codeAttr+'>'+countryOptionsHTML(selectedCode)+'</select>'+
+      '<input type="tel" class="field-input phone-number" '+numberAttr+' value="'+(numberValue||'').replace(/"/g,'&quot;')+'" placeholder="5X XXX XXXX">'+
+    '</div>';
+  }
+
   function motifSVG(type, color){
     color = color || '#B7CC33';
     const p = '<svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">';
@@ -544,7 +609,7 @@ function buildCarouselMarkup(images){
   function renderBookingPage(config, root){
     root = root || document;
     const i18n = config.i18n;
-    const state = { showroom:null, date:null, slot:null, name:'', phone:'', notes:'' };
+    const state = { showroom:null, date:null, slot:null, name:'', phone:'', phoneCode:'+966', notes:'' };
 
     const showroomsEl = root.querySelector('[data-role="book-showrooms"]');
     const datesEl     = root.querySelector('[data-role="book-dates"]');
@@ -552,7 +617,11 @@ function buildCarouselMarkup(images){
     const summaryEl   = root.querySelector('[data-role="book-summary"]');
     const confirmBtn  = root.querySelector('[data-role="book-confirm"]');
     const emailBtn    = root.querySelector('[data-role="book-email"]');
+    const phoneCodeEl = root.querySelector('[data-role="book-phone-code"]');
     if(!showroomsEl) return;
+
+    // same list used by the Bespoke Studio and Projects enquiry forms
+    if(phoneCodeEl) phoneCodeEl.innerHTML = countryOptionsHTML(state.phoneCode);
 
     // ---- showroom chooser ----
     showroomsEl.innerHTML = config.showrooms.map(s=>
@@ -626,7 +695,7 @@ function buildCarouselMarkup(images){
         [i18n.sumLabels.date,     prettyDate(state.date)],
         [i18n.sumLabels.time,     state.slot || i18n.notSelected],
         [i18n.sumLabels.name,     state.name || i18n.notSelected],
-        [i18n.sumLabels.phone,    state.phone || i18n.notSelected]
+        [i18n.sumLabels.phone,    state.phone ? state.phoneCode+' '+state.phone : i18n.notSelected]
       ];
       summaryEl.innerHTML = rows.map(r=>
         '<div class="preview-summary-row summary-light"><span>'+r[0]+'</span><span>'+r[1]+'</span></div>'
@@ -640,7 +709,7 @@ function buildCarouselMarkup(images){
           i18n.sumLabels.date+': '+prettyDate(state.date),
           i18n.sumLabels.time+': '+state.slot,
           i18n.sumLabels.name+': '+state.name,
-          i18n.sumLabels.phone+': '+(state.phone||'-'),
+          i18n.sumLabels.phone+': '+(state.phone ? state.phoneCode+' '+state.phone : '-'),
           i18n.sumLabels.notes+': '+(state.notes||'-')
         ].join('\n');
         const body = i18n.requestIntro + '\n\n' + lines;
@@ -677,6 +746,7 @@ function buildCarouselMarkup(images){
       const el = root.querySelector('[data-role="book-'+f+'"]');
       if(el) el.addEventListener('input', function(){ state[f] = el.value; renderSummary(); });
     });
+    if(phoneCodeEl) phoneCodeEl.addEventListener('change', function(){ state.phoneCode = phoneCodeEl.value; renderSummary(); });
     [confirmBtn, emailBtn].forEach(btn=>{
       if(!btn) return;
       btn.addEventListener('click', function(e){
@@ -1235,7 +1305,7 @@ function buildCarouselMarkup(images){
         '<div class="pv-field"><label>'+F.name+' *</label><input class="field-input" data-f="name"></div>'+
         '<div class="pv-field"><label>'+F.company+'</label><input class="field-input" data-f="company"></div>'+
         '<div class="pv-field"><label>'+F.email+'</label><input class="field-input" type="email" data-f="email"></div>'+
-        '<div class="pv-field"><label>'+F.phone+'</label><input class="field-input" data-f="phone"></div>'+
+        '<div class="pv-field"><label>'+F.phone+'</label>'+phoneFieldHTML('data-f="phoneCode"', 'data-f="phone"', '+966', '')+'</div>'+
         '<div class="pv-field"><label>'+F.type+'</label><select class="field-input" data-f="type">'+
           '<option value=""></option>'+F.types.map(t=>'<option>'+t+'</option>').join('')+'</select></div>'+
         '<div class="pv-field"><label>'+F.location+'</label><input class="field-input" data-f="location"></div>'+
@@ -1268,7 +1338,7 @@ function buildCarouselMarkup(images){
           F.name+': '+val('name'),
           F.company+': '+(val('company')||'-'),
           F.email+': '+(val('email')||'-'),
-          F.phone+': '+(val('phone')||'-'),
+          F.phone+': '+(val('phone') ? val('phoneCode')+' '+val('phone') : '-'),
           F.type+': '+(val('type')||'-'),
           F.location+': '+(val('location')||'-'),
           F.size+': '+(val('size')||'-'),
@@ -1796,7 +1866,7 @@ function buildCarouselMarkup(images){
       room:null, shape:null, widthM:3, lengthM:4, customShapeDesc:'',
       material:null, color:config.colors[1] ? config.colors[1].key : null, customHex:null,
       pattern:null, files:[], notes:'',
-      name:'', email:'', phone:'', showroom:null, contactMethod:null
+      name:'', email:'', phone:'', phoneCode:'+966', showroom:null, contactMethod:null
     };
 
     const stepContainer = root.querySelector('[data-role="wizard-step"]');
@@ -1896,7 +1966,7 @@ function buildCarouselMarkup(images){
           '<div class="contact-grid">'+
             '<div><label>'+i18n.nameLabel+'</label><input class="field-input" id="'+uid('nameInput')+'" value="'+state.name+'"></div>'+
             '<div><label>'+i18n.emailLabel+'</label><input class="field-input" type="email" id="'+uid('emailInput')+'" value="'+state.email+'"></div>'+
-            '<div><label>'+i18n.phoneLabel+'</label><input class="field-input" id="'+uid('phoneInput')+'" value="'+state.phone+'"></div>'+
+            '<div><label>'+i18n.phoneLabel+'</label>'+phoneFieldHTML('id="'+uid('phoneCode')+'"', 'id="'+uid('phoneInput')+'"', state.phoneCode, state.phone)+'</div>'+
             '<div><label>'+i18n.showroomLabel+'</label><select class="field-input" id="'+uid('showroomInput')+'"><option value="">'+i18n.notSelected+'</option>'+
               config.showrooms.map(sr=>'<option value="'+sr.key+'"'+(state.showroom===sr.key?' selected':'')+'>'+sr.label+'</option>').join('')+'</select></div>'+
             '<div class="field-full"><label>'+i18n.contactMethodLabel+'</label><select class="field-input" id="'+uid('contactMethodInput')+'"><option value="">'+i18n.notSelected+'</option>'+
@@ -1947,7 +2017,7 @@ function buildCarouselMarkup(images){
         '',
         L.name+': '+state.name,
         L.email+': '+state.email,
-        L.phone+': '+(state.phone||dash),
+        L.phone+': '+(state.phone ? state.phoneCode+' '+state.phone : dash),
         L.showroom+': '+(state.showroom ? (config.showrooms.find(sr=>sr.key===state.showroom)||{}).label : dash),
         L.contactMethod+': '+(state.contactMethod ? (config.contactMethods.find(cm=>cm.key===state.contactMethod)||{}).label : dash)
       ];
@@ -2048,6 +2118,8 @@ function buildCarouselMarkup(images){
           updateSendState();
         });
       });
+      const phoneCodeInput = stepContainer.querySelector('#'+uid('phoneCode'));
+      if(phoneCodeInput) phoneCodeInput.addEventListener('change', function(){ state.phoneCode = phoneCodeInput.value; });
       const showroomInput = stepContainer.querySelector('#'+uid('showroomInput'));
       if(showroomInput) showroomInput.addEventListener('change', function(){ state.showroom = showroomInput.value || null; });
       const contactMethodInput = stepContainer.querySelector('#'+uid('contactMethodInput'));

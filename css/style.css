@@ -661,6 +661,26 @@ footer > *{position:relative;z-index:1;}
   .clients-track{animation:none;}
 }
 
+/* ============ PHONE FIELD (country code + number) ============
+   Used by the Bespoke Studio wizard, the Projects enquiry form, and Book a Visit. */
+.phone-field{display:flex;gap:0;}
+.phone-field .phone-code{
+  flex:0 0 auto;width:auto;max-width:112px;
+  border:1.5px solid var(--line-light);border-inline-end:none;
+  background:var(--parchment-2);padding:14px 8px;
+  font-size:14px;font-family:inherit;color:var(--ink-text);
+  border-start-start-radius:2px;border-end-start-radius:2px;
+}
+.phone-field .phone-number{
+  flex:1 1 auto;min-width:0;
+  border-start-start-radius:0;border-end-start-radius:0;
+  border-start-end-radius:2px;border-end-end-radius:2px;
+}
+.phone-field .phone-code:focus{outline:none;border-color:var(--madder);position:relative;z-index:1;}
+@media (max-width:480px){
+  .phone-field .phone-code{max-width:92px;font-size:13px;padding:14px 6px;}
+}
+
 /* ============ FOOTER ============ */
 footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
 .footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr;gap:40px;padding-bottom:64px;border-bottom:1px solid var(--line-dark);}

@@ -1079,6 +1079,212 @@ function buildCarouselMarkup(images){
     });
   }
 
+  /* ---------------- Projects page (projects.html) ----------------
+     Content comes from js/projects-data.js so the English and Arabic copy sit
+     side by side in one file. Rendered per language block like every other page. */
+  function renderProjectsPage(config, root){
+    root = root || document;
+    const lang = root.getAttribute('data-lang') || 'en';
+    const P = window.HeritageProjects;
+    if(!P) return;
+    const C = P[lang] || P.en;
+
+    // ---- showcase video: embed > mp4 > poster still ----
+    const videoWrap = root.querySelector('[data-role="pv-video"]');
+    if(videoWrap){
+      const v = P.video || {};
+      if(v.embed){
+        videoWrap.innerHTML = '<iframe src="'+v.embed+'" title="'+C.hero.title+'" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+      } else if(v.src){
+        videoWrap.innerHTML =
+          '<video autoplay muted loop playsinline preload="metadata"'+(v.poster?' poster="'+v.poster+'"':'')+'>'+
+          '<source src="'+v.src+'" type="video/mp4"></video>';
+        const vid = videoWrap.querySelector('video');
+        // if the file isn't there yet, fall back to the poster, then to the motif
+        vid.addEventListener('error', function(){ fallbackVideo(videoWrap, v); }, {once:true});
+        vid.querySelector('source').addEventListener('error', function(){ fallbackVideo(videoWrap, v); }, {once:true});
+      } else {
+        fallbackVideo(videoWrap, v);
+      }
+    }
+    function fallbackVideo(wrap, v){
+      wrap.innerHTML = v && v.poster
+        ? '<img class="pv-video-poster" src="'+v.poster+'" alt="">'
+        : motifSVG('arch', '#C9DC5E');
+      const img = wrap.querySelector('img');
+      if(img) img.addEventListener('error', function(){ wrap.innerHTML = motifSVG('arch','#C9DC5E'); }, {once:true});
+    }
+
+    const setText = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
+    const head = (prefix, obj) => {
+      setText(prefix+'-kicker', obj.kicker);
+      setText(prefix+'-title', obj.title);
+      setText(prefix+'-lead', obj.lead);
+    };
+    head('pv-hero', C.hero);
+    head('pv-commercial', C.commercialHead);
+    head('pv-intro', C.introHead);
+    head('pv-gallery', C.galleryHead);
+    head('pv-process', C.processHead);
+    head('pv-form', C.formHead);
+
+    // ---- commercial solutions (same set as the homepage) ----
+    const cg = root.querySelector('[data-role="pv-commercial-grid"]');
+    if(cg) cg.innerHTML = C.commercial.map(c=>{
+      const inner = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.3">'+ICONS[c.icon]+'</svg><h4>'+c.t+'</h4><p>'+c.d+'</p>';
+      return c.href
+        ? '<a class="commercial-card is-link" href="'+c.href+'">'+inner+'</a>'
+        : '<div class="commercial-card">'+inner+'</div>';
+    }).join('');
+
+    // ---- the seven solution blocks ----
+    const list = root.querySelector('[data-role="pv-solutions"]');
+    if(list){
+      list.innerHTML = C.solutions.map((s, i)=>{
+        const imgs = (Array.isArray(s.images) && s.images.length) ? s.images : [
+          'Assets/projects/'+s.slug+'.jpg',
+          'Assets/projects/'+s.slug+'-2.jpg',
+          'Assets/projects/'+s.slug+'-3.jpg'
+        ];
+        const panel = (key, items)=>{
+          if(!items || !items.length) return '';
+          return '<div class="acc">'+
+            '<button type="button" class="acc-head" aria-expanded="false">'+
+              '<span>'+C.panelLabels[key]+'</span><span class="acc-icon" aria-hidden="true"></span>'+
+            '</button>'+
+            '<div class="acc-body"><ul>'+items.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
+          '</div>';
+        };
+        return '<article class="solution'+(i%2 ? ' is-reversed':'')+'" id="solution-'+s.slug+'-'+lang+'">'+
+          '<div class="solution-media"><div class="motif">'+motifSVG(s.motif, '#C9DC5E')+buildCarouselMarkup(imgs)+'</div>'+
+            '<div class="solution-project">'+s.project+'</div></div>'+
+          '<div class="solution-body">'+
+            '<h3>'+s.title+'</h3>'+
+            '<p class="solution-text">'+s.body+'</p>'+
+            '<div class="acc-group">'+
+              panel('usage', s.usage)+
+              panel('characteristics', s.characteristics)+
+              panel('availability', s.availability)+
+            '</div>'+
+          '</div>'+
+        '</article>';
+      }).join('');
+
+      // accordions — one handler for the whole list
+      list.addEventListener('click', function(e){
+        const btn = e.target.closest('.acc-head');
+        if(!btn) return;
+        const open = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+        btn.parentNode.classList.toggle('is-open', !open);
+      });
+      initCarousels(list);
+    }
+
+    // ---- full-width featured gallery ----
+    const gal = root.querySelector('[data-role="pv-gallery-track"]');
+    if(gal){
+      const slides = C.solutions.map(s=>({slug:s.slug, label:s.project}));
+      gal.innerHTML = slides.map((s,i)=>
+        '<div class="pv-slide'+(i===0?' active':'')+'" data-index="'+i+'">'+
+          motifSVG('medallion','#C9DC5E')+
+          '<img src="Assets/projects/'+s.slug+'.jpg" alt="'+s.label+'">'+
+          '<div class="pv-slide-label">'+s.label+'</div>'+
+        '</div>'
+      ).join('');
+      const dots = root.querySelector('[data-role="pv-gallery-dots"]');
+      if(dots) dots.innerHTML = slides.map((_,i)=>'<span class="carousel-dot'+(i===0?' active':'')+'" data-index="'+i+'"></span>').join('');
+      let gi = 0;
+      const show = (i)=>{
+        gi = (i + slides.length) % slides.length;
+        gal.querySelectorAll('.pv-slide').forEach((el,idx)=>el.classList.toggle('active', idx===gi));
+        if(dots) dots.querySelectorAll('.carousel-dot').forEach((el,idx)=>el.classList.toggle('active', idx===gi));
+      };
+      gal.querySelectorAll('.pv-slide img').forEach(img=>{
+        img.addEventListener('error', function(){ img.remove(); }, {once:true});
+      });
+      const prev = root.querySelector('[data-role="pv-gallery-prev"]');
+      const next = root.querySelector('[data-role="pv-gallery-next"]');
+      if(prev) prev.addEventListener('click', ()=>show(gi-1));
+      if(next) next.addEventListener('click', ()=>show(gi+1));
+      if(dots) dots.addEventListener('click', function(e){
+        const d = e.target.closest('.carousel-dot');
+        if(d) show(parseInt(d.dataset.index,10));
+      });
+      if(!reducedMotion){
+        let timer = setInterval(()=>show(gi+1), 5200);
+        gal.addEventListener('mouseenter', ()=>clearInterval(timer));
+        gal.addEventListener('mouseleave', ()=>{ timer = setInterval(()=>show(gi+1), 5200); });
+      }
+    }
+
+    // ---- end-to-end process ----
+    const proc = root.querySelector('[data-role="pv-process"]');
+    if(proc) proc.innerHTML = C.process.map(p=>
+      '<div class="process-step"><div class="process-num">'+p.n+'</div><h4>'+p.t+'</h4><p>'+p.d+'</p></div>'
+    ).join('');
+
+    // ---- enquiry form -> WhatsApp / email, same handoff as Book a Visit ----
+    const form = root.querySelector('[data-role="pv-form"]');
+    if(form){
+      const F = C.form;
+      form.innerHTML =
+        '<div class="pv-field"><label>'+F.name+' *</label><input class="field-input" data-f="name"></div>'+
+        '<div class="pv-field"><label>'+F.company+'</label><input class="field-input" data-f="company"></div>'+
+        '<div class="pv-field"><label>'+F.email+'</label><input class="field-input" type="email" data-f="email"></div>'+
+        '<div class="pv-field"><label>'+F.phone+'</label><input class="field-input" data-f="phone"></div>'+
+        '<div class="pv-field"><label>'+F.type+'</label><select class="field-input" data-f="type">'+
+          '<option value=""></option>'+F.types.map(t=>'<option>'+t+'</option>').join('')+'</select></div>'+
+        '<div class="pv-field"><label>'+F.location+'</label><input class="field-input" data-f="location"></div>'+
+        '<div class="pv-field"><label>'+F.size+'</label><input class="field-input" type="number" min="0" data-f="size"></div>'+
+        '<div class="pv-field"><label>'+F.timeline+'</label><select class="field-input" data-f="timeline">'+
+          '<option value=""></option>'+F.timelines.map(t=>'<option>'+t+'</option>').join('')+'</select></div>'+
+        '<div class="pv-field pv-field-full"><label>'+F.details+'</label>'+
+          '<textarea class="field-input" rows="4" data-f="details" placeholder="'+F.detailsPlaceholder+'"></textarea></div>'+
+        '<div class="pv-field pv-field-full pv-actions">'+
+          '<a class="btn btn-wa is-disabled" data-role="pv-send-wa" href="#" target="_blank" rel="noopener">'+F.submitWa+'</a>'+
+          '<a class="btn btn-outline dark is-disabled" data-role="pv-send-email" href="#">'+F.submitEmail+'</a>'+
+        '</div>'+
+        '<p class="pv-note pv-field-full" data-role="pv-form-note">'+F.note+'</p>';
+
+      const val = (k)=>{ const el = form.querySelector('[data-f="'+k+'"]'); return el ? el.value.trim() : ''; };
+      const waBtn = form.querySelector('[data-role="pv-send-wa"]');
+      const emBtn = form.querySelector('[data-role="pv-send-email"]');
+      const note  = form.querySelector('[data-role="pv-form-note"]');
+
+      function refresh(){
+        const ready = !!(val('name') && (val('email') || val('phone')));
+        [waBtn, emBtn].forEach(b=>{ if(b) b.classList.toggle('is-disabled', !ready); });
+        note.textContent = ready ? F.note : F.required;
+        if(!ready){
+          if(waBtn) waBtn.setAttribute('href','#');
+          if(emBtn) emBtn.setAttribute('href','#');
+          return;
+        }
+        const rows = [
+          F.name+': '+val('name'),
+          F.company+': '+(val('company')||'-'),
+          F.email+': '+(val('email')||'-'),
+          F.phone+': '+(val('phone')||'-'),
+          F.type+': '+(val('type')||'-'),
+          F.location+': '+(val('location')||'-'),
+          F.size+': '+(val('size')||'-'),
+          F.timeline+': '+(val('timeline')||'-'),
+          F.details+': '+(val('details')||'-')
+        ].join('\n');
+        const body = F.intro+'\n\n'+rows;
+        if(waBtn) waBtn.setAttribute('href','https://wa.me/966532148055?text='+encodeURIComponent(body));
+        if(emBtn) emBtn.setAttribute('href','mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(F.subject)+'&body='+encodeURIComponent(body));
+      }
+      form.addEventListener('input', refresh);
+      form.addEventListener('change', refresh);
+      [waBtn, emBtn].forEach(b=>{
+        if(b) b.addEventListener('click', function(e){ if(b.classList.contains('is-disabled')) e.preventDefault(); });
+      });
+      refresh();
+    }
+  }
+
   /* ---------------- Language switching ---------------- */
   function setLanguage(lang, opts){
     opts = opts || {};
@@ -1105,6 +1311,14 @@ function buildCarouselMarkup(images){
     revealInView(document.querySelector('.lang-block[data-lang="'+lang+'"]'));
 
     if(!opts.skipScroll) window.scrollTo(0, 0);
+    // The browser resolved any #hash before we knew which language block would be
+    // visible, so re-resolve it against the block that is actually shown.
+    if(opts.keepHash && window.location.hash){
+      const target = document.querySelector(window.location.hash);
+      if(target && target.scrollIntoView){
+        setTimeout(function(){ target.scrollIntoView({behavior:'auto', block:'start'}); }, 0);
+      }
+    }
   }
 
   function initLanguageSwitch(){
@@ -1112,7 +1326,7 @@ function buildCarouselMarkup(images){
     try { stored = localStorage.getItem('heritage-lang'); } catch(e) {}
 
     const initialLang = stored || document.documentElement.getAttribute('lang') || 'en';
-    setLanguage(initialLang, {skipScroll:true});
+    setLanguage(initialLang, {skipScroll:true, keepHash:true});
 
     document.querySelectorAll('[data-lang-switch]').forEach(btn => {
       // The nav toggles are the EN/AR pill (they contain .lang-option spans); the footer
@@ -1288,14 +1502,20 @@ function buildCarouselMarkup(images){
 
     const commercialGrid = root.querySelector('[data-role="commercial-grid"]');
     if(commercialGrid && content.commercial){
-      commercialGrid.innerHTML = content.commercial.map(c=>
-        '<div class="commercial-card"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.3">'+ICONS[c.icon]+'</svg><h4>'+c.t+'</h4><p>'+c.d+'</p></div>'
-      ).join('');
+      // each card links through to the matching solution on the Projects page
+      commercialGrid.innerHTML = content.commercial.map(c=>{
+        const inner = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.3">'+ICONS[c.icon]+'</svg><h4>'+c.t+'</h4><p>'+c.d+'</p>';
+        return c.href
+          ? '<a class="commercial-card is-link" href="'+c.href+'">'+inner+'</a>'
+          : '<div class="commercial-card">'+inner+'</div>';
+      }).join('');
     }
 
     const projectsGrid = root.querySelector('[data-role="projects-grid"]');
     if(projectsGrid && content.projects){
-      projectsGrid.innerHTML = content.projects.map(p=>{
+      // the homepage shows a short selection; the full set lives on projects.html
+      const projectList = content.projectsLimit ? content.projects.slice(0, content.projectsLimit) : content.projects;
+      projectsGrid.innerHTML = projectList.map(p=>{
         const photo = buildCarouselMarkup(resolveImages(p, 'projects'));
         return '<div class="project-item" data-cat="'+p.cat+'"><div class="motif" style="--ar:'+p.aspect+'">'+motifSVG(p.motif,'#C9DC5E')+photo+'</div>'+
         '<div class="p-body"><div class="p-tag">'+content.catLabel[p.cat]+'</div><div class="p-title">'+p.t+'</div></div></div>';
@@ -1921,5 +2141,5 @@ function buildCarouselMarkup(images){
 
   document.addEventListener('DOMContentLoaded', initCommon);
 
-  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
+  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
 })();

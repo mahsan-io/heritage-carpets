@@ -441,7 +441,7 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
   box-shadow:0 8px 24px rgba(20,15,10,0.32);
   transition:transform .3s var(--ease), box-shadow .3s var(--ease);
 }
-.wa-float svg{width:30px;height:30px;fill:#fff;display:block;}
+.wa-float svg{width:20px;height:20px;fill:#fff;display:block;}
 .wa-float:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 12px 30px rgba(20,15,10,0.4);}
 .wa-float:focus-visible{outline:3px solid var(--brass-light);outline-offset:3px;}
 .wa-float .wa-label{

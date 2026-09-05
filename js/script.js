@@ -1132,8 +1132,11 @@ function buildCarouselMarkup(images){
     const cg = root.querySelector('[data-role="pv-commercial-grid"]');
     if(cg) cg.innerHTML = C.commercial.map(c=>{
       const inner = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.3">'+ICONS[c.icon]+'</svg><h4>'+c.t+'</h4><p>'+c.d+'</p>';
-      return c.href
-        ? '<a class="commercial-card is-link" href="'+c.href+'">'+inner+'</a>'
+      // `target` is a solution slug; the language suffix is added here so the anchor
+      // always points at the block in the language currently being shown
+      const href = c.href || (c.target ? '#solution-'+c.target+'-'+lang : '');
+      return href
+        ? '<a class="commercial-card is-link" href="'+href+'">'+inner+'</a>'
         : '<div class="commercial-card">'+inner+'</div>';
     }).join('');
 

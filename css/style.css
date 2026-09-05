@@ -458,7 +458,7 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
   background-position:right bottom;
-  background-size:auto 88%;
+  background-size:auto 100%;
   opacity:0.13;
   pointer-events:none;
   z-index:0;
@@ -476,7 +476,7 @@ footer::before{
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
   background-position:right bottom;
-  background-size:auto 86%;
+  background-size:auto 100%;
   opacity:0.13;
   pointer-events:none;
   z-index:0;
@@ -485,8 +485,8 @@ footer::before{
 [dir="rtl"] footer::before{background-position:right bottom;transform:none;}
 footer > *{position:relative;z-index:1;}
 @media (max-width:768px){
-  footer::before{background-size:auto 55%;opacity:0.07;}
-  .has-arch-pattern::before{background-size:auto 55%;}
+  footer::before{background-size:auto 58%;opacity:0.11;}
+  .has-arch-pattern::before{background-size:auto 58%;}
 }
 
 /* ============ SCROLL BUTTON (down / back to top) ============
@@ -938,74 +938,3 @@ html[lang="ar"] .testi-quote,
 html[lang="ar"] .journey-step .jnum{font-style:normal;}
 html[lang="ar"] *{letter-spacing:normal !important;}
 
-/* ======================================================================
-   ARCH PATTERN
-   Single arch watermark positioned at the bottom-right.
-   Uses: Assets/pattern-arch.svg
-   ====================================================================== */
-
-.arch-pattern,
-.arch-pattern-light {
-  position: relative;
-  overflow: hidden;
-
-  --arch-opacity: 0.16;
-  --arch-height: 320px;
-}
-
-/* Single arch — bottom right */
-.arch-pattern::before,
-.arch-pattern-light::before,
-footer::before {
-  content: "";
-  position: absolute;
-
-  right: 0;
-  bottom: 0;
-
-  width: 320px;
-  height: var(--arch-height);
-
- background-image: url("../Assets/pattern-arch.svg");
-  background-repeat: no-repeat;
-  background-position: right bottom;
-  background-size: 400px auto;
-
-  opacity: var(--arch-opacity);
-
-  pointer-events: none;
-  z-index: 0;
-}
-
-
-/* Keep page content above the watermark */
-.arch-pattern > *,
-.arch-pattern-light > *,
-footer > * {
-  position: relative;
-  z-index: 1;
-}
-
-
-/* Footer carries the pattern by default */
-footer {
-  position: relative;
-  overflow: hidden;
-
-  --arch-opacity: 0.16;
-  --arch-height: 320px;
-}
-
-
-/* Mobile */
-@media (max-width: 768px) {
-  footer {
-    --arch-height: 200px;
-    --arch-opacity: 0.13;
-  }
-
-  footer::before {
-    width: 200px;
-    background-size: 200px auto;
-  }
-}

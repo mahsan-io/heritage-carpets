@@ -1573,27 +1573,36 @@ function buildCarouselMarkup(images){
     }
 
     // ---- Our Clients: auto-scrolling logo marquee ----
-    // Filenames are just sequential numbers (1.png, 2.png, ...) in Assets/Clients/, so
-    // logos can be added over time with no code changes. Attempts a generous count;
-    // whichever don't exist yet simply never appear (same onerror-remove pattern used
-    // everywhere else on the site). The track is duplicated once for a seamless CSS
-    // loop — both copies request the same URLs, so they always fail/succeed identically
-    // and stay the same length, which is what keeps the loop math (translateX -50%) exact.
+    // Filenames are just sequential numbers (1, 2, 3, ...) in Assets/Clients/, so
+    // logos can be added over time with no code changes. Each slot tries .png first,
+    // then .jpg, before giving up — so either format works and nothing needs
+    // renaming. Whichever slots don't exist in either format simply never appear
+    // (same onerror-remove pattern used everywhere else on the site). The track is
+    // duplicated once for a seamless CSS loop — both copies try the same URLs in the
+    // same order, so they always end up identical, which is what keeps the loop math
+    // (translateX -50%) exact even after some slots fail.
     const clientsTrack = root.querySelector('[data-role="clients-track"]');
     if(clientsTrack){
       const CLIENTS_FOLDER = 'Assets/Clients/';
       const CLIENTS_ATTEMPT_COUNT = 16;
-      const logos = [];
-      for(let i=1;i<=CLIENTS_ATTEMPT_COUNT;i++){ logos.push(CLIENTS_FOLDER+i+'.png'); }
-      const renderSet = () => logos.map(src=>
-        '<div class="client-logo"><img src="'+src+'" alt="" loading="lazy"></div>'
+      const CLIENTS_EXTENSIONS = ['png', 'jpg'];
+      const nums = [];
+      for(let i=1;i<=CLIENTS_ATTEMPT_COUNT;i++){ nums.push(i); }
+      const renderSet = () => nums.map(n=>
+        '<div class="client-logo"><img src="'+CLIENTS_FOLDER+n+'.'+CLIENTS_EXTENSIONS[0]+'" data-num="'+n+'" data-ext-stage="0" alt="" loading="lazy"></div>'
       ).join('');
       clientsTrack.innerHTML = renderSet() + renderSet();
       clientsTrack.querySelectorAll('img').forEach(img=>{
         img.addEventListener('error', function(){
-          const wrap = img.closest('.client-logo');
-          if(wrap) wrap.remove();
-        }, {once:true});
+          const stage = parseInt(img.dataset.extStage, 10) + 1;
+          if(stage < CLIENTS_EXTENSIONS.length){
+            img.dataset.extStage = String(stage);
+            img.src = CLIENTS_FOLDER + img.dataset.num + '.' + CLIENTS_EXTENSIONS[stage];
+          } else {
+            const wrap = img.closest('.client-logo');
+            if(wrap) wrap.remove();
+          }
+        });
       });
     }
 

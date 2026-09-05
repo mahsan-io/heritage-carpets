@@ -1369,7 +1369,9 @@ function buildCarouselMarkup(images){
     document.querySelectorAll('.logo-img').forEach(img=>{
       img.addEventListener('error', function(){ img.classList.add('logo-missing'); }, {once:true});
     });
-    document.querySelectorAll('.hero-photo').forEach(img=>{
+    // images only: a <video class="hero-photo"> must survive a failed load so its
+    // poster (Assets/hero.png) keeps showing instead of leaving a bare gradient
+    document.querySelectorAll('img.hero-photo').forEach(img=>{
       img.addEventListener('error', function(){ img.remove(); }, {once:true});
     });
     document.querySelectorAll('.motif-photo').forEach(img=>{

@@ -1132,8 +1132,11 @@ function buildCarouselMarkup(images){
     const cg = root.querySelector('[data-role="pv-commercial-grid"]');
     if(cg) cg.innerHTML = C.commercial.map(c=>{
       const inner = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.3">'+ICONS[c.icon]+'</svg><h4>'+c.t+'</h4><p>'+c.d+'</p>';
-      return c.href
-        ? '<a class="commercial-card is-link" href="'+c.href+'">'+inner+'</a>'
+      // `target` is a solution slug; the language suffix is added here so the anchor
+      // always points at the block in the language currently being shown
+      const href = c.href || (c.target ? '#solution-'+c.target+'-'+lang : '');
+      return href
+        ? '<a class="commercial-card is-link" href="'+href+'">'+inner+'</a>'
         : '<div class="commercial-card">'+inner+'</div>';
     }).join('');
 
@@ -1369,7 +1372,9 @@ function buildCarouselMarkup(images){
     document.querySelectorAll('.logo-img').forEach(img=>{
       img.addEventListener('error', function(){ img.classList.add('logo-missing'); }, {once:true});
     });
-    document.querySelectorAll('.hero-photo').forEach(img=>{
+    // images only: a <video class="hero-photo"> must survive a failed load so its
+    // poster (Assets/hero.png) keeps showing instead of leaving a bare gradient
+    document.querySelectorAll('img.hero-photo').forEach(img=>{
       img.addEventListener('error', function(){ img.remove(); }, {once:true});
     });
     document.querySelectorAll('.motif-photo').forEach(img=>{
@@ -1565,6 +1570,31 @@ function buildCarouselMarkup(images){
           wrap.addEventListener('mouseleave', ()=>{ timer = setInterval(()=>showTesti(testiIndex+1), 6500); });
         }
       }
+    }
+
+    // ---- Our Clients: auto-scrolling logo marquee ----
+    // Filenames are just sequential numbers (1.png, 2.png, ...) in Assets/Clients/, so
+    // logos can be added over time with no code changes. Attempts a generous count;
+    // whichever don't exist yet simply never appear (same onerror-remove pattern used
+    // everywhere else on the site). The track is duplicated once for a seamless CSS
+    // loop — both copies request the same URLs, so they always fail/succeed identically
+    // and stay the same length, which is what keeps the loop math (translateX -50%) exact.
+    const clientsTrack = root.querySelector('[data-role="clients-track"]');
+    if(clientsTrack){
+      const CLIENTS_FOLDER = 'Assets/Clients/';
+      const CLIENTS_ATTEMPT_COUNT = 16;
+      const logos = [];
+      for(let i=1;i<=CLIENTS_ATTEMPT_COUNT;i++){ logos.push(CLIENTS_FOLDER+i+'.png'); }
+      const renderSet = () => logos.map(src=>
+        '<div class="client-logo"><img src="'+src+'" alt="" loading="lazy"></div>'
+      ).join('');
+      clientsTrack.innerHTML = renderSet() + renderSet();
+      clientsTrack.querySelectorAll('img').forEach(img=>{
+        img.addEventListener('error', function(){
+          const wrap = img.closest('.client-logo');
+          if(wrap) wrap.remove();
+        }, {once:true});
+      });
     }
 
     initCarousels(root);

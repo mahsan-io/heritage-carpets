@@ -541,9 +541,21 @@ footer > *{position:relative;z-index:1;}
 .pv-video{position:relative;width:100%;aspect-ratio:16/7;background:var(--ink);overflow:hidden;}
 .pv-video video,.pv-video iframe,.pv-video img,.pv-video svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border:0;display:block;}
 .pv-video::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(47,45,46,0.35) 0%,rgba(47,45,46,0.15) 45%,rgba(47,45,46,0.9) 100%);pointer-events:none;}
+/* The caption is absolutely positioned; without a positioned parent it escaped
+   this header entirely and landed on top of the following section on mobile. */
+.pv-video-header{position:relative;overflow:hidden;}
 .pv-video-caption{position:absolute;inset-inline-start:0;bottom:0;width:100%;z-index:2;padding:0 0 44px;}
 .pv-video-caption h1{font-size:clamp(30px,4.4vw,50px);color:var(--cream-text);}
 .pv-video-caption p{margin-top:14px;font-size:16.5px;color:var(--cream-text-dim);max-width:60ch;}
+@media (max-width:768px){
+  /* on a narrow screen there isn't room to overlay the copy legibly, so it
+     sits below the video instead of on top of it */
+  .pv-video-header{background:var(--ink);}
+  .pv-video-caption{position:static;padding:28px 0 8px;}
+  .pv-video-caption h1{font-size:clamp(26px,7vw,34px);}
+  .pv-video-caption p{font-size:15px;}
+  .pv-video::after{background:linear-gradient(180deg,rgba(47,45,46,0.25) 0%,rgba(47,45,46,0.15) 60%,rgba(47,45,46,0.55) 100%);}
+}
 
 .solution{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start;padding:64px 0;border-bottom:1px solid var(--line-light);}
 .solution:last-child{border-bottom:none;}
@@ -611,6 +623,42 @@ footer > *{position:relative;z-index:1;}
   .pv-gallery-track{aspect-ratio:4/3;}
   .pv-video{aspect-ratio:4/3;}
   .pv-gallery-nav button{width:38px;height:38px;font-size:20px;}
+}
+
+/* ============ OUR CLIENTS (logo marquee) ============ */
+.clients-marquee{
+  overflow:hidden;
+  padding:12px 0;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+}
+.clients-track{
+  display:flex;
+  align-items:center;
+  gap:56px;
+  width:max-content;
+  animation:clientsScroll 36s linear infinite;
+}
+.clients-marquee:hover .clients-track{animation-play-state:paused;}
+[dir="rtl"] .clients-track{animation-direction:reverse;}
+@keyframes clientsScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.client-logo{
+  flex-shrink:0;
+  width:104px;height:104px;
+  border-radius:50%;
+  background:var(--parchment);
+  border:1px solid var(--line-light);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  padding:20px;
+}
+.client-logo img{width:100%;height:100%;object-fit:contain;}
+@media (max-width:768px){
+  .client-logo{width:76px;height:76px;padding:14px;}
+  .clients-track{gap:34px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .clients-track{animation:none;}
 }
 
 /* ============ FOOTER ============ */

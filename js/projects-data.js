@@ -23,7 +23,7 @@ window.HeritageProjects = (function(){
   const video = {
     // e.g. 'Assets/projects/showcase.mp4'  — leave '' until the file is supplied
     src: 'Assets/projects/HERITAGE-PROJECT.mp4',
-    poster: 'Assets/projects/project-poster.jpg',
+    poster: 'Assets/projects/heritage-poster.jpg',
     embed: ''   // e.g. 'https://www.youtube.com/embed/XXXXXXXX' — takes priority if set
   };
 
@@ -40,11 +40,11 @@ window.HeritageProjects = (function(){
       lead: 'Carpet tiles, broadloom, and bespoke commissions for hospitality, government, and corporate projects across the Kingdom.'
     },
     commercial: [
-      {icon:'hotels', t:'Hotels', d:'Lobby-to-suite carpet programs built for daily luxury foot traffic.'},
-      {icon:'offices', t:'Offices', d:'Broadloom and carpet tile systems for corporate headquarters.'},
-      {icon:'mosques', t:'Mosques', d:'Custom-dimension prayer hall carpets, woven to precise architectural specification.'},
-      {icon:'retail', t:'Retail Spaces', d:'Durable, brand-considered flooring for luxury retail environments.'},
-      {icon:'corporate', t:'Corporate Projects', d:'Large-scale flooring programs for headquarters and government developments.'}
+      {icon:'hotels', t:'Hotels', d:'Lobby-to-suite carpet programs built for daily luxury foot traffic.', target:'le-park-concord-hotel'},
+      {icon:'offices', t:'Offices', d:'Broadloom and carpet tile systems for corporate headquarters.', target:'makkah-chamber'},
+      {icon:'mosques', t:'Mosques', d:'Custom-dimension prayer hall carpets, woven to precise architectural specification.', target:'king-abdullah-sport-city-mosque'},
+      {icon:'retail', t:'Retail Spaces', d:'Durable, brand-considered flooring for luxury retail environments.', target:'alfalah-schools-jeddah'},
+      {icon:'corporate', t:'Corporate Projects', d:'Large-scale flooring programs for headquarters and government developments.', target:'juffali-head-office'}
     ],
     introHead: {
       kicker: 'What We Deliver',
@@ -146,11 +146,11 @@ window.HeritageProjects = (function(){
       lead:'بلاط سجاد، وسجاد عريض، وتصاميم حصرية لمشاريع الضيافة والقطاع الحكومي والشركات في أنحاء المملكة.'
     },
     commercial: [
-      {icon:'hotels', t:'الفنادق', d:'برامج سجاد تمتد من البهو إلى الأجنحة، مصممة لتحمل حركة يومية فاخرة.'},
-      {icon:'offices', t:'المكاتب', d:'أنظمة سجاد عريض وبلاط سجاد لمقار الشركات.'},
-      {icon:'mosques', t:'المساجد', d:'سجاد لقاعات الصلاة بأبعاد مخصصة، منسوج وفق مواصفات معمارية دقيقة.'},
-      {icon:'retail', t:'المساحات التجارية', d:'أرضيات متينة تراعي هوية العلامة التجارية لبيئات البيع الفاخرة.'},
-      {icon:'corporate', t:'المشاريع المؤسسية', d:'برامج أرضيات واسعة النطاق للمقار والمشاريع الحكومية.'}
+      {icon:'hotels', t:'الفنادق', d:'برامج سجاد تمتد من البهو إلى الأجنحة، مصممة لتحمل حركة يومية فاخرة.', target:'le-park-concord-hotel'},
+      {icon:'offices', t:'المكاتب', d:'أنظمة سجاد عريض وبلاط سجاد لمقار الشركات.', target:'makkah-chamber'},
+      {icon:'mosques', t:'المساجد', d:'سجاد لقاعات الصلاة بأبعاد مخصصة، منسوج وفق مواصفات معمارية دقيقة.', target:'king-abdullah-sport-city-mosque'},
+      {icon:'retail', t:'المساحات التجارية', d:'أرضيات متينة تراعي هوية العلامة التجارية لبيئات البيع الفاخرة.', target:'alfalah-schools-jeddah'},
+      {icon:'corporate', t:'المشاريع المؤسسية', d:'برامج أرضيات واسعة النطاق للمقار والمشاريع الحكومية.', target:'juffali-head-office'}
     ],
     introHead: {
       kicker:'ما نقدمه',

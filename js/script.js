@@ -434,7 +434,7 @@ function buildCarouselMarkup(images){
     const inqBtn = root.querySelector('[data-role="pdp-inquire"]');
     if(inqBtn) inqBtn.setAttribute('href', 'mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(i18n.inquireSubjectPrefix + product.name));
     const waBtn = root.querySelector('[data-role="pdp-whatsapp"]');
-    if(waBtn) waBtn.setAttribute('href', 'https://wa.me/966552144855?text='+encodeURIComponent(i18n.waPrefix + product.name));
+    if(waBtn) waBtn.setAttribute('href', 'https://wa.me/966532148055?text='+encodeURIComponent(i18n.waPrefix + product.name));
     const roomBtn = root.querySelector('[data-role="pdp-room"]');
     if(roomBtn) roomBtn.setAttribute('href', 'room.html?handle='+encodeURIComponent(product.handle));
 
@@ -644,7 +644,7 @@ function buildCarouselMarkup(images){
           i18n.sumLabels.notes+': '+(state.notes||'-')
         ].join('\n');
         const body = i18n.requestIntro + '\n\n' + lines;
-        if(confirmBtn) confirmBtn.setAttribute('href','https://wa.me/966552144855?text='+encodeURIComponent(body));
+        if(confirmBtn) confirmBtn.setAttribute('href','https://wa.me/966532148055?text='+encodeURIComponent(body));
         if(emailBtn) emailBtn.setAttribute('href','mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(i18n.emailSubject)+'&body='+encodeURIComponent(body));
       } else {
         if(confirmBtn) confirmBtn.setAttribute('href','#');
@@ -1276,7 +1276,7 @@ function buildCarouselMarkup(images){
           F.details+': '+(val('details')||'-')
         ].join('\n');
         const body = F.intro+'\n\n'+rows;
-        if(waBtn) waBtn.setAttribute('href','https://wa.me/966552144855?text='+encodeURIComponent(body));
+        if(waBtn) waBtn.setAttribute('href','https://wa.me/966532148055?text='+encodeURIComponent(body));
         if(emBtn) emBtn.setAttribute('href','mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(F.subject)+'&body='+encodeURIComponent(body));
       }
       form.addEventListener('input', refresh);
@@ -1570,6 +1570,31 @@ function buildCarouselMarkup(images){
           wrap.addEventListener('mouseleave', ()=>{ timer = setInterval(()=>showTesti(testiIndex+1), 6500); });
         }
       }
+    }
+
+    // ---- Our Clients: auto-scrolling logo marquee ----
+    // Filenames are just sequential numbers (1.png, 2.png, ...) in Assets/Clients/, so
+    // logos can be added over time with no code changes. Attempts a generous count;
+    // whichever don't exist yet simply never appear (same onerror-remove pattern used
+    // everywhere else on the site). The track is duplicated once for a seamless CSS
+    // loop — both copies request the same URLs, so they always fail/succeed identically
+    // and stay the same length, which is what keeps the loop math (translateX -50%) exact.
+    const clientsTrack = root.querySelector('[data-role="clients-track"]');
+    if(clientsTrack){
+      const CLIENTS_FOLDER = 'Assets/Clients/';
+      const CLIENTS_ATTEMPT_COUNT = 16;
+      const logos = [];
+      for(let i=1;i<=CLIENTS_ATTEMPT_COUNT;i++){ logos.push(CLIENTS_FOLDER+i+'.png'); }
+      const renderSet = () => logos.map(src=>
+        '<div class="client-logo"><img src="'+src+'" alt="" loading="lazy"></div>'
+      ).join('');
+      clientsTrack.innerHTML = renderSet() + renderSet();
+      clientsTrack.querySelectorAll('img').forEach(img=>{
+        img.addEventListener('error', function(){
+          const wrap = img.closest('.client-logo');
+          if(wrap) wrap.remove();
+        }, {once:true});
+      });
     }
 
     initCarousels(root);

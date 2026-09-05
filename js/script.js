@@ -434,7 +434,7 @@ function buildCarouselMarkup(images){
     const inqBtn = root.querySelector('[data-role="pdp-inquire"]');
     if(inqBtn) inqBtn.setAttribute('href', 'mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(i18n.inquireSubjectPrefix + product.name));
     const waBtn = root.querySelector('[data-role="pdp-whatsapp"]');
-    if(waBtn) waBtn.setAttribute('href', 'https://wa.me/966532148055?text='+encodeURIComponent(i18n.waPrefix + product.name));
+    if(waBtn) waBtn.setAttribute('href', 'https://wa.me/966552144855?text='+encodeURIComponent(i18n.waPrefix + product.name));
     const roomBtn = root.querySelector('[data-role="pdp-room"]');
     if(roomBtn) roomBtn.setAttribute('href', 'room.html?handle='+encodeURIComponent(product.handle));
 
@@ -644,7 +644,7 @@ function buildCarouselMarkup(images){
           i18n.sumLabels.notes+': '+(state.notes||'-')
         ].join('\n');
         const body = i18n.requestIntro + '\n\n' + lines;
-        if(confirmBtn) confirmBtn.setAttribute('href','https://wa.me/966532148055?text='+encodeURIComponent(body));
+        if(confirmBtn) confirmBtn.setAttribute('href','https://wa.me/966552144855?text='+encodeURIComponent(body));
         if(emailBtn) emailBtn.setAttribute('href','mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(i18n.emailSubject)+'&body='+encodeURIComponent(body));
       } else {
         if(confirmBtn) confirmBtn.setAttribute('href','#');
@@ -1276,7 +1276,7 @@ function buildCarouselMarkup(images){
           F.details+': '+(val('details')||'-')
         ].join('\n');
         const body = F.intro+'\n\n'+rows;
-        if(waBtn) waBtn.setAttribute('href','https://wa.me/966532148055?text='+encodeURIComponent(body));
+        if(waBtn) waBtn.setAttribute('href','https://wa.me/966552144855?text='+encodeURIComponent(body));
         if(emBtn) emBtn.setAttribute('href','mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(F.subject)+'&body='+encodeURIComponent(body));
       }
       form.addEventListener('input', refresh);

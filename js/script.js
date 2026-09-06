@@ -494,8 +494,8 @@ function buildCarouselMarkup(images){
     if(careEl) careEl.innerHTML = detail.care.map(c=>'<li>'+c+'</li>').join('');
 
     // ---- actions ----
-    const buyBtn = root.querySelector('[data-role="pdp-buy"]');
-    if(buyBtn) buyBtn.setAttribute('href', shopUrl);
+    //const buyBtn = root.querySelector('[data-role="pdp-buy"]');
+    //if(buyBtn) buyBtn.setAttribute('href', shopUrl);
     const inqBtn = root.querySelector('[data-role="pdp-inquire"]');
     if(inqBtn) inqBtn.setAttribute('href', 'mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(i18n.inquireSubjectPrefix + product.name));
     const waBtn = root.querySelector('[data-role="pdp-whatsapp"]');

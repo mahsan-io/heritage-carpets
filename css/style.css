@@ -704,7 +704,15 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding-top:28px;font-size:12.5px;opacity:0.55;}
 
 /* ============ COLLECTIONS / PLP PAGE ============ */
-.page-header{background:var(--ink);color:var(--cream-text);padding:170px 0 64px;}
+.page-header{background:var(--ink);color:var(--cream-text);padding:170px 0 64px;position:relative;overflow:hidden;}
+/* Optional background image or video for a page header. If the file is missing or
+   fails to load, JS removes this whole layer (see initCommon), leaving the exact
+   plain --ink background this header has always had — never a broken image. */
+.page-header-media{position:absolute;inset:0;z-index:0;}
+.page-header-media img,.page-header-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.page-header-media::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(47,45,46,0.5) 0%,rgba(47,45,46,0.68) 55%,rgba(47,45,46,0.92) 100%);}
+.page-header > .container-wide{position:relative;z-index:1;}
 .breadcrumb{font-size:12.5px;color:var(--cream-text-dim);margin-bottom:18px;}
 .breadcrumb a{color:var(--cream-text-dim);transition:.3s;}
 .breadcrumb a:hover{color:var(--brass-light);}

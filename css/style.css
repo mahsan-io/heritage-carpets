@@ -472,7 +472,7 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
   background-position:right bottom;
-  background-size:auto 150%;
+  background-size:auto 120%;
   opacity:0.13;
   pointer-events:none;
   z-index:0;

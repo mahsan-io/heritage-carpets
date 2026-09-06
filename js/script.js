@@ -1663,9 +1663,11 @@ function buildCarouselMarkup(images){
     // (same onerror-remove pattern used everywhere else on the site). The track is
     // duplicated once for a seamless CSS loop — both copies try the same URLs in the
     // same order, so they always end up identical, which is what keeps the loop math
-    // (translateX -50%) exact even after some slots fail.
-    const clientsTrack = root.querySelector('[data-role="clients-track"]');
-    if(clientsTrack){
+    // (translateX -50%) exact even after some slots fail. There can be more than one
+    // track (a second row scrolling the opposite way) — each is populated and
+    // recovers from missing logos independently, from the same numbered pool.
+    const clientsTracks = root.querySelectorAll('[data-role^="clients-track"]');
+    clientsTracks.forEach(clientsTrack=>{
       const CLIENTS_FOLDER = 'Assets/Clients/';
       const CLIENTS_ATTEMPT_COUNT = 16;
       const CLIENTS_EXTENSIONS = ['png', 'jpg'];
@@ -1687,7 +1689,7 @@ function buildCarouselMarkup(images){
           }
         });
       });
-    }
+    });
 
     initCarousels(root);
   }

@@ -1450,6 +1450,19 @@ function buildCarouselMarkup(images){
     document.querySelectorAll('.motif-photo').forEach(img=>{
       img.addEventListener('error', function(){ img.remove(); }, {once:true});
     });
+    // page-header background image/video: on failure, drop the whole media layer
+    // (not just the broken element) so the scrim doesn't linger over nothing —
+    // this restores the header to its original plain dark background exactly.
+    document.querySelectorAll('.page-header-media').forEach(wrap=>{
+      const media = wrap.querySelector('img, video');
+      if(!media) return;
+      const fail = function(){ wrap.remove(); };
+      media.addEventListener('error', fail, {once:true});
+      if(media.tagName === 'VIDEO'){
+        const src = media.querySelector('source');
+        if(src) src.addEventListener('error', fail, {once:true});
+      }
+    });
 
     // threshold must be 0, not a fraction. intersectionRatio is visibleArea/totalArea,
     // so an element taller than ~10x the viewport can never reach 0.1 — which is exactly

@@ -1711,11 +1711,6 @@ function buildCarouselMarkup(images){
     document.querySelectorAll('.logo-img').forEach(img=>{
       img.addEventListener('error', function(){ img.classList.add('logo-missing'); }, {once:true});
     });
-    // images only: a <video class="hero-photo"> must survive a failed load so its
-    // poster (Assets/hero.png) keeps showing instead of leaving a bare gradient
-    document.querySelectorAll('img.hero-photo').forEach(img=>{
-      img.addEventListener('error', function(){ img.remove(); }, {once:true});
-    });
     document.querySelectorAll('.motif-photo').forEach(img=>{
       img.addEventListener('error', function(){ img.remove(); }, {once:true});
     });
@@ -1824,6 +1819,8 @@ function buildCarouselMarkup(images){
   /* ---------------- Home page render (called once per language block) ---------------- */
   function renderHomePage(content, root){
     root = root || document;
+
+    renderVideoHeader(root.querySelector('[data-role="hero-video"]'), content.heroVideo, 'Heritage Carpet Company');
 
     const timelineItems = root.querySelectorAll('.timeline-item');
     timelineItems.forEach(item=>{

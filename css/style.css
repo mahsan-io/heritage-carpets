@@ -751,6 +751,36 @@ footer > *{position:relative;z-index:1;}
   .loc-tab{flex:1 1 100%;}
 }
 
+/* ============ BRAND SHOWCASE (About Us) ============ */
+.bs-brand{display:grid;grid-template-columns:1fr 1.3fr;gap:56px;align-items:start;padding:64px 0;border-bottom:1px solid var(--line-light);}
+.bs-brand:last-child{border-bottom:none;}
+.bs-media{position:sticky;top:96px;min-width:0;}
+.bs-media .motif{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--ink);}
+.bs-body{min-width:0;}
+.bs-logo{display:flex;align-items:center;min-height:44px;margin-bottom:16px;}
+.bs-logo img{max-height:44px;max-width:200px;width:auto;display:block;}
+.bs-logo-fallback{display:none;font-family:var(--font-display);font-size:24px;color:var(--ink-text);}
+.bs-logo img.logo-missing{display:none;}
+.bs-logo img.logo-missing ~ .bs-logo-fallback{display:inline;}
+.bs-tagline{font-size:15px;font-style:italic;color:var(--madder);opacity:0.9;margin-bottom:22px;}
+.bs-intro{font-size:15.5px;line-height:1.8;opacity:0.85;margin-bottom:24px;}
+.bs-features{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-light);margin-bottom:28px;}
+.bs-feature{background:var(--parchment-2);padding:20px 18px;}
+.bs-feature h4{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--madder);font-weight:700;}
+.bs-feature p{margin-top:8px;font-size:13px;line-height:1.6;opacity:0.8;}
+.bs-section{margin-bottom:26px;}
+.bs-section:last-child{margin-bottom:0;}
+.bs-section h4{font-size:16.5px;margin-bottom:10px;}
+.bs-section p{font-size:15px;line-height:1.8;opacity:0.85;}
+
+@media (max-width:980px){
+  .bs-brand{grid-template-columns:1fr;gap:26px;padding:44px 0;}
+  .bs-media{position:static;}
+}
+@media (max-width:640px){
+  .bs-features{grid-template-columns:1fr;}
+}
+
 /* ============ FOOTER ============ */
 footer{background:var(--ink);color:var(--cream-text-dim);padding:52px 0 22px;}
 .footer-top{display:grid;grid-template-columns:1.3fr 1.4fr 1fr;gap:40px;padding-bottom:32px;border-bottom:1px solid var(--line-dark);}

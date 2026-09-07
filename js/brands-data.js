@@ -129,31 +129,17 @@ window.HeritageBrandShowcase = (function(){
     }
   };
 
- // const video = {
-    // Reuses the same file already supplied for the homepage hero — point this
-    // at a dedicated multi-brand reel whenever one exists, nothing else changes.
-  //  src: 'Assets/HERITAGE.mp4',
- //   poster: 'Assets/hero.png',
- //   embed: ''
- // };
    const video = {
-  videos: [
-    {
-      src: 'Assets/HERITAGE.mp4',
-      poster: 'Assets/hcc.png'
-    },
-    {
-      src: 'Assets/divano.mp4',
-      poster: 'Assets/divano.png'
-    },
-    {
-      src: 'Assets/divano-1.mp4',
-      poster: 'Assets/divano.png'
-    },
-    
-  ],
-  embed: ''
-};
+    // Plays each clip in order, advancing when one finishes, looping back to
+    // the first once the list is exhausted. Add or remove entries freely —
+    // one entry alone just loops continuously, same as a single-video header.
+    videos: [
+      { src: 'Assets/HERITAGE.mp4', poster: 'Assets/hcc.png' },
+      { src: 'Assets/divano.mp4',   poster: 'Assets/divano.png' },
+      { src: 'Assets/divano-1.mp4', poster: 'Assets/divano.png' }
+    ],
+    embed: ''
+  };
 
   const i18n = {
     en: {

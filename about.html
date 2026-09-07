@@ -77,6 +77,17 @@
   </div>
 </section>
 
+<section class="section on-parchment2 bs-section-wrap">
+  <div class="container-wide">
+    <div class="section-head center">
+      <div class="eyebrow on-light" data-role="bs-kicker"></div>
+      <h2 data-role="bs-title"></h2>
+      <p data-role="bs-lead"></p>
+    </div>
+    <div data-role="bs-brands"></div>
+  </div>
+</section>
+
 <section class="cta-band">
   <div class="container">
     <h2 data-role="cp-cta-title"></h2>
@@ -202,6 +213,17 @@
   </div>
 </section>
 
+<section class="section on-parchment2 bs-section-wrap">
+  <div class="container-wide">
+    <div class="section-head center">
+      <div class="eyebrow on-light" data-role="bs-kicker"></div>
+      <h2 data-role="bs-title"></h2>
+      <p data-role="bs-lead"></p>
+    </div>
+    <div data-role="bs-brands"></div>
+  </div>
+</section>
+
 <section class="cta-band">
   <div class="container">
     <h2 data-role="cp-cta-title"></h2>
@@ -263,12 +285,15 @@
 
 <script src="js/data.js"></script>
 <script src="js/pages-data.js"></script>
+<script src="js/brands-data.js"></script>
 <script src="js/script.js"></script>
 <script>
   Heritage.renderContentPage({page:'about'}, document.querySelector('.lang-block[data-lang="en"]'));
+  Heritage.renderBrandShowcase({}, document.querySelector('.lang-block[data-lang="en"]'));
 </script>
 <script>
   Heritage.renderContentPage({page:'about'}, document.querySelector('.lang-block[data-lang="ar"]'));
+  Heritage.renderBrandShowcase({}, document.querySelector('.lang-block[data-lang="ar"]'));
 </script>
 </body>
 </html>

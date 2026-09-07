@@ -472,7 +472,7 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
   background-position:right bottom;
-  background-size:auto 100%;
+  background-size:auto 80%;
   opacity:0.13;
   pointer-events:none;
   z-index:0;
@@ -490,7 +490,7 @@ footer::before{
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
   background-position:right bottom;
-  background-size:auto 100%;
+  background-size:auto 150%;
   opacity:0.13;
   pointer-events:none;
   z-index:0;
@@ -499,7 +499,7 @@ footer::before{
 [dir="rtl"] footer::before{background-position:right bottom;transform:none;}
 footer > *{position:relative;z-index:1;}
 @media (max-width:768px){
-  footer::before{background-size:auto 58%;opacity:0.11;}
+  footer::before{background-size:auto 90%;opacity:0.11;}
   .has-arch-pattern::before{background-size:auto 58%;}
 }
 
@@ -693,27 +693,81 @@ footer > *{position:relative;z-index:1;}
   .phone-field .phone-code{max-width:92px;font-size:13px;padding:14px 6px;}
 }
 
+
+/* ============ OUR BRANDS (index) ============ */
+.brands-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.brand-card{background:var(--parchment);border:1px solid var(--line-light);padding:38px 32px;transition:.35s var(--ease);min-width:0;}
+.brand-card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(47,45,46,0.12);border-color:var(--brass);}
+.brand-mark{width:44px;height:44px;border-radius:50%;border:2px solid var(--brass);margin-bottom:22px;}
+.brand-card h3{font-size:22px;}
+.brand-card p{margin-top:12px;font-size:14.5px;line-height:1.7;opacity:0.78;}
+.brand-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px;}
+.brand-actions .btn-text{font-size:12.5px;color:var(--madder);}
+.brand-actions .brand-loc{opacity:0.7;}
+
+/* ============ SHOWROOMS BY BRAND (index) ============ */
+.showroom-brands{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line-dark);}
+.showroom-brand-card{display:block;background:var(--ink);padding:38px 32px;transition:.35s var(--ease);}
+.showroom-brand-card:hover{background:var(--ink-3);}
+.sb-count{font-family:var(--font-display);font-size:38px;color:var(--brass-light);line-height:1;}
+.sb-count span{font-family:var(--font-body);font-size:12px;letter-spacing:0.12em;text-transform:uppercase;opacity:0.7;margin-inline-start:6px;}
+.showroom-brand-card h3{font-size:20px;color:var(--cream-text);margin-top:16px;}
+.sb-cities{margin-top:10px;font-size:13.5px;color:var(--cream-text-dim);line-height:1.6;}
+.sb-link{margin-top:20px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--brass-light);}
+
+/* ============ STORE LOCATOR (locations.html) ============ */
+.loc-tabs{display:flex;gap:2px;background:var(--line-light);margin-bottom:36px;flex-wrap:wrap;}
+.loc-tab{flex:1 1 200px;background:var(--parchment-2);padding:20px 24px;text-align:start;transition:.3s var(--ease);border-bottom:3px solid transparent;}
+.loc-tab:hover{background:var(--parchment);}
+.loc-tab.active{border-bottom-color:var(--brass);background:var(--parchment);}
+.loc-tab-name{display:block;font-family:var(--font-display);font-size:18px;color:var(--ink-text);}
+.loc-tab-count{display:block;margin-top:6px;font-size:11.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--madder);font-weight:700;}
+.loc-tagline{font-size:15.5px;opacity:0.75;margin-bottom:28px;max-width:60ch;}
+.loc-nophone{margin-top:12px;font-size:13px;color:var(--cream-text-dim);opacity:0.7;}
+
+/* ============ CONTENT PAGES (furniture / flooring / about) ============ */
+.cp-block{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:48px 0;border-bottom:1px solid var(--line-light);}
+.cp-block:last-child{border-bottom:none;}
+.cp-block.is-reversed .cp-block-media{order:2;}
+.cp-block-media{min-width:0;}
+.cp-block-media .motif{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--ink);}
+.cp-block-body{min-width:0;}
+.cp-block-body h3{font-size:clamp(20px,2.4vw,27px);}
+.cp-block-body p{margin-top:14px;font-size:15.5px;line-height:1.8;opacity:0.85;}
+.cp-block-link{display:inline-block;margin-top:18px;color:var(--madder);font-size:12.5px;}
+.cp-features{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--line-dark);}
+.cp-feature{background:var(--ink);padding:32px 26px;}
+.cp-feature h4{font-size:15.5px;color:var(--brass-light);}
+.cp-feature p{margin-top:10px;font-size:13.5px;color:var(--cream-text-dim);line-height:1.65;}
+
+@media (max-width:980px){
+  .brands-grid,.showroom-brands{grid-template-columns:1fr;}
+  .cp-block{grid-template-columns:1fr;gap:26px;padding:36px 0;}
+  .cp-block.is-reversed .cp-block-media{order:0;}
+  .cp-features{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:640px){
+  .cp-features{grid-template-columns:1fr;}
+  .loc-tab{flex:1 1 100%;}
+}
+
 /* ============ FOOTER ============ */
-footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
-.footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1.2fr;gap:40px;padding-bottom:64px;border-bottom:1px solid var(--line-dark);}
-.footer-top.footer-top-plp{grid-template-columns:1.4fr 1fr 1fr 1fr;}
+footer{background:var(--ink);color:var(--cream-text-dim);padding:52px 0 22px;}
+.footer-top{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:40px;padding-bottom:32px;border-bottom:1px solid var(--line-dark);}
+.footer-top.footer-top-plp{grid-template-columns:1.6fr 1fr 1fr;}
 /* min-width:0 lets grid columns shrink below their content's min-content width,
    which is what was pushing the footer (and the page) wider than the viewport. */
 .footer-top > *{min-width:0;}
 .footer-col a,.footer-brand p{overflow-wrap:anywhere;}
-.footer-brand p{margin-top:16px;font-size:13.5px;max-width:26ch;opacity:0.75;}
-.footer-social{display:flex;gap:12px;margin-top:26px;}
-.footer-social a{width:36px;height:36px;border:1px solid var(--line-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.3s;}
+.footer-brand p{margin-top:14px;font-size:13px;line-height:1.65;max-width:30ch;opacity:0.75;}
+.footer-social{display:flex;gap:10px;margin-top:20px;}
+.footer-social a{width:32px;height:32px;border:1px solid var(--line-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:.3s;}
 .footer-social a:hover{border-color:var(--brass-light);background:rgba(176,141,70,0.1);}
 .footer-social svg{width:15px;height:15px;stroke:var(--cream-text-dim);}
-.footer-col h5{font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass-light);font-weight:700;margin-bottom:20px;}
-.footer-col a{display:block;font-size:13.5px;margin-bottom:13px;opacity:0.8;transition:.3s;}
+.footer-col h5{font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass-light);font-weight:700;margin-bottom:14px;}
+.footer-col a{display:block;font-size:13.5px;margin-bottom:9px;opacity:0.8;transition:.3s;}
 .footer-col a:hover{opacity:1;color:var(--brass-light);}
-.newsletter-form{display:flex;margin-top:18px;border-bottom:1px solid var(--line-dark);padding-bottom:10px;}
-.newsletter-form input{flex:1;min-width:0;background:none;border:none;color:var(--cream-text);font-size:14px;padding:6px 0;}
-.newsletter-form input::placeholder{color:var(--cream-text-dim);}
-.newsletter-form button{color:var(--brass-light);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding-top:28px;font-size:12.5px;opacity:0.55;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-top:18px;font-size:12.5px;opacity:0.55;}
 
 /* ============ COLLECTIONS / PLP PAGE ============ */
 .page-header{background:var(--ink);color:var(--cream-text);padding:170px 0 64px;position:relative;overflow:hidden;}
@@ -935,7 +989,7 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
   .commercial-grid{grid-template-columns:repeat(3,1fr);}
   .showrooms-grid{grid-template-columns:1fr;}
   .map-grid{grid-template-columns:1fr;}
-  .footer-top{grid-template-columns:1fr 1fr;}
+  .footer-top{grid-template-columns:1fr 1fr;gap:32px;}
   /* .footer-top-plp is a two-class selector, so it needs its own responsive rule —
      without this it stayed at 4 columns on phones (the horizontal footer bug). */
   .footer-top.footer-top-plp{grid-template-columns:1fr 1fr;}
@@ -958,7 +1012,7 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:88px 0 32px;}
   .collections-grid{grid-template-columns:1fr;}
   .commercial-grid{grid-template-columns:repeat(2,1fr);}
   .journey{flex-direction:column;}
-  .footer-top{grid-template-columns:1fr;gap:36px;}
+  .footer-top{grid-template-columns:1fr;gap:28px;}
   .footer-top.footer-top-plp{grid-template-columns:1fr;gap:36px;}
   .footer-bottom{flex-direction:column;align-items:flex-start;text-align:start;}
   .projects-grid{columns:1;}

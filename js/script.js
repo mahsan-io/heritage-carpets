@@ -494,8 +494,8 @@ function buildCarouselMarkup(images){
     if(careEl) careEl.innerHTML = detail.care.map(c=>'<li>'+c+'</li>').join('');
 
     // ---- actions ----
-    const buyBtn = root.querySelector('[data-role="pdp-buy"]');
-    if(buyBtn) buyBtn.setAttribute('href', shopUrl);
+    //const buyBtn = root.querySelector('[data-role="pdp-buy"]');
+    //if(buyBtn) buyBtn.setAttribute('href', shopUrl);
     const inqBtn = root.querySelector('[data-role="pdp-inquire"]');
     if(inqBtn) inqBtn.setAttribute('href', 'mailto:info@heritagecarpet.sa?subject='+encodeURIComponent(i18n.inquireSubjectPrefix + product.name));
     const waBtn = root.querySelector('[data-role="pdp-whatsapp"]');
@@ -1358,6 +1358,140 @@ function buildCarouselMarkup(images){
     }
   }
 
+  /* ---------------- Content pages (furniture.html / flooring.html / about.html) ----------------
+     All three share one layout and one renderer; only the data key differs.
+     Copy lives in js/pages-data.js. */
+  function renderContentPage(config, root){
+    root = root || document;
+    const lang = root.getAttribute('data-lang') || 'en';
+    const P = window.HeritagePages;
+    if(!P || !P[config.page]) return;
+    const C = P[config.page][lang] || P[config.page].en;
+
+    const set = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
+    set('cp-kicker', C.kicker);
+    set('cp-title', C.title);
+    set('cp-lead', C.lead);
+    set('cp-intro-title', C.introTitle);
+    set('cp-intro-body', C.introBody);
+    set('cp-feat-title', C.featTitle);
+    set('cp-cta-title', C.ctaTitle);
+    set('cp-cta-body', C.ctaBody);
+
+    const blocks = root.querySelector('[data-role="cp-blocks"]');
+    if(blocks){
+      blocks.innerHTML = C.blocks.map((b,i)=>{
+        // a block only gets a photo if it names one; otherwise the motif carries it
+        const imgs = b.slug ? ['Assets/projects/'+b.slug+'.jpg'] : [];
+        const media = '<div class="motif">'+motifSVG(b.motif, '#C9DC5E')+buildCarouselMarkup(imgs)+'</div>';
+        const body = '<h3>'+b.t+'</h3><p>'+b.d+'</p>'+
+          (b.href ? '<a class="btn-text cp-block-link" href="'+b.href+'">'+(lang==='ar'?'التفاصيل ←':'See Details →')+'</a>' : '');
+        return '<article class="cp-block'+(i%2 ? ' is-reversed':'')+'">'+
+          '<div class="cp-block-media">'+media+'</div>'+
+          '<div class="cp-block-body">'+body+'</div>'+
+        '</article>';
+      }).join('');
+      initCarousels(blocks);
+    }
+
+    const feats = root.querySelector('[data-role="cp-features"]');
+    if(feats){
+      feats.innerHTML = C.features.map(f=>
+        '<div class="cp-feature"><h4>'+f.t+'</h4><p>'+f.d+'</p></div>'
+      ).join('');
+    }
+
+    const p1 = root.querySelector('[data-role="cp-cta-primary"]');
+    if(p1) p1.textContent = C.ctaPrimary;
+    const p2 = root.querySelector('[data-role="cp-cta-secondary"]');
+    if(p2) p2.textContent = C.ctaSecondary;
+
+    const brand = (lang==='ar') ? 'شركة التراث للسجاد' : 'Heritage Carpet Company';
+    document.documentElement.setAttribute('data-title-'+lang, C.title + ' — ' + brand);
+    if(document.documentElement.getAttribute('lang') === lang){
+      document.title = C.title + ' — ' + brand;
+    }
+  }
+
+  /* ---------------- Store locator (locations.html) ----------------
+     One page, three brand tabs. ?brand=platinum opens that tab directly, so
+     each brand still has its own shareable link. */
+  function renderLocationsPage(config, root){
+    root = root || document;
+    const lang = root.getAttribute('data-lang') || 'en';
+    const L = window.HeritageLocations;
+    if(!L) return;
+    const T = L.i18n[lang] || L.i18n.en;
+
+    const set = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
+    set('loc-kicker', T.kicker);
+    set('loc-title', T.title);
+    set('loc-lead', T.lead);
+
+    const tabsEl = root.querySelector('[data-role="loc-tabs"]');
+    const panelEl = root.querySelector('[data-role="loc-panel"]');
+    if(!tabsEl || !panelEl) return;
+
+    const param = new URLSearchParams(window.location.search).get('brand');
+    let active = (param && L.brands[param]) ? param : L.order[0];
+
+    function renderTabs(){
+      tabsEl.innerHTML = L.order.map(k=>{
+        const b = L.brands[k];
+        const name = lang==='ar' ? b.name_ar : b.name_en;
+        return '<button type="button" class="loc-tab'+(k===active?' active':'')+'" data-brand="'+k+'">'+
+          '<span class="loc-tab-name">'+name+'</span>'+
+          '<span class="loc-tab-count">'+T.branchCount.replace('{n}', b.branches.length)+'</span>'+
+        '</button>';
+      }).join('');
+    }
+
+    function renderPanel(){
+      const b = L.brands[active];
+      const tagline = lang==='ar' ? b.tagline_ar : b.tagline_en;
+      const cards = b.branches.map(br=>{
+        const city = lang==='ar' ? br.city_ar : br.city_en;
+        const addr = lang==='ar' ? br.addr_ar : br.addr_en;
+        const name = lang==='ar' ? (br.name_ar||'') : (br.name_en||'');
+        const hours = lang==='ar' ? (br.hours_ar||'') : (br.hours_en||'');
+        const q = encodeURIComponent(br.q || (br.addr_en + ', Saudi Arabia'));
+        const phone = br.tel
+          ? '<a class="phone" href="tel:'+br.tel+'">&#9742; '+L.displayTel(br.tel)+'</a>'
+          : '<div class="loc-nophone">'+T.noPhone+'</div>';
+        return '<div class="map-card">'+
+          '<div class="map-embed"><iframe src="https://www.google.com/maps?q='+q+'&output=embed" title="'+(name||city)+'" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'+
+          '<div class="map-card-body">'+
+            '<div class="showroom-city">'+city+'</div>'+
+            (name ? '<h3>'+name+'</h3>' : '')+
+            '<div class="addr">'+addr+'</div>'+
+            (hours ? '<div class="hours">'+hours+'</div>' : '')+
+            phone+
+            '<div class="map-actions">'+
+              '<a href="https://www.google.com/maps/dir/?api=1&destination='+q+'" target="_blank" rel="noopener">'+T.directions+' &rarr;</a>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+      }).join('');
+      panelEl.innerHTML = '<p class="loc-tagline">'+tagline+'</p><div class="map-grid">'+cards+'</div>';
+    }
+
+    tabsEl.addEventListener('click', function(e){
+      const btn = e.target.closest('.loc-tab');
+      if(!btn) return;
+      active = btn.dataset.brand;
+      renderTabs(); renderPanel();
+      // keep the URL shareable without reloading
+      try{
+        const u = new URL(window.location.href);
+        u.searchParams.set('brand', active);
+        window.history.replaceState({}, '', u);
+      }catch(err){}
+    });
+
+    renderTabs();
+    renderPanel();
+  }
+
   /* ---------------- Language switching ---------------- */
   function setLanguage(lang, opts){
     opts = opts || {};
@@ -1794,7 +1928,7 @@ function buildCarouselMarkup(images){
               '<div class="product-name"><a href="'+detailUrl+'">'+p.name+'</a></div>'+
               '<div class="product-meta">'+metaParts.join(' \u00b7 ')+'</div>'+
               '<div class="product-actions">'+
-                '<a class="btn btn-fill btn-sm" href="'+detailUrl+'">'+(i18n.viewDetails || i18n.viewOnShopify)+'</a>'+
+                '<a class="btn btn-fill btn-sm" href="'+detailUrl+'">'+i18n.viewDetails+'</a>'+
                 '<a class="btn btn-outline dark btn-sm" href="mailto:info@heritagecarpet.sa?subject='+inquireSubject+'">'+i18n.inquire+'</a>'+
               '</div>'+
             '</div></div>';
@@ -2267,5 +2401,5 @@ function buildCarouselMarkup(images){
 
   document.addEventListener('DOMContentLoaded', initCommon);
 
-  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
+  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
 })();

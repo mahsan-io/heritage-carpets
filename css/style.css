@@ -472,7 +472,7 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
   background-position:right bottom;
-  background-size:auto 80%;
+  background-size:auto 150%;
   opacity:0.13;
   pointer-events:none;
   z-index:0;
@@ -490,7 +490,7 @@ footer::before{
   background-image:var(--pattern-arch);
   background-repeat:no-repeat;
   background-position:right bottom;
-  background-size:auto 150%;
+  background-size:auto 82%;
   opacity:0.13;
   pointer-events:none;
   z-index:0;
@@ -499,7 +499,7 @@ footer::before{
 [dir="rtl"] footer::before{background-position:right bottom;transform:none;}
 footer > *{position:relative;z-index:1;}
 @media (max-width:768px){
-  footer::before{background-size:auto 90%;opacity:0.11;}
+  footer::before{background-size:auto 60%;opacity:0.11;}
   .has-arch-pattern::before{background-size:auto 58%;}
 }
 
@@ -753,7 +753,7 @@ footer > *{position:relative;z-index:1;}
 
 /* ============ FOOTER ============ */
 footer{background:var(--ink);color:var(--cream-text-dim);padding:52px 0 22px;}
-.footer-top{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:40px;padding-bottom:32px;border-bottom:1px solid var(--line-dark);}
+.footer-top{display:grid;grid-template-columns:1.3fr 1.4fr 1fr;gap:40px;padding-bottom:32px;border-bottom:1px solid var(--line-dark);}
 .footer-top.footer-top-plp{grid-template-columns:1.6fr 1fr 1fr;}
 /* min-width:0 lets grid columns shrink below their content's min-content width,
    which is what was pushing the footer (and the page) wider than the viewport. */
@@ -766,6 +766,8 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:52px 0 22px;}
 .footer-social svg{width:15px;height:15px;stroke:var(--cream-text-dim);}
 .footer-col h5{font-size:11.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--brass-light);font-weight:700;margin-bottom:14px;}
 .footer-col a{display:block;font-size:13.5px;margin-bottom:9px;opacity:0.8;transition:.3s;}
+.footer-links-cols{column-count:2;column-gap:22px;}
+.footer-links-cols a{break-inside:avoid;-webkit-column-break-inside:avoid;}
 .footer-col a:hover{opacity:1;color:var(--brass-light);}
 .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding-top:18px;font-size:12.5px;opacity:0.55;}
 
@@ -1013,6 +1015,7 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:52px 0 22px;}
   .commercial-grid{grid-template-columns:repeat(2,1fr);}
   .journey{flex-direction:column;}
   .footer-top{grid-template-columns:1fr;gap:28px;}
+  .footer-links-cols{column-count:1;}
   .footer-top.footer-top-plp{grid-template-columns:1fr;gap:36px;}
   .footer-bottom{flex-direction:column;align-items:flex-start;text-align:start;}
   .projects-grid{columns:1;}

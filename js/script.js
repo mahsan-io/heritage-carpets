@@ -1413,6 +1413,70 @@ function buildCarouselMarkup(images){
     }
   }
 
+  /* ---------------- Brand Showcase (About Us page) ----------------
+     One detailed profile per brand: Heritage, Divano, Platinum. Each brand's
+     photos/logo come from Assets/brands/{PREFIX}_... — see js/brands-data.js
+     for the exact filenames expected. Handles each brand's own shape rather
+     than forcing an identical template (Platinum has an intro + a compact
+     features trio that the other two don't). */
+  function renderBrandShowcase(config, root){
+    root = root || document;
+    const lang = root.getAttribute('data-lang') || 'en';
+    const B = window.HeritageBrandShowcase;
+    if(!B) return;
+    const T = B.i18n[lang] || B.i18n.en;
+
+    const set = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
+    set('bs-kicker', T.kicker);
+    set('bs-title', T.title);
+    set('bs-lead', T.lead);
+
+    const wrap = root.querySelector('[data-role="bs-brands"]');
+    if(!wrap) return;
+
+    wrap.innerHTML = B.order.map(key=>{
+      const b = B.brands[key];
+      const C = b[lang] || b.en;
+      const logoSrc = 'Assets/brands/'+b.prefix+'_logo.png';
+      const photoImgs = ['Assets/brands/'+b.prefix+'_1.jpg','Assets/brands/'+b.prefix+'_2.jpg','Assets/brands/'+b.prefix+'_3.jpg'];
+
+      const media = '<div class="bs-media"><div class="motif">'+motifSVG(b.motif,'#C9DC5E')+buildCarouselMarkup(photoImgs)+'</div></div>';
+
+      const logoBlock = '<div class="bs-logo">'+
+        '<img src="'+logoSrc+'" alt="'+C.name+'">'+
+        '<span class="bs-logo-fallback">'+C.name+'</span>'+
+      '</div>';
+
+      const introHTML = C.intro ? '<p class="bs-intro">'+C.intro+'</p>' : '';
+
+      const featuresHTML = (C.features && C.features.length)
+        ? '<div class="bs-features">'+C.features.map(f=>
+            '<div class="bs-feature"><h4>'+f.t+'</h4><p>'+f.b+'</p></div>'
+          ).join('')+'</div>'
+        : '';
+
+      const sectionsHTML = C.sections.map(s=>
+        '<div class="bs-section"><h4>'+s.t+'</h4><p>'+s.b+'</p></div>'
+      ).join('');
+
+      return '<article class="bs-brand" id="brand-'+key+'-'+lang+'">'+
+        media +
+        '<div class="bs-body">'+
+          logoBlock +
+          '<p class="bs-tagline">'+C.tagline+'</p>' +
+          introHTML +
+          featuresHTML +
+          sectionsHTML +
+        '</div>'+
+      '</article>';
+    }).join('');
+
+    wrap.querySelectorAll('.bs-logo img').forEach(img=>{
+      img.addEventListener('error', function(){ img.classList.add('logo-missing'); }, {once:true});
+    });
+    initCarousels(wrap);
+  }
+
   /* ---------------- Store locator (locations.html) ----------------
      One page, three brand tabs. ?brand=platinum opens that tab directly, so
      each brand still has its own shareable link. */
@@ -2401,5 +2465,5 @@ function buildCarouselMarkup(images){
 
   document.addEventListener('DOMContentLoaded', initCommon);
 
-  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
+  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderBrandShowcase, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
 })();

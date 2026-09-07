@@ -141,21 +141,19 @@ window.HeritagePages = (function(){
          d:'Heritage opens in Jeddah, importing hand-knotted carpets from Persia, Turkey and the wider Orient for a young and fast-growing Kingdom.'},
         {t:'Growing With the Kingdom', motif:'floorplan', slug:'',
          d:'As the country built, so did we — expanding from private residences into hotels, corporate headquarters, mosques and government projects, and adding our own installation teams.'},
-        {t:'Three Brands, One Standard', motif:'tile', slug:'',
-         d:'Heritage Carpets for handmade and bespoke work, Platinum Carpets for machine-made and contract supply, and Divano for luxury furniture — each with its own showrooms, held to the same standard.'},
         {t:'Today', motif:'medallion', slug:'',
          d:'A projects division specifying and installing complete interiors, a bespoke studio commissioning one-off carpets, and showrooms across Jeddah, Riyadh, Dammam, Khamis Mushait, Al Qatif and Al Ahsa.'}
       ],
       featTitle:'What We Stand For',
       features: [
         {t:'Provenance', d:'We know where every piece comes from, who wove it, and how — and we will tell you.'},
-        {t:'Craft', d:'Hand-knotted and hand-tufted work by skilled artisans, judged on knot density and finish, not just pattern.'},
+        {t:'Craft', d:'Hand-knotted carpets and hand-finished furniture, made by skilled artisans and judged on construction and finish, not just pattern.'},
         {t:'Accountability', d:'Supply, fabrication and installation in-house, so one team answers for the result.'},
         {t:'Longevity', d:'Pieces intended to be kept, maintained and passed on rather than replaced.'}
       ],
       ctaTitle:'Come and See',
       ctaBody:'The difference between a good carpet and a great one is something you have to stand on. Visit a showroom, or start a conversation with our team.',
-      ctaPrimary:'Find a Showroom', ctaSecondary:'Book a Visit'
+      ctaPrimary:'Find a Showroom', ctaSecondary:'Contact Us'
     },
     ar: {
       kicker:'من نحن', title:'فخامة منسوجة عبر الأجيال',
@@ -167,21 +165,19 @@ window.HeritagePages = (function(){
          d:'افتتحت التراث في جدة، مستوردةً السجاد المعقود يدويًا من بلاد فارس وتركيا والشرق، لمملكة فتية سريعة النمو.'},
         {t:'ننمو مع المملكة', motif:'floorplan', slug:'',
          d:'ومع بناء الوطن نمونا معه — من المنازل الخاصة إلى الفنادق والمقار المؤسسية والمساجد والمشاريع الحكومية، مع تكوين فرق تركيب خاصة بنا.'},
-        {t:'ثلاث علامات، معيار واحد', motif:'tile', slug:'',
-         d:'التراث للسجاد اليدوي والحصري، وبلاتينيوم للسجاد الآلي ومشاريع العقود، وديفانو للأثاث الفاخر — لكل منها صالاتها، وجميعها بالمعيار ذاته.'},
         {t:'اليوم', motif:'medallion', slug:'',
          d:'قسم مشاريع يحدد المواصفات وينفذ التجهيزات المتكاملة، واستوديو للتصميم الحصري، وصالات عرض في جدة والرياض والدمام وخميس مشيط والقطيف والأحساء.'}
       ],
       featTitle:'ما نؤمن به',
       features: [
         {t:'المنشأ', d:'نعرف مصدر كل قطعة ومن نسجها وكيف — ونخبرك بذلك.'},
-        {t:'الحِرفة', d:'أعمال معقودة يدويًا على أيدي حرفيين مهرة، تُقاس بكثافة العقد والإتقان لا بالنقش وحده.'},
+        {t:'الحِرفة', d:'سجاد معقود يدويًا وأثاث منجّز يدويًا على أيدي حرفيين مهرة، يُقاس بجودة التصنيع والإتقان لا بالنقش وحده.'},
         {t:'المسؤولية', d:'التوريد والتصنيع والتركيب داخليًا، ليكون فريق واحد مسؤولًا عن النتيجة.'},
         {t:'الاستدامة', d:'قطع تُقتنى وتُصان وتُورّث، لا تُستبدل.'}
       ],
       ctaTitle:'تفضل بزيارتنا',
       ctaBody:'الفرق بين سجادة جيدة وأخرى استثنائية شيء يجب أن تقف عليه. زر إحدى صالاتنا، أو ابدأ حديثًا مع فريقنا.',
-      ctaPrimary:'اعثر على صالة عرض', ctaSecondary:'احجز زيارة'
+      ctaPrimary:'اعثر على صالة عرض', ctaSecondary:'تواصل معنا'
     }
   };
 

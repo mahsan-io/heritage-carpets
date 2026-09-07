@@ -805,10 +805,13 @@
 <script>
   Heritage.renderHomePage({
     heroVideo: {
+      // Continuous playlist, no poster images — a static poster didn't sit
+      // well visually in the hero, so each clip has no fallback still and,
+      // if one fails to load, playback skips straight to the next clip.
       videos: [
-        { src: 'Assets/HERITAGE.mp4', poster: 'Assets/hcc.png' },
-        { src: 'Assets/divano.mp4',   poster: 'Assets/divano.png' },
-        { src: 'Assets/divano-1.mp4', poster: 'Assets/divano.png' }
+        { src: 'Assets/HERITAGE.mp4' },
+        { src: 'Assets/divano.mp4' },
+        { src: 'Assets/divano-1.mp4' }
       ],
       embed: ''
     },
@@ -908,10 +911,13 @@
 <script>
   Heritage.renderHomePage({
     heroVideo: {
+      // Continuous playlist, no poster images — a static poster didn't sit
+      // well visually in the hero, so each clip has no fallback still and,
+      // if one fails to load, playback skips straight to the next clip.
       videos: [
-        { src: 'Assets/HERITAGE.mp4', poster: 'Assets/hcc.png' },
-        { src: 'Assets/divano.mp4',   poster: 'Assets/divano.png' },
-        { src: 'Assets/divano-1.mp4', poster: 'Assets/divano.png' }
+        { src: 'Assets/HERITAGE.mp4' },
+        { src: 'Assets/divano.mp4' },
+        { src: 'Assets/divano-1.mp4' }
       ],
       embed: ''
     },

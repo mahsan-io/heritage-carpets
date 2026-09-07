@@ -130,56 +130,5 @@ window.HeritagePages = (function(){
     }
   };
 
-  const about = {
-    en: {
-      kicker:'About Us', title:'Luxury Woven Through Generations',
-      lead:"Since 1975, Heritage Carpet Company has furnished the Kingdom's palaces, hotels, mosques and homes — one commission at a time.",
-      introTitle:'Fifty Years of Floors',
-      introBody:'What began as a single Jeddah showroom in 1975 has grown into a group of three retail brands and a projects division delivering complete furnishing and flooring solutions across Saudi Arabia and the GCC. The standard has not changed: sourcing the best of what the world weaves, and finishing it to a level the client can feel underfoot.',
-      blocks: [
-        {t:'1975 — The First Showroom', motif:'arch', slug:'',
-         d:'Heritage opens in Jeddah, importing hand-knotted carpets from Persia, Turkey and the wider Orient for a young and fast-growing Kingdom.'},
-        {t:'Growing With the Kingdom', motif:'floorplan', slug:'',
-         d:'As the country built, so did we — expanding from private residences into hotels, corporate headquarters, mosques and government projects, and adding our own installation teams.'},
-        {t:'Today', motif:'medallion', slug:'',
-         d:'A projects division specifying and installing complete interiors, a bespoke studio commissioning one-off carpets, and showrooms across Jeddah, Riyadh, Dammam, Khamis Mushait, Al Qatif and Al Ahsa.'}
-      ],
-      featTitle:'What We Stand For',
-      features: [
-        {t:'Provenance', d:'We know where every piece comes from, who wove it, and how — and we will tell you.'},
-        {t:'Craft', d:'Hand-knotted carpets and hand-finished furniture, made by skilled artisans and judged on construction and finish, not just pattern.'},
-        {t:'Accountability', d:'Supply, fabrication and installation in-house, so one team answers for the result.'},
-        {t:'Longevity', d:'Pieces intended to be kept, maintained and passed on rather than replaced.'}
-      ],
-      ctaTitle:'Come and See',
-      ctaBody:'The difference between a good carpet and a great one is something you have to stand on. Visit a showroom, or start a conversation with our team.',
-      ctaPrimary:'Find a Showroom', ctaSecondary:'Contact Us'
-    },
-    ar: {
-      kicker:'من نحن', title:'فخامة منسوجة عبر الأجيال',
-      lead:'منذ 1975، جهّزت شركة التراث للسجاد قصور المملكة وفنادقها ومساجدها ومنازلها — مشروعًا تلو الآخر.',
-      introTitle:'خمسون عامًا من الأرضيات',
-      introBody:'ما بدأ كصالة عرض واحدة في جدة عام 1975 نما ليصبح مجموعة من ثلاث علامات تجارية وقسمًا للمشاريع يقدم حلول تجهيز وأرضيات متكاملة في أنحاء السعودية ودول الخليج. ولم يتغير المعيار: انتقاء أفضل ما يُنسج في العالم، وإنجازه بمستوى يشعر به العميل تحت قدميه.',
-      blocks: [
-        {t:'1975 — صالة العرض الأولى', motif:'arch', slug:'',
-         d:'افتتحت التراث في جدة، مستوردةً السجاد المعقود يدويًا من بلاد فارس وتركيا والشرق، لمملكة فتية سريعة النمو.'},
-        {t:'ننمو مع المملكة', motif:'floorplan', slug:'',
-         d:'ومع بناء الوطن نمونا معه — من المنازل الخاصة إلى الفنادق والمقار المؤسسية والمساجد والمشاريع الحكومية، مع تكوين فرق تركيب خاصة بنا.'},
-        {t:'اليوم', motif:'medallion', slug:'',
-         d:'قسم مشاريع يحدد المواصفات وينفذ التجهيزات المتكاملة، واستوديو للتصميم الحصري، وصالات عرض في جدة والرياض والدمام وخميس مشيط والقطيف والأحساء.'}
-      ],
-      featTitle:'ما نؤمن به',
-      features: [
-        {t:'المنشأ', d:'نعرف مصدر كل قطعة ومن نسجها وكيف — ونخبرك بذلك.'},
-        {t:'الحِرفة', d:'سجاد معقود يدويًا وأثاث منجّز يدويًا على أيدي حرفيين مهرة، يُقاس بجودة التصنيع والإتقان لا بالنقش وحده.'},
-        {t:'المسؤولية', d:'التوريد والتصنيع والتركيب داخليًا، ليكون فريق واحد مسؤولًا عن النتيجة.'},
-        {t:'الاستدامة', d:'قطع تُقتنى وتُصان وتُورّث، لا تُستبدل.'}
-      ],
-      ctaTitle:'تفضل بزيارتنا',
-      ctaBody:'الفرق بين سجادة جيدة وأخرى استثنائية شيء يجب أن تقف عليه. زر إحدى صالاتنا، أو ابدأ حديثًا مع فريقنا.',
-      ctaPrimary:'اعثر على صالة عرض', ctaSecondary:'تواصل معنا'
-    }
-  };
-
-  return { furniture: furniture, flooring: flooring, about: about };
+  return { furniture: furniture, flooring: flooring };
 })();

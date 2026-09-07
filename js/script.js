@@ -1152,6 +1152,33 @@ function buildCarouselMarkup(images){
   /* ---------------- Projects page (projects.html) ----------------
      Content comes from js/projects-data.js so the English and Arabic copy sit
      side by side in one file. Rendered per language block like every other page. */
+  /* ---------------- Shared video header (Projects + Brands pages) ----------------
+     embed > mp4 > poster > motif fallback, in that order. One implementation so
+     both pages behave identically and stay in sync if this logic ever changes. */
+  function renderVideoHeader(videoWrap, video, titleForEmbed){
+    if(!videoWrap) return;
+    const v = video || {};
+    function fallbackVideo(wrap){
+      wrap.innerHTML = v.poster
+        ? '<img class="pv-video-poster" src="'+v.poster+'" alt="">'
+        : motifSVG('arch', '#C9DC5E');
+      const img = wrap.querySelector('img');
+      if(img) img.addEventListener('error', function(){ wrap.innerHTML = motifSVG('arch','#C9DC5E'); }, {once:true});
+    }
+    if(v.embed){
+      videoWrap.innerHTML = '<iframe src="'+v.embed+'" title="'+(titleForEmbed||'')+'" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
+    } else if(v.src){
+      videoWrap.innerHTML =
+        '<video autoplay muted loop playsinline preload="metadata"'+(v.poster?' poster="'+v.poster+'"':'')+'>'+
+        '<source src="'+v.src+'" type="video/mp4"></video>';
+      const vid = videoWrap.querySelector('video');
+      vid.addEventListener('error', function(){ fallbackVideo(videoWrap); }, {once:true});
+      vid.querySelector('source').addEventListener('error', function(){ fallbackVideo(videoWrap); }, {once:true});
+    } else {
+      fallbackVideo(videoWrap);
+    }
+  }
+
   function renderProjectsPage(config, root){
     root = root || document;
     const lang = root.getAttribute('data-lang') || 'en';
@@ -1159,31 +1186,7 @@ function buildCarouselMarkup(images){
     if(!P) return;
     const C = P[lang] || P.en;
 
-    // ---- showcase video: embed > mp4 > poster still ----
-    const videoWrap = root.querySelector('[data-role="pv-video"]');
-    if(videoWrap){
-      const v = P.video || {};
-      if(v.embed){
-        videoWrap.innerHTML = '<iframe src="'+v.embed+'" title="'+C.hero.title+'" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
-      } else if(v.src){
-        videoWrap.innerHTML =
-          '<video autoplay muted loop playsinline preload="metadata"'+(v.poster?' poster="'+v.poster+'"':'')+'>'+
-          '<source src="'+v.src+'" type="video/mp4"></video>';
-        const vid = videoWrap.querySelector('video');
-        // if the file isn't there yet, fall back to the poster, then to the motif
-        vid.addEventListener('error', function(){ fallbackVideo(videoWrap, v); }, {once:true});
-        vid.querySelector('source').addEventListener('error', function(){ fallbackVideo(videoWrap, v); }, {once:true});
-      } else {
-        fallbackVideo(videoWrap, v);
-      }
-    }
-    function fallbackVideo(wrap, v){
-      wrap.innerHTML = v && v.poster
-        ? '<img class="pv-video-poster" src="'+v.poster+'" alt="">'
-        : motifSVG('arch', '#C9DC5E');
-      const img = wrap.querySelector('img');
-      if(img) img.addEventListener('error', function(){ wrap.innerHTML = motifSVG('arch','#C9DC5E'); }, {once:true});
-    }
+    renderVideoHeader(root.querySelector('[data-role="pv-video"]'), P.video, C.hero.title);
 
     const setText = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
     const head = (prefix, obj) => {
@@ -1413,29 +1416,44 @@ function buildCarouselMarkup(images){
     }
   }
 
-  /* ---------------- Brand Showcase (About Us page) ----------------
-     One detailed profile per brand: Heritage, Divano, Platinum. Each brand's
-     photos/logo come from Assets/brands/{PREFIX}_... — see js/brands-data.js
-     for the exact filenames expected. Handles each brand's own shape rather
-     than forcing an identical template (Platinum has an intro + a compact
-     features trio that the other two don't). */
-  function renderBrandShowcase(config, root){
+  /* ---------------- Our Brands page (brands.html) ----------------
+     Video header, then a tab per brand (Heritage / Platinum / Divano). Each
+     panel shows that brand's own Mission/Story/Approach content — kept in its
+     own natural shape rather than forced into an identical template, since
+     Platinum's supplied copy genuinely has more parts than Divano's — plus
+     photos and three action links (products, category page, showroom).
+     Photos/logo come from Assets/brands/{PREFIX}_... — see js/brands-data.js
+     for the exact filenames expected. ?brand=platinum opens that tab directly. */
+  function renderBrandsPage(config, root){
     root = root || document;
     const lang = root.getAttribute('data-lang') || 'en';
     const B = window.HeritageBrandShowcase;
     if(!B) return;
     const T = B.i18n[lang] || B.i18n.en;
 
+    renderVideoHeader(root.querySelector('[data-role="brands-video"]'), B.video, T.title);
+
     const set = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
-    set('bs-kicker', T.kicker);
-    set('bs-title', T.title);
-    set('bs-lead', T.lead);
+    set('brands-kicker', T.kicker);
+    set('brands-title', T.title);
+    set('brands-lead', T.lead);
 
-    const wrap = root.querySelector('[data-role="bs-brands"]');
-    if(!wrap) return;
+    const tabsEl = root.querySelector('[data-role="brands-tabs"]');
+    const panelEl = root.querySelector('[data-role="brands-panel"]');
+    if(!tabsEl || !panelEl) return;
 
-    wrap.innerHTML = B.order.map(key=>{
-      const b = B.brands[key];
+    const param = new URLSearchParams(window.location.search).get('brand');
+    let active = (param && B.brands[param]) ? param : B.order[0];
+
+    function renderTabs(){
+      tabsEl.innerHTML = B.order.map(key=>{
+        const C = B.brands[key][lang] || B.brands[key].en;
+        return '<button type="button" class="brand-tab-btn'+(key===active?' active':'')+'" data-brand="'+key+'">'+C.name+'</button>';
+      }).join('');
+    }
+
+    function renderPanel(){
+      const b = B.brands[active];
       const C = b[lang] || b.en;
       const logoSrc = 'Assets/brands/'+b.prefix+'_logo.png';
       const photoImgs = ['Assets/brands/'+b.prefix+'_1.jpg','Assets/brands/'+b.prefix+'_2.jpg','Assets/brands/'+b.prefix+'_3.jpg'];
@@ -1459,7 +1477,14 @@ function buildCarouselMarkup(images){
         '<div class="bs-section"><h4>'+s.t+'</h4><p>'+s.b+'</p></div>'
       ).join('');
 
-      return '<article class="bs-brand" id="brand-'+key+'-'+lang+'">'+
+      const catLabel = lang==='ar' ? b.links.category.ar : b.links.category.en;
+      const actionsHTML = '<div class="bs-actions">'+
+        '<a class="btn btn-fill" href="'+b.links.products+'">'+T.viewProducts+'</a>'+
+        '<a class="btn btn-outline dark" href="'+b.links.category.href+'">'+catLabel+'</a>'+
+        '<a class="btn btn-outline dark" href="'+b.links.locations+'">'+T.findShowroom+'</a>'+
+      '</div>';
+
+      panelEl.innerHTML = '<article class="bs-brand">'+
         media +
         '<div class="bs-body">'+
           logoBlock +
@@ -1467,14 +1492,30 @@ function buildCarouselMarkup(images){
           introHTML +
           featuresHTML +
           sectionsHTML +
+          actionsHTML +
         '</div>'+
       '</article>';
-    }).join('');
 
-    wrap.querySelectorAll('.bs-logo img').forEach(img=>{
-      img.addEventListener('error', function(){ img.classList.add('logo-missing'); }, {once:true});
+      panelEl.querySelectorAll('.bs-logo img').forEach(img=>{
+        img.addEventListener('error', function(){ img.classList.add('logo-missing'); }, {once:true});
+      });
+      initCarousels(panelEl);
+    }
+
+    tabsEl.addEventListener('click', function(e){
+      const btn = e.target.closest('.brand-tab-btn');
+      if(!btn) return;
+      active = btn.dataset.brand;
+      renderTabs(); renderPanel();
+      try{
+        const u = new URL(window.location.href);
+        u.searchParams.set('brand', active);
+        window.history.replaceState({}, '', u);
+      }catch(err){}
     });
-    initCarousels(wrap);
+
+    renderTabs();
+    renderPanel();
   }
 
   /* ---------------- Store locator (locations.html) ----------------
@@ -2465,5 +2506,5 @@ function buildCarouselMarkup(images){
 
   document.addEventListener('DOMContentLoaded', initCommon);
 
-  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderBrandShowcase, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
+  return { SHOPIFY_STORE, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderBrandsPage, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
 })();

@@ -17,12 +17,17 @@
    ====================================================================== */
 window.HeritageBrandShowcase = (function(){
 
-  const order = ['heritage', 'divano', 'platinum'];
+  const order = ['heritage', 'platinum', 'divano'];
 
   const brands = {
 
     heritage: {
       prefix: 'H', motif: 'medallion',
+      links: {
+        products: 'collections.html',
+        category: { href:'projects.html', en:'Our Projects', ar:'مشاريعنا' },
+        locations: 'locations.html?brand=heritage'
+      },
       en: {
         name: 'Heritage Carpets',
         tagline: 'Handmade and bespoke carpets since 1975 — the house the group began with.',
@@ -51,6 +56,11 @@ window.HeritageBrandShowcase = (function(){
 
     divano: {
       prefix: 'D', motif: 'sofa',
+      links: {
+        products: 'collections.html?category=furniture',
+        category: { href:'furniture.html', en:'Explore Furniture', ar:'استكشف الأثاث' },
+        locations: 'locations.html?brand=divano'
+      },
       en: {
         name: 'Divano',
         tagline: 'Italian-inspired luxury furniture, est. 2010.',
@@ -79,6 +89,11 @@ window.HeritageBrandShowcase = (function(){
 
     platinum: {
       prefix: 'P', motif: 'tile',
+      links: {
+        products: 'collections.html?category=machine-made',
+        category: { href:'flooring.html', en:'Flooring Solutions', ar:'حلول الأرضيات' },
+        locations: 'locations.html?brand=platinum'
+      },
       en: {
         name: 'Platinum Carpets',
         tagline: 'Where Heritage Meets Modernity — 40 years of craftsmanship since 1985.',
@@ -114,10 +129,26 @@ window.HeritageBrandShowcase = (function(){
     }
   };
 
-  const i18n = {
-    en: { kicker:'Our Brands', title:'Three Brands, In Their Own Words', lead:'Each brand in the group has its own story and its own standard. Here is each, in full.' },
-    ar: { kicker:'علاماتنا التجارية', title:'ثلاث علامات، بكلماتها الخاصة', lead:'لكل علامة في المجموعة قصتها ومعيارها الخاص. وفيما يلي كل واحدة منها، بالتفصيل.' }
+  const video = {
+    // Reuses the same file already supplied for the homepage hero — point this
+    // at a dedicated multi-brand reel whenever one exists, nothing else changes.
+    src: 'Assets/HERITAGE.mp4',
+    poster: 'Assets/hero.png',
+    embed: ''
   };
 
-  return { order: order, brands: brands, i18n: i18n };
+  const i18n = {
+    en: {
+      kicker:'Our Brands', title:'Three Brands, One Standard',
+      lead:'Heritage, Platinum and Divano — each with its own identity, its own showrooms, and its own story. Select a brand to read it in full.',
+      viewProducts:'View Products', findShowroom:'Find a Showroom'
+    },
+    ar: {
+      kicker:'علاماتنا التجارية', title:'ثلاث علامات، معيار واحد',
+      lead:'التراث وبلاتينيوم وديفانو — لكل منها هويتها وصالاتها وقصتها الخاصة. اختر علامة لقراءة قصتها كاملة.',
+      viewProducts:'عرض المنتجات', findShowroom:'اعثر على صالة عرض'
+    }
+  };
+
+  return { order: order, brands: brands, i18n: i18n, video: video };
 })();

@@ -150,10 +150,7 @@ window.HeritageBrandShowcase = (function(){
       src: 'Assets/divano-1.mp4',
       poster: 'Assets/divano.png'
     },
-    {
-      src: 'Assets/BRAND-03.mp4',
-      poster: 'Assets/brand-03.png'
-    }
+    
   ],
   embed: ''
 };

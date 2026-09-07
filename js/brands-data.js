@@ -129,13 +129,34 @@ window.HeritageBrandShowcase = (function(){
     }
   };
 
-  const video = {
+ // const video = {
     // Reuses the same file already supplied for the homepage hero — point this
     // at a dedicated multi-brand reel whenever one exists, nothing else changes.
-    src: 'Assets/HERITAGE.mp4',
-    poster: 'Assets/hero.png',
-    embed: ''
-  };
+  //  src: 'Assets/HERITAGE.mp4',
+ //   poster: 'Assets/hero.png',
+ //   embed: ''
+ // };
+   const video = {
+  videos: [
+    {
+      src: 'Assets/HERITAGE.mp4',
+      poster: 'Assets/hcc.png'
+    },
+    {
+      src: 'Assets/divano.mp4',
+      poster: 'Assets/divano.png'
+    },
+    {
+      src: 'Assets/divano-1.mp4',
+      poster: 'Assets/divano.png'
+    },
+    {
+      src: 'Assets/BRAND-03.mp4',
+      poster: 'Assets/brand-03.png'
+    }
+  ],
+  embed: ''
+};
 
   const i18n = {
     en: {

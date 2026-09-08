@@ -1431,6 +1431,12 @@ function buildCarouselMarkup(images){
     // "about" blocks on pages that supply `storySlides` (currently only
     // Furniture/Divano) — a single fixed-height section showing one slide at
     // a time, instead of several full-width blocks stacked one after another
+    // ---- scroll-triggered card stack (image + header + details per card) ----
+    // Pure CSS position:sticky does the actual stacking (each card pins at the
+    // same offset, so the next one visually slides up and covers it as the
+    // page continues to scroll — no scroll-jacking, no animation library).
+    // JS only handles: building the cards, and adding the fade+rise entrance
+    // via the same IntersectionObserver used for .reveal elsewhere on the site.
     const storySlider = root.querySelector('[data-role="cp-story-slider"]');
     if(storySlider && C.storySlides && C.storySlides.length){
       const logoWrap = root.querySelector('[data-role="cp-story-logo"]');
@@ -1439,40 +1445,20 @@ function buildCarouselMarkup(images){
         logoWrap.querySelector('img').addEventListener('error', function(){ logoWrap.innerHTML = ''; }, {once:true});
       }
       const track = storySlider.querySelector('[data-role="cp-story-track"]');
-      const dots = storySlider.querySelector('[data-role="cp-story-dots"]');
       const slides = C.storySlides;
       if(track){
         track.innerHTML = slides.map((s,i)=>
-          '<div class="bss-slide'+(i===0?' active':'')+'" data-index="'+i+'">'+
-            '<div class="bss-media"><img src="'+s.img+'" alt="" loading="lazy"></div>'+
-            '<div class="bss-body"><h3>'+s.t+'</h3><p>'+s.b+'</p></div>'+
-          '</div>'
+          '<article class="stack-card reveal" style="--i:'+i+'">'+
+            '<div class="stack-card-media"><img src="'+s.img+'" alt="" loading="lazy"></div>'+
+            '<div class="stack-card-body"><h3>'+s.t+'</h3><p>'+s.b+'</p></div>'+
+          '</article>'
         ).join('');
         track.querySelectorAll('img').forEach(img=>{
-          img.addEventListener('error', function(){ img.closest('.bss-slide').classList.add('no-media'); img.remove(); }, {once:true});
+          img.addEventListener('error', function(){ img.closest('.stack-card').classList.add('no-media'); img.remove(); }, {once:true});
         });
-      }
-      if(dots){
-        dots.innerHTML = slides.map((_,i)=>'<span class="carousel-dot'+(i===0?' active':'')+'" data-index="'+i+'"></span>').join('');
-      }
-      let si = 0;
-      function showStory(i){
-        si = (i + slides.length) % slides.length;
-        storySlider.querySelectorAll('.bss-slide').forEach((el,idx)=>el.classList.toggle('active', idx===si));
-        if(dots) dots.querySelectorAll('.carousel-dot').forEach((el,idx)=>el.classList.toggle('active', idx===si));
-      }
-      const prevBtn = storySlider.querySelector('[data-role="cp-story-prev"]');
-      const nextBtn = storySlider.querySelector('[data-role="cp-story-next"]');
-      if(prevBtn) prevBtn.addEventListener('click', ()=>showStory(si-1));
-      if(nextBtn) nextBtn.addEventListener('click', ()=>showStory(si+1));
-      if(dots) dots.addEventListener('click', function(e){
-        const d = e.target.closest('.carousel-dot');
-        if(d) showStory(parseInt(d.dataset.index,10));
-      });
-      if(!reducedMotion && slides.length > 1){
-        let timer = setInterval(()=>showStory(si+1), 6500);
-        storySlider.addEventListener('mouseenter', ()=>clearInterval(timer));
-        storySlider.addEventListener('mouseleave', ()=>{ timer = setInterval(()=>showStory(si+1), 6500); });
+        // no explicit reveal call needed here: these cards exist in the DOM
+        // before DOMContentLoaded fires, so initCommon()'s own IntersectionObserver
+        // picks them up automatically, same as every other .reveal element.
       }
     }
 

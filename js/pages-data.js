@@ -16,10 +16,10 @@ window.HeritagePages = (function(){
     en: {
       kicker:'Furniture', title:'Divano — Luxury Furniture',
       lead:'Furniture is not simply about filling a space. It is a reflection of a refined lifestyle, and the balance of elegance and comfort that a room is built around.',
-      introTitle:'Crafted for Living',
-      introBody:'Divano is our furniture house: exceptional collections that blend innovative modern design with high-end craftsmanship, made for premium villas, residential estates, and prestigious commercial projects. Every piece is built on a robust, meticulously engineered frame, padded with high-density foam for long-lasting ergonomic support, and upholstered in the finest woven fabrics and premium leathers.',
       storyLogo: 'Assets/brands/D_logo.png',
       storySlides: [
+        {t:'Crafted for Living', img:'Assets/brands/D_0.jpg',
+         b:'Divano is our furniture house: exceptional collections that blend innovative modern design with high-end craftsmanship, made for premium villas, residential estates, and prestigious commercial projects. Every piece is built on a robust, meticulously engineered frame, padded with high-density foam for long-lasting ergonomic support, and upholstered in the finest woven fabrics and premium leathers.'},
         {t:'Our Mission', img:'Assets/brands/D_1.jpg',
          b:'At Divano, our mission is to provide you with the finest selection of luxurious furniture pieces that will transform your living space into a haven of comfort and elegance. As an ecommerce store specialising in high-quality furniture, we pride ourselves on offering high-quality furnishings and home accessories with Italian designs and limited editions, with customised services and a distinguished customer shopping experience.'},
         {t:'Our Story', img:'Assets/brands/D_2.jpg',
@@ -94,10 +94,10 @@ window.HeritagePages = (function(){
     ar: {
       kicker:'الأثاث', title:'ديفانو — الأثاث الفاخر',
       lead:'الأثاث ليس مجرد شغل للمساحة، بل انعكاس لأسلوب حياة راقٍ، وتوازن بين الأناقة والراحة تُبنى حوله الغرفة.',
-      introTitle:'مصنوع للحياة',
-      introBody:'ديفانو هي دار الأثاث لدينا: مجموعات استثنائية تمزج التصميم العصري المبتكر بالحِرفية الراقية، لتناسب الفلل الفاخرة والمجمعات السكنية والمشاريع التجارية المرموقة. تُبنى كل قطعة على هيكل متين مصمم بعناية، محشو بإسفنج عالي الكثافة لدعم مريح يدوم، ومكسو بأجود الأقمشة المنسوجة والجلود الفاخرة.',
       storyLogo: 'Assets/brands/D_logo.png',
       storySlides: [
+        {t:'مصنوع للحياة', img:'Assets/brands/D_0.jpg',
+         b:'ديفانو هي دار الأثاث لدينا: مجموعات استثنائية تمزج التصميم العصري المبتكر بالحِرفية الراقية، لتناسب الفلل الفاخرة والمجمعات السكنية والمشاريع التجارية المرموقة. تُبنى كل قطعة على هيكل متين مصمم بعناية، محشو بإسفنج عالي الكثافة لدعم مريح يدوم، ومكسو بأجود الأقمشة المنسوجة والجلود الفاخرة.'},
         {t:'مهمتنا', img:'Assets/brands/D_1.jpg',
          b:'في ديفانو، مهمتنا أن نقدم لك أرقى تشكيلة من قطع الأثاث الفاخرة التي تحوّل مساحة معيشتك إلى ملاذ من الراحة والأناقة. وبصفتنا متجرًا إلكترونيًا متخصصًا في الأثاث عالي الجودة، نفخر بتقديم مفروشات وإكسسوارات منزلية بتصاميم إيطالية وإصدارات محدودة، مع خدمات مخصصة وتجربة تسوق مميزة لعملائنا.'},
         {t:'قصتنا', img:'Assets/brands/D_2.jpg',

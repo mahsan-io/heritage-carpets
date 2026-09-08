@@ -727,7 +727,6 @@ footer > *{position:relative;z-index:1;}
 .loc-nophone{margin-top:12px;font-size:13px;color:var(--cream-text-dim);opacity:0.7;}
 
 /* ============ CONTENT PAGES (furniture / flooring / about) ============ */
-.cp-block{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:48px 0;border-bottom:1px solid var(--line-light);}
 
 /* ============ SCROLL-STACKING STORY CARDS (replaces the old arrow/dot slider) ============
    Pure CSS position:sticky does the actual stacking: every card pins at the
@@ -769,6 +768,7 @@ footer > *{position:relative;z-index:1;}
 .stack-card-body h3{font-size:clamp(22px,2.6vw,29px);}
 .stack-card-body p{margin-top:18px;font-size:14.5px;line-height:1.85;opacity:0.85;
   max-height:280px;overflow-y:auto;padding-inline-end:8px;}
+.stack-card-link{display:inline-block;margin-top:20px;color:var(--madder);font-size:12.5px;align-self:flex-start;}
 @media (max-width:768px){
   .stack-card{grid-template-columns:1fr;top:88px;min-height:auto;margin-bottom:24px;}
   .stack-card-media{min-height:200px;}
@@ -782,14 +782,6 @@ footer > *{position:relative;z-index:1;}
 .cp-service-box h2{color:var(--cream-text);font-size:clamp(24px,3vw,32px);}
 .cp-service-box p{margin-top:16px;font-size:15.5px;line-height:1.8;color:var(--cream-text-dim);}
 .cp-service-box .btn{margin-top:28px;}
-.cp-block:last-child{border-bottom:none;}
-.cp-block.is-reversed .cp-block-media{order:2;}
-.cp-block-media{min-width:0;}
-.cp-block-media .motif{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--ink);}
-.cp-block-body{min-width:0;}
-.cp-block-body h3{font-size:clamp(20px,2.4vw,27px);}
-.cp-block-body p{margin-top:14px;font-size:15.5px;line-height:1.8;opacity:0.85;}
-.cp-block-link{display:inline-block;margin-top:18px;color:var(--madder);font-size:12.5px;}
 .cp-features{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--line-dark);}
 
 /* ============ PRODUCT CATEGORY DIRECTORY (e.g. Divano on furniture.html) ============ */
@@ -814,8 +806,6 @@ a.cp-cat-heading:hover{color:var(--madder);}
 
 @media (max-width:980px){
   .brands-grid,.showroom-brands{grid-template-columns:1fr;}
-  .cp-block{grid-template-columns:1fr;gap:26px;padding:36px 0;}
-  .cp-block.is-reversed .cp-block-media{order:0;}
   .cp-features{grid-template-columns:repeat(2,1fr);}
 }
 @media (max-width:640px){

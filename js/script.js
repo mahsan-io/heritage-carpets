@@ -1459,6 +1459,42 @@ function buildCarouselMarkup(images){
         // no explicit reveal call needed here: these cards exist in the DOM
         // before DOMContentLoaded fires, so initCommon()'s own IntersectionObserver
         // picks them up automatically, same as every other .reveal element.
+
+        // Scroll-driven "minimize" effect: position:sticky alone makes each card
+        // pin and get covered abruptly. To make the covered (topmost) card shrink
+        // smoothly as the next one arrives, its scale has to track live scroll
+        // position — that part can't be done in pure CSS. Progress is measured
+        // from the NEXT card's own distance to the sticky offset, so the shrink
+        // is tied to actual position, not a timer — it reads as "minimize on
+        // scroll down" and naturally reverses (grows back) scrolling back up,
+        // rather than a one-way animation that would fight the sticky behaviour.
+        if(slides.length > 1){
+          const STICKY_TOP = 110;
+          let ticking = false;
+          function updateStack(){
+            ticking = false;
+            const cardsNow = track.querySelectorAll('.stack-card');
+            const buffer = Math.min(420, (window.innerHeight || 800) * 0.55);
+            cardsNow.forEach((el, i)=>{
+              const next = cardsNow[i+1];
+              if(!next){ el.style.transform = ''; return; }
+              const nextTop = next.getBoundingClientRect().top;
+              const progress = Math.min(1, Math.max(0, 1 - (nextTop - STICKY_TOP) / buffer));
+              el.style.transform = progress > 0.001 ? 'scale('+(1 - progress * 0.08).toFixed(4)+')' : '';
+            });
+          }
+          function onScroll(){
+            if(!ticking){ window.requestAnimationFrame(updateStack); ticking = true; }
+          }
+          if(reducedMotion){
+            // respect prefers-reduced-motion: keep the structural stack, skip
+            // the continuous scale animation entirely
+          } else {
+            window.addEventListener('scroll', onScroll, {passive:true});
+            window.addEventListener('resize', onScroll, {passive:true});
+            updateStack();
+          }
+        }
       }
     }
 
@@ -1568,8 +1604,9 @@ function buildCarouselMarkup(images){
     function renderPanel(){
       const b = B.brands[active];
       const C = b[lang] || b.en;
-      const logoSrc = 'Assets/brands/'+b.prefix+'_logo.png';
-      const photoImgs = ['Assets/brands/'+b.prefix+'_1.jpg','Assets/brands/'+b.prefix+'_2.jpg','Assets/brands/'+b.prefix+'_3.jpg'];
+      const folder = b.folder || 'Assets/brands/';
+      const logoSrc = folder+b.prefix+'_logo.png';
+      const photoImgs = [folder+b.prefix+'_1.jpg', folder+b.prefix+'_2.jpg', folder+b.prefix+'_3.jpg'];
 
       const media = '<div class="bs-media"><div class="motif">'+motifSVG(b.motif,'#C9DC5E')+buildCarouselMarkup(photoImgs)+'</div></div>';
 

@@ -742,17 +742,23 @@ footer > *{position:relative;z-index:1;}
   position:sticky;
   top:110px;
   z-index:calc(var(--i) + 1);
-  margin-bottom:36px;
+  margin-bottom:64px;
   min-height:58vh;
   width:100%;
   background:var(--parchment-2);
+  border:1px solid rgba(183,204,51,0.55);
   border-radius:12px;
   overflow:hidden;
-  /* a lime glow matching the brand palette, plus a neutral shadow underneath
-     so the card still reads as lifted off the page rather than just glowing */
+  /* The glow has to carry across a very wide card on desktop, where a soft
+     blur alone is proportionally tiny (~4% of card width) and reads as nothing.
+     So: a solid 1px lime border for a crisp always-visible edge, a tight ring
+     just outside it, then the soft outer glow, then a neutral shadow for depth.
+     The 64px gap below matters too — with a smaller gap the next (opaque) card
+     simply covers the glow before you can see it. */
   box-shadow:
-    0 0 0 1px rgba(183,204,51,0.28),
-    0 0 46px rgba(183,204,51,0.24),
+    0 0 0 5px rgba(183,204,51,0.16),
+    0 0 34px rgba(183,204,51,0.42),
+    0 0 80px rgba(183,204,51,0.22),
     0 24px 60px rgba(47,45,46,0.20);
   display:grid;
   grid-template-columns:1fr 1.1fr;

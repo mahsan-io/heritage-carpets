@@ -1411,22 +1411,6 @@ function buildCarouselMarkup(images){
     set('cp-cta-title', C.ctaTitle);
     set('cp-cta-body', C.ctaBody);
 
-    const blocks = root.querySelector('[data-role="cp-blocks"]');
-    if(blocks && C.blocks){
-      blocks.innerHTML = C.blocks.map((b,i)=>{
-        // a block only gets a photo if it names one; otherwise the motif carries it
-        const imgs = b.slug ? ['Assets/projects/'+b.slug+'.jpg'] : [];
-        const media = '<div class="motif">'+motifSVG(b.motif, '#C9DC5E')+buildCarouselMarkup(imgs)+'</div>';
-        const body = '<h3>'+b.t+'</h3><p>'+b.d+'</p>'+
-          (b.href ? '<a class="btn-text cp-block-link" href="'+b.href+'">'+(lang==='ar'?'التفاصيل ←':'See Details →')+'</a>' : '');
-        return '<article class="cp-block'+(i%2 ? ' is-reversed':'')+'">'+
-          '<div class="cp-block-media">'+media+'</div>'+
-          '<div class="cp-block-body">'+body+'</div>'+
-        '</article>';
-      }).join('');
-      initCarousels(blocks);
-    }
-
     // optional: a compact image+text story slider, replacing the old stacked
     // "about" blocks on pages that supply `storySlides` (currently only
     // Furniture/Divano) — a single fixed-height section showing one slide at
@@ -1440,17 +1424,26 @@ function buildCarouselMarkup(images){
     const storySlider = root.querySelector('[data-role="cp-story-slider"]');
     if(storySlider && C.storySlides && C.storySlides.length){
       const logoWrap = root.querySelector('[data-role="cp-story-logo"]');
-      if(logoWrap && C.storyLogo){
-        logoWrap.innerHTML = '<img src="'+C.storyLogo+'" alt="">';
-        logoWrap.querySelector('img').addEventListener('error', function(){ logoWrap.innerHTML = ''; }, {once:true});
+      if(logoWrap){
+        if(C.storyLogo){
+          logoWrap.innerHTML = '<img src="'+C.storyLogo+'" alt="">';
+          logoWrap.querySelector('img').addEventListener('error', function(){ logoWrap.style.display = 'none'; }, {once:true});
+        } else {
+          // pages without a single brand logo (e.g. Flooring) shouldn't leave
+          // an empty 40px slot above the stack
+          logoWrap.style.display = 'none';
+        }
       }
       const track = storySlider.querySelector('[data-role="cp-story-track"]');
       const slides = C.storySlides;
       if(track){
+        const moreLabel = (lang==='ar') ? 'التفاصيل ←' : 'See Details →';
         track.innerHTML = slides.map((s,i)=>
           '<article class="stack-card reveal" style="--i:'+i+'">'+
             '<div class="stack-card-media"><img src="'+s.img+'" alt="" loading="lazy"></div>'+
-            '<div class="stack-card-body"><h3>'+s.t+'</h3><p>'+s.b+'</p></div>'+
+            '<div class="stack-card-body"><h3>'+s.t+'</h3><p>'+s.b+'</p>'+
+              (s.href ? '<a class="btn-text stack-card-link" href="'+s.href+'">'+moreLabel+'</a>' : '')+
+            '</div>'+
           '</article>'
         ).join('');
         track.querySelectorAll('img').forEach(img=>{

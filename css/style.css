@@ -728,6 +728,52 @@ footer > *{position:relative;z-index:1;}
 
 /* ============ CONTENT PAGES (furniture / flooring / about) ============ */
 .cp-block{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:48px 0;border-bottom:1px solid var(--line-light);}
+
+/* ============ COMPACT BRAND STORY SLIDER (replaces stacked "about" blocks) ============
+   One fixed-height slide at a time — image one side, text the other — instead
+   of several full-width blocks stacked one after another. Meant to be a much
+   shorter footprint than the old .cp-block layout for the same amount of copy. */
+.bss-wrap{position:relative;}
+.bss-logo{height:40px;margin-bottom:28px;display:flex;}
+.bss-logo img{height:100%;width:auto;object-fit:contain;}
+.bss-viewport{position:relative;overflow:hidden;border-radius:2px;}
+.bss-track{position:relative;min-height:420px;}
+.bss-slide{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1.1fr;gap:0;
+  opacity:0;pointer-events:none;transition:opacity .5s ease;}
+.bss-slide.active{opacity:1;pointer-events:auto;}
+.bss-media{position:relative;background:var(--ink);overflow:hidden;min-height:340px;}
+.bss-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+.bss-slide.no-media .bss-media{background:linear-gradient(135deg,var(--ink) 0%,var(--ink-3) 100%);}
+.bss-body{background:var(--parchment-2);padding:44px 48px;display:flex;flex-direction:column;justify-content:center;min-width:0;}
+.bss-body h3{font-size:clamp(21px,2.4vw,27px);}
+.bss-body p{margin-top:16px;font-size:14.5px;line-height:1.8;opacity:0.85;
+  max-height:220px;overflow-y:auto;padding-inline-end:8px;}
+.bss-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--line-light);
+  background:var(--parchment-2);color:var(--ink-text);font-size:24px;line-height:1;
+  display:flex;align-items:center;justify-content:center;transition:.25s var(--ease);
+  opacity:0.9;}
+.bss-arrow:hover{background:var(--brass);border-color:var(--brass);}
+.bss-prev{inset-inline-start:16px;}
+.bss-next{inset-inline-end:16px;}
+.bss-dots{justify-content:center;margin-top:18px;position:static;}
+.bss-dots .carousel-dot{background:var(--line-light);}
+.bss-dots .carousel-dot.active{background:var(--brass);}
+@media (max-width:768px){
+  .bss-track{min-height:auto;}
+  .bss-slide{position:relative;display:none;grid-template-columns:1fr;}
+  .bss-slide.active{display:grid;}
+  .bss-media{min-height:220px;}
+  .bss-body{padding:28px 24px;}
+  .bss-body p{max-height:none;}
+  .bss-arrow{width:38px;height:38px;font-size:20px;}
+}
+
+/* ============ SERVICE CALLOUT (e.g. Divano Interior Design) ============ */
+.cp-service-box{max-width:720px;margin:0 auto;text-align:center;}
+.cp-service-box h2{color:var(--cream-text);font-size:clamp(24px,3vw,32px);}
+.cp-service-box p{margin-top:16px;font-size:15.5px;line-height:1.8;color:var(--cream-text-dim);}
+.cp-service-box .btn{margin-top:28px;}
 .cp-block:last-child{border-bottom:none;}
 .cp-block.is-reversed .cp-block-media{order:2;}
 .cp-block-media{min-width:0;}

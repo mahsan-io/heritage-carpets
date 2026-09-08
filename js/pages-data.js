@@ -16,9 +16,9 @@ window.HeritagePages = (function(){
     en: {
       kicker:'Furniture', title:'Divano — Luxury Furniture',
       lead:'Furniture is not simply about filling a space. It is a reflection of a refined lifestyle, and the balance of elegance and comfort that a room is built around.',
-      storyLogo: 'Assets/brands/divano/D_logo.png',
+     // storyLogo: 'Assets/brands/divano/D_logo.png',
       storySlides: [
-        {t:'Crafted for Living', img:'Assets/brands/divano/D_0.jpg',
+        {t:'Crafted for Living', img:'Assets/brands/divano/D_0.png',
          b:'Divano is our furniture house: exceptional collections that blend innovative modern design with high-end craftsmanship, made for premium villas, residential estates, and prestigious commercial projects. Every piece is built on a robust, meticulously engineered frame, padded with high-density foam for long-lasting ergonomic support, and upholstered in the finest woven fabrics and premium leathers.'},
         {t:'Our Mission', img:'Assets/brands/divano/D_1.jpg',
          b:'At Divano, our mission is to provide you with the finest selection of luxurious furniture pieces that will transform your living space into a haven of comfort and elegance. As an ecommerce store specialising in high-quality furniture, we pride ourselves on offering high-quality furnishings and home accessories with Italian designs and limited editions, with customised services and a distinguished customer shopping experience.'},

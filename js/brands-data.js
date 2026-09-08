@@ -55,7 +55,7 @@ window.HeritageBrandShowcase = (function(){
     },
 
     divano: {
-      prefix: 'D', motif: 'sofa',
+      prefix: 'D', motif: 'sofa', folder: 'Assets/brands/divano/',
       links: {
         products: 'https://www.divanoksa.com',
         category: { href:'furniture.html', en:'Explore Furniture', ar:'استكشف الأثاث' },

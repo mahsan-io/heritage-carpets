@@ -1155,28 +1155,58 @@ function buildCarouselMarkup(images){
   /* ---------------- Shared video header (Projects + Brands pages) ----------------
      embed > mp4 > poster > motif fallback, in that order. One implementation so
      both pages behave identically and stay in sync if this logic ever changes. */
+  /* ---------------- Shared video header (Projects + Brands pages) ----------------
+     embed > videos[] playlist > single src > poster > motif, in that priority.
+     A `videos` array plays each clip through in sequence, advancing on 'ended'
+     and looping back to the first once the list is exhausted — one clip just
+     loops continuously as before (unchanged behaviour for existing configs
+     that still use the plain src/poster shape, e.g. js/projects-data.js).
+     If a clip fails to load, its own poster stands in briefly and playback
+     advances to the next clip; if everything in the list fails, the arch
+     motif shows, exactly as the single-video fallback always has. */
   function renderVideoHeader(videoWrap, video, titleForEmbed){
     if(!videoWrap) return;
     const v = video || {};
-    function fallbackVideo(wrap){
-      wrap.innerHTML = v.poster
-        ? '<img class="pv-video-poster" src="'+v.poster+'" alt="">'
-        : motifSVG('arch', '#C9DC5E');
-      const img = wrap.querySelector('img');
-      if(img) img.addEventListener('error', function(){ wrap.innerHTML = motifSVG('arch','#C9DC5E'); }, {once:true});
-    }
+    const list = (v.videos && v.videos.length) ? v.videos : (v.src ? [{src:v.src, poster:v.poster}] : []);
+
     if(v.embed){
       videoWrap.innerHTML = '<iframe src="'+v.embed+'" title="'+(titleForEmbed||'')+'" loading="lazy" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
-    } else if(v.src){
-      videoWrap.innerHTML =
-        '<video autoplay muted loop playsinline preload="metadata"'+(v.poster?' poster="'+v.poster+'"':'')+'>'+
-        '<source src="'+v.src+'" type="video/mp4"></video>';
-      const vid = videoWrap.querySelector('video');
-      vid.addEventListener('error', function(){ fallbackVideo(videoWrap); }, {once:true});
-      vid.querySelector('source').addEventListener('error', function(){ fallbackVideo(videoWrap); }, {once:true});
-    } else {
-      fallbackVideo(videoWrap);
+      return;
     }
+    if(!list.length){
+      videoWrap.innerHTML = motifSVG('arch', '#C9DC5E');
+      return;
+    }
+
+    let idx = 0;
+    function showMotif(){ videoWrap.innerHTML = motifSVG('arch', '#C9DC5E'); }
+    function advance(){
+      idx += 1;
+      if(idx >= list.length){ showMotif(); return; }
+      playCurrent();
+    }
+    function playCurrent(){
+      const entry = list[idx];
+      if(!entry || !entry.src){ advance(); return; }
+      const multi = list.length > 1;
+      videoWrap.innerHTML =
+        '<video autoplay muted'+(multi?'':' loop')+' playsinline preload="metadata"'+(entry.poster?' poster="'+entry.poster+'"':'')+'>'+
+        '<source src="'+entry.src+'" type="video/mp4"></video>';
+      const vidEl = videoWrap.querySelector('video');
+      const srcEl = vidEl.querySelector('source');
+      // with more than one clip, move to the next once this one finishes
+      // playing through — a single clip keeps looping itself as it always has
+      if(multi) vidEl.addEventListener('ended', function(){ idx = (idx+1) % list.length; playCurrent(); });
+      const onErr = function(){
+        if(!entry.poster){ advance(); return; }
+        videoWrap.innerHTML = '<img class="pv-video-poster" src="'+entry.poster+'" alt="">';
+        videoWrap.querySelector('img').addEventListener('error', advance, {once:true});
+      };
+      vidEl.addEventListener('error', onErr, {once:true});
+      srcEl.addEventListener('error', onErr, {once:true});
+    }
+
+    playCurrent();
   }
 
   function renderProjectsPage(config, root){
@@ -1681,11 +1711,6 @@ function buildCarouselMarkup(images){
     document.querySelectorAll('.logo-img').forEach(img=>{
       img.addEventListener('error', function(){ img.classList.add('logo-missing'); }, {once:true});
     });
-    // images only: a <video class="hero-photo"> must survive a failed load so its
-    // poster (Assets/hero.png) keeps showing instead of leaving a bare gradient
-    document.querySelectorAll('img.hero-photo').forEach(img=>{
-      img.addEventListener('error', function(){ img.remove(); }, {once:true});
-    });
     document.querySelectorAll('.motif-photo').forEach(img=>{
       img.addEventListener('error', function(){ img.remove(); }, {once:true});
     });
@@ -1794,6 +1819,8 @@ function buildCarouselMarkup(images){
   /* ---------------- Home page render (called once per language block) ---------------- */
   function renderHomePage(content, root){
     root = root || document;
+
+    renderVideoHeader(root.querySelector('[data-role="hero-video"]'), content.heroVideo, 'Heritage Carpet Company');
 
     const timelineItems = root.querySelectorAll('.timeline-item');
     timelineItems.forEach(item=>{

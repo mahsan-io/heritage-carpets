@@ -47,9 +47,7 @@
 
 <!-- ============ HERO ============ -->
 <header class="hero">
-  <video class="hero-photo" autoplay muted loop playsinline preload="metadata" poster="Assets/hero.png">
-    <source src="Assets/HERITAGE.mp4" type="video/mp4">
-  </video>
+  <div class="hero-photo" data-role="hero-video"></div>
   <div class="hero-scrim"></div>
   <div class="hero-motif">
     <svg viewBox="0 0 400 400" fill="none">
@@ -444,9 +442,7 @@
 
 <!-- ============ HERO ============ -->
 <header class="hero">
-  <video class="hero-photo" autoplay muted loop playsinline preload="metadata" poster="Assets/hero.png">
-    <source src="Assets/HERITAGE.mp4" type="video/mp4">
-  </video>
+  <div class="hero-photo" data-role="hero-video"></div>
   <div class="hero-scrim"></div>
   <div class="hero-motif">
     <svg viewBox="0 0 400 400" fill="none">
@@ -808,6 +804,17 @@
 <script src="js/script.js"></script>
 <script>
   Heritage.renderHomePage({
+    heroVideo: {
+      // Continuous playlist, no poster images — a static poster didn't sit
+      // well visually in the hero, so each clip has no fallback still and,
+      // if one fails to load, playback skips straight to the next clip.
+      videos: [
+        { src: 'Assets/HERITAGE.mp4' },
+        { src: 'Assets/divano.mp4' },
+        { src: 'Assets/divano-1.mp4' }
+      ],
+      embed: ''
+    },
     collections: [
       {n:'01', t:'Handmade Carpets', d:'Hand-knotted in silk and fine wool, each piece months in the making.', motif:'medallion', href:'collections.html?category=handmade', slug:'handmade',images:[
         'Assets/collections/handmade.jpg',
@@ -903,6 +910,17 @@
 </script>
 <script>
   Heritage.renderHomePage({
+    heroVideo: {
+      // Continuous playlist, no poster images — a static poster didn't sit
+      // well visually in the hero, so each clip has no fallback still and,
+      // if one fails to load, playback skips straight to the next clip.
+      videos: [
+        { src: 'Assets/HERITAGE.mp4' },
+        { src: 'Assets/divano.mp4' },
+        { src: 'Assets/divano-1.mp4' }
+      ],
+      embed: ''
+    },
     collections: [
       {n:'01', t:'السجاد اليدوي', d:'معقود يدويًا من الحرير والصوف الفاخر، كل قطعة تستغرق أشهرًا لإتمامها.', motif:'medallion', href:'collections.html?category=handmade', slug:'handmade', images:[
         'Assets/collections/handmade.jpg',

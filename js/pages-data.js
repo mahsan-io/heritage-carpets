@@ -35,9 +35,57 @@ window.HeritagePages = (function(){
         {t:'Design', d:'Contemporary pieces balanced against timeless elegance, with flexible arrangements for varied layouts.'},
         {t:'Performance', d:'Exceptional comfort and high durability, built to hold its appearance over years of use.'}
       ],
+      storeUrl: 'https://www.divanoksa.com',
+      categoriesTitle: 'Shop the Full Collection',
+      categoriesLead: 'Every Divano category, ready to browse and buy on our online store.',
+      categories: [
+        { t:'Living Room', href:'https://www.divanoksa.com/en/collections/living-room', items:[
+          {t:'Sofa Sets', href:'https://www.divanoksa.com/en/collections/sofa-sets'},
+          {t:'Corner Sofa Sets', href:'https://www.divanoksa.com/en/collections/corner-sofa-sets'},
+          {t:'Sofas', href:'https://www.divanoksa.com/en/collections/sofas'},
+          {t:'Poufs', href:'https://www.divanoksa.com/en/collections/poufs'},
+          {t:'Armchairs', href:'https://www.divanoksa.com/en/collections/armchair'},
+          {t:'Console', href:'https://www.divanoksa.com/en/collections/console'},
+          {t:'Coffee Table Sets', href:'https://www.divanoksa.com/en/collections/coffee-table-sets'},
+          {t:'Coffee Tables', href:'https://www.divanoksa.com/en/collections/coffee-table'},
+          {t:'Side & End Tables', href:'https://www.divanoksa.com/en/collections/side-end-tables'},
+          {t:'Nest of Tables', href:'https://www.divanoksa.com/en/collections/nest-of-tables'},
+          {t:'Bookcases & Display Shelves', href:'https://www.divanoksa.com/en/collections/bookcases-display-shelves'},
+          {t:'TV & Media Units', href:'https://www.divanoksa.com/en/collections/tv-media-units'}
+        ]},
+        { t:'Bedroom', href:'https://www.divanoksa.com/en/collections/bedroom', items:[
+          {t:'Beds & Bedroom Sets', href:'https://www.divanoksa.com/en/collections/bedroom-sets'},
+          {t:'Wardrobes', href:'https://www.divanoksa.com/en/collections/wardrobes'},
+          {t:'Mattresses', href:'https://www.divanoksa.com/en/collections/mattresses'},
+          {t:'Benches', href:'https://www.divanoksa.com/en/collections/%D9%85%D9%82%D8%A7%D8%B9%D8%AF-%D8%A8%D9%86%D8%B4'},
+          {t:'Nightstands', href:'https://www.divanoksa.com/en/collections/nightstands'},
+          {t:'Dresser', href:'https://www.divanoksa.com/en/collections/dresser'}
+        ]},
+        { t:'Dining Room', href:'https://www.divanoksa.com/en/collections/dining-room', items:[
+          {t:'Dining Rooms', href:'https://www.divanoksa.com/en/collections/dining-room-sets'},
+          {t:'Dining Tables', href:'https://www.divanoksa.com/en/collections/dining-tables'},
+          {t:'Dining Chairs', href:'https://www.divanoksa.com/en/collections/dinning-chair'},
+          {t:'Cabinets & Buffets', href:'https://www.divanoksa.com/en/collections/console-tables-mirrors'}
+        ]},
+        { t:'Wall Decor and Mirrors', href:'', items:[
+          {t:'Mirrors', href:'https://www.divanoksa.com/en/collections/mirrors'},
+          {t:'Wall Art', href:'https://www.divanoksa.com/en/collections/wall-art'}
+        ]},
+        { t:'Lighting', href:'', items:[
+          {t:'Pendant Lamps', href:'https://www.divanoksa.com/en/collections/pendant-lamp'},
+          {t:'Table Lamps', href:'https://www.divanoksa.com/en/collections/table-lamp'},
+          {t:'Floor Lamps', href:'https://www.divanoksa.com/en/collections/floor-lamp'}
+        ]},
+        { t:'Decorative Accessories', href:'', items:[
+          {t:'Artificial Flowers & Plants', href:'https://www.divanoksa.com/en/collections/artificial-flowers-plants'},
+          {t:'Decorative Objects & Sculpture', href:'https://www.divanoksa.com/en/collections/decorative-objects-sculpture'},
+          {t:'Trays & Boxes', href:'https://www.divanoksa.com/en/collections/trays-boxes'},
+          {t:'Vase & Candlestick', href:'https://www.divanoksa.com/en/collections/vase-candlestick'}
+        ]}
+      ],
       ctaTitle:'Furnish Your Space',
       ctaBody:'Visit a Divano showroom to see the collections in person, or speak with our team about a commission.',
-      ctaPrimary:'Find a Showroom', ctaSecondary:'Browse Furniture'
+      ctaPrimary:'Find a Showroom', ctaSecondary:'Shop on Divano'
     },
     ar: {
       kicker:'الأثاث', title:'ديفانو — الأثاث الفاخر',
@@ -61,9 +109,57 @@ window.HeritagePages = (function(){
         {t:'التصميم', d:'قطع معاصرة متوازنة مع أناقة خالدة، وترتيبات مرنة تناسب مختلف المخططات.'},
         {t:'الأداء', d:'راحة استثنائية ومتانة عالية، مصممة للحفاظ على مظهرها لسنوات.'}
       ],
+      storeUrl: 'https://www.divanoksa.com',
+      categoriesTitle: 'تصفح المجموعة الكاملة',
+      categoriesLead: 'كل فئات ديفانو، جاهزة للتصفح والشراء عبر متجرنا الإلكتروني.',
+      categories: [
+        { t:'غرفة المعيشة', href:'https://www.divanoksa.com/en/collections/living-room', items:[
+          {t:'أطقم الأرائك', href:'https://www.divanoksa.com/en/collections/sofa-sets'},
+          {t:'أرائك زاوية', href:'https://www.divanoksa.com/en/collections/corner-sofa-sets'},
+          {t:'أرائك', href:'https://www.divanoksa.com/en/collections/sofas'},
+          {t:'بوف', href:'https://www.divanoksa.com/en/collections/poufs'},
+          {t:'كراسي بذراعين', href:'https://www.divanoksa.com/en/collections/armchair'},
+          {t:'كونسول', href:'https://www.divanoksa.com/en/collections/console'},
+          {t:'أطقم طاولات قهوة', href:'https://www.divanoksa.com/en/collections/coffee-table-sets'},
+          {t:'طاولات قهوة', href:'https://www.divanoksa.com/en/collections/coffee-table'},
+          {t:'طاولات جانبية', href:'https://www.divanoksa.com/en/collections/side-end-tables'},
+          {t:'طاولات متداخلة', href:'https://www.divanoksa.com/en/collections/nest-of-tables'},
+          {t:'مكتبات ورفوف عرض', href:'https://www.divanoksa.com/en/collections/bookcases-display-shelves'},
+          {t:'وحدات تلفزيون ووسائط', href:'https://www.divanoksa.com/en/collections/tv-media-units'}
+        ]},
+        { t:'غرفة النوم', href:'https://www.divanoksa.com/en/collections/bedroom', items:[
+          {t:'أسرّة وأطقم غرف نوم', href:'https://www.divanoksa.com/en/collections/bedroom-sets'},
+          {t:'خزائن ملابس', href:'https://www.divanoksa.com/en/collections/wardrobes'},
+          {t:'مراتب', href:'https://www.divanoksa.com/en/collections/mattresses'},
+          {t:'مقاعد بنش', href:'https://www.divanoksa.com/en/collections/%D9%85%D9%82%D8%A7%D8%B9%D8%AF-%D8%A8%D9%86%D8%B4'},
+          {t:'طاولات جانب السرير', href:'https://www.divanoksa.com/en/collections/nightstands'},
+          {t:'تسريحة', href:'https://www.divanoksa.com/en/collections/dresser'}
+        ]},
+        { t:'غرفة الطعام', href:'https://www.divanoksa.com/en/collections/dining-room', items:[
+          {t:'غرف طعام', href:'https://www.divanoksa.com/en/collections/dining-room-sets'},
+          {t:'طاولات طعام', href:'https://www.divanoksa.com/en/collections/dining-tables'},
+          {t:'كراسي طعام', href:'https://www.divanoksa.com/en/collections/dinning-chair'},
+          {t:'خزائن وبوفيهات', href:'https://www.divanoksa.com/en/collections/console-tables-mirrors'}
+        ]},
+        { t:'ديكور الحائط والمرايا', href:'', items:[
+          {t:'مرايا', href:'https://www.divanoksa.com/en/collections/mirrors'},
+          {t:'لوحات جدارية', href:'https://www.divanoksa.com/en/collections/wall-art'}
+        ]},
+        { t:'الإضاءة', href:'', items:[
+          {t:'مصابيح معلقة', href:'https://www.divanoksa.com/en/collections/pendant-lamp'},
+          {t:'مصابيح طاولة', href:'https://www.divanoksa.com/en/collections/table-lamp'},
+          {t:'مصابيح أرضية', href:'https://www.divanoksa.com/en/collections/floor-lamp'}
+        ]},
+        { t:'إكسسوارات الديكور', href:'', items:[
+          {t:'زهور ونباتات صناعية', href:'https://www.divanoksa.com/en/collections/artificial-flowers-plants'},
+          {t:'تحف وقطع ديكور', href:'https://www.divanoksa.com/en/collections/decorative-objects-sculpture'},
+          {t:'صواني وعلب', href:'https://www.divanoksa.com/en/collections/trays-boxes'},
+          {t:'مزهريات وشمعدانات', href:'https://www.divanoksa.com/en/collections/vase-candlestick'}
+        ]}
+      ],
       ctaTitle:'أثّث مساحتك',
       ctaBody:'زر أحد صالات ديفانو لمعاينة المجموعات، أو تحدث مع فريقنا حول تصميم خاص.',
-      ctaPrimary:'اعثر على صالة عرض', ctaSecondary:'تصفح الأثاث'
+      ctaPrimary:'اعثر على صالة عرض', ctaSecondary:'تسوق على ديفانو'
     }
   };
 

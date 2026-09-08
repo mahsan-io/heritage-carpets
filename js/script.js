@@ -1434,6 +1434,36 @@ function buildCarouselMarkup(images){
       ).join('');
     }
 
+    // optional: a full product-category directory linking out to a brand's own
+    // store (currently only Furniture/Divano supplies this) — pages without a
+    // `categories` array simply skip this section entirely
+    const catsSection = root.querySelector('[data-role="cp-categories-section"]');
+    if(catsSection){
+      if(C.categories && C.categories.length){
+        catsSection.hidden = false;
+        const set2 = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
+        set2('cp-categories-title', C.categoriesTitle || '');
+        set2('cp-categories-lead', C.categoriesLead || '');
+        const storeBtn = root.querySelector('[data-role="cp-store-link"]');
+        if(storeBtn && C.storeUrl) storeBtn.setAttribute('href', C.storeUrl);
+
+        const grid = root.querySelector('[data-role="cp-categories-grid"]');
+        if(grid){
+          grid.innerHTML = C.categories.map(cat=>{
+            const heading = cat.href
+              ? '<a class="cp-cat-heading" href="'+cat.href+'" target="_blank" rel="noopener">'+cat.t+'</a>'
+              : '<span class="cp-cat-heading">'+cat.t+'</span>';
+            const items = cat.items.map(i=>
+              '<li><a href="'+i.href+'" target="_blank" rel="noopener">'+i.t+'</a></li>'
+            ).join('');
+            return '<div class="cp-cat-group">'+heading+'<ul>'+items+'</ul></div>';
+          }).join('');
+        }
+      } else {
+        catsSection.hidden = true;
+      }
+    }
+
     const p1 = root.querySelector('[data-role="cp-cta-primary"]');
     if(p1) p1.textContent = C.ctaPrimary;
     const p2 = root.querySelector('[data-role="cp-cta-secondary"]');
@@ -1508,10 +1538,13 @@ function buildCarouselMarkup(images){
       ).join('');
 
       const catLabel = lang==='ar' ? b.links.category.ar : b.links.category.en;
+      // external targets (e.g. Divano's own store) open in a new tab; internal
+      // site links (collections, locations, other content pages) stay in-page
+      const extAttr = (href) => /^https?:\/\//.test(href) ? ' target="_blank" rel="noopener"' : '';
       const actionsHTML = '<div class="bs-actions">'+
-        '<a class="btn btn-fill" href="'+b.links.products+'">'+T.viewProducts+'</a>'+
-        '<a class="btn btn-outline dark" href="'+b.links.category.href+'">'+catLabel+'</a>'+
-        '<a class="btn btn-outline dark" href="'+b.links.locations+'">'+T.findShowroom+'</a>'+
+        '<a class="btn btn-fill" href="'+b.links.products+'"'+extAttr(b.links.products)+'>'+T.viewProducts+'</a>'+
+        '<a class="btn btn-outline dark" href="'+b.links.category.href+'"'+extAttr(b.links.category.href)+'>'+catLabel+'</a>'+
+        '<a class="btn btn-outline dark" href="'+b.links.locations+'"'+extAttr(b.links.locations)+'>'+T.findShowroom+'</a>'+
       '</div>';
 
       panelEl.innerHTML = '<article class="bs-brand">'+

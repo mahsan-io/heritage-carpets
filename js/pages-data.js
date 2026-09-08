@@ -18,16 +18,20 @@ window.HeritagePages = (function(){
       lead:'Furniture is not simply about filling a space. It is a reflection of a refined lifestyle, and the balance of elegance and comfort that a room is built around.',
       introTitle:'Crafted for Living',
       introBody:'Divano is our furniture house: exceptional collections that blend innovative modern design with high-end craftsmanship, made for premium villas, residential estates, and prestigious commercial projects. Every piece is built on a robust, meticulously engineered frame, padded with high-density foam for long-lasting ergonomic support, and upholstered in the finest woven fabrics and premium leathers.',
-      blocks: [
-        {t:'Majlis & Living Seating', motif:'sofa', slug:'private-villa-jeddah',
-         d:'Corner sofas, sectionals and modular seating scaled to the room — from intimate family majlis to full reception halls, arranged to suit the layout rather than the other way round.'},
-        {t:'Occasional & Accent Pieces', motif:'frame', slug:'',
-         d:'Armchairs, side tables and console pieces that finish a room. Available in the same fabric and leather ranges as the main collections, so a scheme stays coherent across every piece.'},
-        {t:'Contract & Hospitality', motif:'floorplan', slug:'juffali-head-office',
-         d:'Executive offices, boardrooms, hotel suites and lounges — specified for daily commercial use, with durability and maintenance considered alongside the aesthetic.'},
-        {t:'Bespoke Commissions', motif:'medallion', slug:'',
-         d:'Dimensions, fabrics and finishes tailored to your architectural drawings. Our team works from your concept and returns samples for approval before anything enters production.'}
+      storyLogo: 'Assets/brands/D_logo.png',
+      storySlides: [
+        {t:'Our Mission', img:'Assets/brands/D_1.jpg',
+         b:'At Divano, our mission is to provide you with the finest selection of luxurious furniture pieces that will transform your living space into a haven of comfort and elegance. As an ecommerce store specialising in high-quality furniture, we pride ourselves on offering high-quality furnishings and home accessories with Italian designs and limited editions, with customised services and a distinguished customer shopping experience.'},
+        {t:'Our Story', img:'Assets/brands/D_2.jpg',
+         b:"Our store was founded in 2010. Due to our commitment to the highest standards of craftsmanship and quality over the years, we have built a reputable reputation in Saudi Arabia. The Divano brand quickly became a trusted destination for those looking for high-quality furniture that will last for many years. We began to expand our product range and became one of the first brands to offer modern furniture with modern designs locally, in order to keep up with the latest developments and meet the ever-changing needs of our customers. Over the past few years, which have witnessed an incredible boom in Saudi Arabia, the Divano brand has continued to grow through the opening of many new stores and showrooms. Today, as one of the pioneers in the field, we continue to work and progress in accordance with Saudi Vision 2030, in order to contribute to the development of the furniture sector and preserve the rich heritage and unique identity that distinguishes our civilisation."},
+        {t:'Our Approach', img:'Assets/brands/D_3.jpg',
+         b:"At Divano, we understand the importance of creating a home that exudes elegance and style. That's why we have curated a selection of top-selling furniture items, including elegant sofas, stylish armchairs, stunning leather recliners, and modern sectional sofas. Our commitment to quality craftsmanship and attention to detail sets us apart, ensuring that every piece we offer is not only visually stunning but also built to last."}
       ],
+      service: {
+        title:'Interior Design',
+        body:'Enjoy an easy and exceptional interior design experience with Divano Elite Experts. Divano Elite offers a comprehensive design service to help you create a unique and modern home that reflects your style, fits your space, and stays within your budget.',
+        linkText:'Start Your Design', linkUrl:'https://www.divanoksa.com/en/pages/interior-design'
+      },
       featTitle:'What Sets It Apart',
       features: [
         {t:'Craftsmanship', d:'Professional attention to detail throughout, ensuring a premium and flawless finish.'},
@@ -92,16 +96,20 @@ window.HeritagePages = (function(){
       lead:'الأثاث ليس مجرد شغل للمساحة، بل انعكاس لأسلوب حياة راقٍ، وتوازن بين الأناقة والراحة تُبنى حوله الغرفة.',
       introTitle:'مصنوع للحياة',
       introBody:'ديفانو هي دار الأثاث لدينا: مجموعات استثنائية تمزج التصميم العصري المبتكر بالحِرفية الراقية، لتناسب الفلل الفاخرة والمجمعات السكنية والمشاريع التجارية المرموقة. تُبنى كل قطعة على هيكل متين مصمم بعناية، محشو بإسفنج عالي الكثافة لدعم مريح يدوم، ومكسو بأجود الأقمشة المنسوجة والجلود الفاخرة.',
-      blocks: [
-        {t:'مجالس وجلسات المعيشة', motif:'sofa', slug:'private-villa-jeddah',
-         d:'أرائك زاوية وجلسات مقسّمة ووحدات مرنة بمقاسات تناسب الغرفة — من المجالس العائلية الحميمة إلى قاعات الاستقبال الكاملة، مرتبة لتلائم المخطط لا العكس.'},
-        {t:'القطع المميزة والمكمّلة', motif:'frame', slug:'',
-         d:'كراسي وطاولات جانبية وقطع كونسول تُكمل الغرفة، متوفرة بالأقمشة والجلود ذاتها المستخدمة في المجموعات الرئيسية للحفاظ على تناسق التصميم.'},
-        {t:'المشاريع والضيافة', motif:'floorplan', slug:'juffali-head-office',
-         d:'مكاتب تنفيذية وقاعات اجتماعات وأجنحة فنادق وصالات — مُعدّة للاستخدام التجاري اليومي، مع مراعاة المتانة وسهولة الصيانة إلى جانب الجانب الجمالي.'},
-        {t:'التصاميم الحصرية', motif:'medallion', slug:'',
-         d:'أبعاد وأقمشة وتشطيبات مفصّلة وفق مخططاتكم المعمارية. يعمل فريقنا انطلاقًا من مفهومكم ويقدم عينات للاعتماد قبل بدء الإنتاج.'}
+      storyLogo: 'Assets/brands/D_logo.png',
+      storySlides: [
+        {t:'مهمتنا', img:'Assets/brands/D_1.jpg',
+         b:'في ديفانو، مهمتنا أن نقدم لك أرقى تشكيلة من قطع الأثاث الفاخرة التي تحوّل مساحة معيشتك إلى ملاذ من الراحة والأناقة. وبصفتنا متجرًا إلكترونيًا متخصصًا في الأثاث عالي الجودة، نفخر بتقديم مفروشات وإكسسوارات منزلية بتصاميم إيطالية وإصدارات محدودة، مع خدمات مخصصة وتجربة تسوق مميزة لعملائنا.'},
+        {t:'قصتنا', img:'Assets/brands/D_2.jpg',
+         b:'تأسس متجرنا عام 2010. وبفضل التزامنا بأعلى معايير الحِرفية والجودة على مر السنين، بنينا سمعة موثوقة في المملكة العربية السعودية. وسرعان ما أصبحت علامة ديفانو وجهة موثوقة لمن يبحثون عن أثاث عالي الجودة يدوم لسنوات طويلة. وبدأنا في توسيع تشكيلة منتجاتنا، لنصبح من أوائل العلامات التي تقدم أثاثًا عصريًا بتصاميم حديثة محليًا، لمواكبة أحدث التطورات وتلبية احتياجات عملائنا المتغيرة باستمرار. وعلى مدى السنوات الأخيرة التي شهدت ازدهارًا استثنائيًا في المملكة العربية السعودية، واصلت علامة ديفانو نموها من خلال افتتاح العديد من المتاجر وصالات العرض الجديدة. واليوم، وبصفتنا من رواد هذا المجال، نواصل العمل والتطور بما يتماشى مع رؤية السعودية 2030، إسهامًا منا في تطوير قطاع الأثاث والحفاظ على الإرث الغني والهوية الفريدة التي تميز حضارتنا.'},
+        {t:'منهجنا', img:'Assets/brands/D_3.jpg',
+         b:'في ديفانو، ندرك أهمية خلق منزل يفيض بالأناقة والرقي. لذا انتقينا تشكيلة من أكثر قطع الأثاث مبيعًا، تشمل الأرائك الأنيقة، والكراسي بذراعين العصرية، والكراسي الجلدية القابلة للاستلقاء الرائعة، والأرائك القطاعية الحديثة. والتزامنا بالحِرفية العالية والاهتمام بالتفاصيل هو ما يميزنا، ليضمن أن كل قطعة نقدمها ليست فقط أخّاذة بصريًا بل مصنوعة لتدوم.'}
       ],
+      service: {
+        title:'التصميم الداخلي',
+        body:'استمتع بتجربة تصميم داخلي سهلة واستثنائية مع خبراء ديفانو إيليت. تقدم ديفانو إيليت خدمة تصميم متكاملة تساعدك على ابتكار منزل عصري وفريد يعكس أسلوبك، ويلائم مساحتك، ويبقى ضمن ميزانيتك.',
+        linkText:'ابدأ تصميمك', linkUrl:'https://www.divanoksa.com/en/pages/interior-design'
+      },
       featTitle:'ما يميزه',
       features: [
         {t:'الحِرفية', d:'اهتمام احترافي بالتفاصيل يضمن تشطيبًا فاخرًا خاليًا من العيوب.'},

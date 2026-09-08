@@ -1412,7 +1412,7 @@ function buildCarouselMarkup(images){
     set('cp-cta-body', C.ctaBody);
 
     const blocks = root.querySelector('[data-role="cp-blocks"]');
-    if(blocks){
+    if(blocks && C.blocks){
       blocks.innerHTML = C.blocks.map((b,i)=>{
         // a block only gets a photo if it names one; otherwise the motif carries it
         const imgs = b.slug ? ['Assets/projects/'+b.slug+'.jpg'] : [];
@@ -1425,6 +1425,73 @@ function buildCarouselMarkup(images){
         '</article>';
       }).join('');
       initCarousels(blocks);
+    }
+
+    // optional: a compact image+text story slider, replacing the old stacked
+    // "about" blocks on pages that supply `storySlides` (currently only
+    // Furniture/Divano) — a single fixed-height section showing one slide at
+    // a time, instead of several full-width blocks stacked one after another
+    const storySlider = root.querySelector('[data-role="cp-story-slider"]');
+    if(storySlider && C.storySlides && C.storySlides.length){
+      const logoWrap = root.querySelector('[data-role="cp-story-logo"]');
+      if(logoWrap && C.storyLogo){
+        logoWrap.innerHTML = '<img src="'+C.storyLogo+'" alt="">';
+        logoWrap.querySelector('img').addEventListener('error', function(){ logoWrap.innerHTML = ''; }, {once:true});
+      }
+      const track = storySlider.querySelector('[data-role="cp-story-track"]');
+      const dots = storySlider.querySelector('[data-role="cp-story-dots"]');
+      const slides = C.storySlides;
+      if(track){
+        track.innerHTML = slides.map((s,i)=>
+          '<div class="bss-slide'+(i===0?' active':'')+'" data-index="'+i+'">'+
+            '<div class="bss-media"><img src="'+s.img+'" alt="" loading="lazy"></div>'+
+            '<div class="bss-body"><h3>'+s.t+'</h3><p>'+s.b+'</p></div>'+
+          '</div>'
+        ).join('');
+        track.querySelectorAll('img').forEach(img=>{
+          img.addEventListener('error', function(){ img.closest('.bss-slide').classList.add('no-media'); img.remove(); }, {once:true});
+        });
+      }
+      if(dots){
+        dots.innerHTML = slides.map((_,i)=>'<span class="carousel-dot'+(i===0?' active':'')+'" data-index="'+i+'"></span>').join('');
+      }
+      let si = 0;
+      function showStory(i){
+        si = (i + slides.length) % slides.length;
+        storySlider.querySelectorAll('.bss-slide').forEach((el,idx)=>el.classList.toggle('active', idx===si));
+        if(dots) dots.querySelectorAll('.carousel-dot').forEach((el,idx)=>el.classList.toggle('active', idx===si));
+      }
+      const prevBtn = storySlider.querySelector('[data-role="cp-story-prev"]');
+      const nextBtn = storySlider.querySelector('[data-role="cp-story-next"]');
+      if(prevBtn) prevBtn.addEventListener('click', ()=>showStory(si-1));
+      if(nextBtn) nextBtn.addEventListener('click', ()=>showStory(si+1));
+      if(dots) dots.addEventListener('click', function(e){
+        const d = e.target.closest('.carousel-dot');
+        if(d) showStory(parseInt(d.dataset.index,10));
+      });
+      if(!reducedMotion && slides.length > 1){
+        let timer = setInterval(()=>showStory(si+1), 6500);
+        storySlider.addEventListener('mouseenter', ()=>clearInterval(timer));
+        storySlider.addEventListener('mouseleave', ()=>{ timer = setInterval(()=>showStory(si+1), 6500); });
+      }
+    }
+
+    // optional: a single service callout (currently Divano's Interior Design)
+    const serviceSection = root.querySelector('[data-role="cp-service-section"]');
+    if(serviceSection){
+      if(C.service){
+        serviceSection.hidden = false;
+        const setS = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
+        setS('cp-service-title', C.service.title);
+        setS('cp-service-body', C.service.body);
+        const linkEl = root.querySelector('[data-role="cp-service-link"]');
+        if(linkEl){
+          linkEl.textContent = C.service.linkText;
+          linkEl.setAttribute('href', C.service.linkUrl);
+        }
+      } else {
+        serviceSection.hidden = true;
+      }
     }
 
     const feats = root.querySelector('[data-role="cp-features"]');

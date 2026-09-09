@@ -736,31 +736,33 @@ footer > *{position:relative;z-index:1;}
 
 /* ============ CONTENT PAGES (furniture / flooring / about) ============ */
 
-/* ============ STACKED-CARD CAROUSEL (a deck you advance through) ============
-   Cards are layered on top of each other rather than laid out in sequence: the
-   active card sits in front, the next two peek out behind it (pushed down,
-   scaled back, dimmed) so it reads as a physical deck. --pos is set per card by
-   the JS to say how deep in the stack it currently is; everything below is
-   driven off that single value. */
+/* ============ SCROLL-STACKING STORY CARDS (replaces the old arrow/dot slider) ============
+   Pure CSS position:sticky does the actual stacking: every card pins at the
+   same --stack-top offset, so as you keep scrolling the next card slides up
+   and visually covers the one before it — no scroll-jacking JS needed. Each
+   card also carries .reveal (from the site's existing scroll-reveal system)
+   for the fade+rise entrance the first time it comes into view. */
 .stack-section{overflow:visible;padding:56px 0;}
 .bss-logo{height:40px;margin-bottom:28px;display:flex;justify-content:center;}
 .bss-logo img{height:100%;width:auto;object-fit:contain;}
-.stack-track{width:100%;position:relative;max-width:1080px;margin:0 auto;}
-.stack-section:focus-visible{outline:2px solid var(--brass);outline-offset:8px;border-radius:var(--radius-md);}
-
-.deck-viewport{position:relative;height:clamp(420px,52vh,520px);perspective:1400px;}
+.stack-track{width:100%;position:relative;}
 .stack-card{
-  position:absolute;
-  inset:0;
-  /* deeper cards sit lower, smaller and dimmer — the peek behind the front card */
-  transform:translateY(calc(var(--pos, 0) * 22px)) scale(calc(1 - var(--pos, 0) * 0.05));
-  opacity:calc(1 - var(--pos, 0) * 0.28);
-  z-index:calc(10 - var(--pos, 0));
-  pointer-events:none;
+  position:sticky;
+  top:110px;
+  z-index:calc(var(--i) + 1);
+  margin-bottom:64px;
+  min-height:58vh;
+  width:100%;
   background:var(--parchment-2);
   border:1px solid rgba(183,204,51,0.55);
-  border-radius:var(--radius-md);
+  border-radius:12px;
   overflow:hidden;
+  /* The glow has to carry across a very wide card on desktop, where a soft
+     blur alone is proportionally tiny (~4% of card width) and reads as nothing.
+     So: a solid 1px lime border for a crisp always-visible edge, a tight ring
+     just outside it, then the soft outer glow, then a neutral shadow for depth.
+     The 64px gap below matters too — with a smaller gap the next (opaque) card
+     simply covers the glow before you can see it. */
   box-shadow:
     0 0 0 5px rgba(183,204,51,0.16),
     0 0 34px rgba(183,204,51,0.42),
@@ -768,42 +770,24 @@ footer > *{position:relative;z-index:1;}
     0 24px 60px rgba(47,45,46,0.20);
   display:grid;
   grid-template-columns:1fr 1.1fr;
-  transition:transform .5s var(--ease), opacity .5s var(--ease);
-  will-change:transform,opacity;
+  transform-origin:top center;
+  transition:transform .25s ease-out, box-shadow .25s ease-out;
+  will-change:transform;
 }
-.stack-card.is-active{pointer-events:auto;cursor:pointer;}
-.stack-card[hidden]{display:none;}
-.stack-card-media{position:relative;background:var(--ink);overflow:hidden;}
+.stack-card:last-child{margin-bottom:0;}
+.stack-card-media{position:relative;background:var(--ink);overflow:hidden;min-height:280px;}
 .stack-card-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
 .stack-card.no-media .stack-card-media{background:linear-gradient(135deg,var(--ink) 0%,var(--ink-3) 100%);}
-.stack-card-body{padding:40px 46px;display:flex;flex-direction:column;justify-content:center;min-width:0;overflow:hidden;}
-.stack-card-step{font-size:11.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--madder);font-weight:700;margin-bottom:12px;}
-.stack-card-body h3{font-size:clamp(21px,2.5vw,28px);}
-.stack-card-body p{margin-top:16px;font-size:14.5px;line-height:1.8;opacity:0.85;
-  overflow-y:auto;padding-inline-end:8px;}
-.stack-card-link{display:inline-block;margin-top:18px;color:var(--madder);font-size:12.5px;align-self:flex-start;}
-
-.deck-controls{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:32px;}
-.deck-arrow{width:46px;height:46px;border-radius:50%;border:1px solid var(--line-light);
-  background:var(--parchment-2);color:var(--ink-text);font-size:24px;line-height:1;
-  display:flex;align-items:center;justify-content:center;transition:.25s var(--ease);}
-.deck-arrow:hover{background:var(--brass);border-color:var(--brass);}
-.deck-arrow:focus-visible{outline:2px solid var(--brass);outline-offset:3px;}
-.deck-dots{display:flex;gap:8px;align-items:center;}
-.deck-dot{width:8px;height:8px;border-radius:50%;background:var(--line-light);padding:0;
-  transition:.25s var(--ease);}
-.deck-dot.active{background:var(--brass);width:26px;border-radius:var(--radius-pill);}
-.deck-dot:focus-visible{outline:2px solid var(--brass);outline-offset:3px;}
-
+.stack-card-body{padding:48px 52px;display:flex;flex-direction:column;justify-content:center;min-width:0;}
+.stack-card-body h3{font-size:clamp(22px,2.6vw,29px);}
+.stack-card-body p{margin-top:18px;font-size:14.5px;line-height:1.85;opacity:0.85;
+  max-height:280px;overflow-y:auto;padding-inline-end:8px;}
+.stack-card-link{display:inline-block;margin-top:20px;color:var(--madder);font-size:12.5px;align-self:flex-start;}
 @media (max-width:768px){
-  .deck-viewport{height:auto;min-height:540px;}
-  .stack-card{grid-template-columns:1fr;grid-template-rows:200px 1fr;}
-  .stack-card-body{padding:24px 22px;}
-  .deck-controls{gap:14px;margin-top:24px;}
-  .deck-arrow{width:40px;height:40px;font-size:20px;}
-}
-@media (prefers-reduced-motion: reduce){
-  .stack-card{transition:none;}
+  .stack-card{grid-template-columns:1fr;top:88px;min-height:auto;margin-bottom:24px;}
+  .stack-card-media{min-height:200px;}
+  .stack-card-body{padding:28px 24px;}
+  .stack-card-body p{max-height:none;}
 }
 
 /* ============ SERVICE CALLOUT (e.g. Divano Interior Design) ============ */
@@ -1308,4 +1292,3 @@ html[lang="ar"] .timeline-year,
 html[lang="ar"] .testi-quote,
 html[lang="ar"] .journey-step .jnum{font-style:normal;}
 html[lang="ar"] *{letter-spacing:normal !important;}
-

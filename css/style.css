@@ -754,7 +754,7 @@ footer > *{position:relative;z-index:1;}
   min-height:58vh;
   width:100%;
   background:var(--parchment-2);
-  border:1px solid rgba(183,204,51,0.55);
+  border: 1px solid rgba(47,45,46,0.12);
   border-radius:12px;
   overflow:hidden;
   /* The glow has to carry across a very wide card on desktop, where a soft

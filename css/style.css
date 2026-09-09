@@ -661,7 +661,7 @@ footer > *{position:relative;z-index:1;}
   width:136px;height:136px;
   border-radius:50%;
   background:var(--parchment-2);
-  border: 1px solid #2F2D2E;
+  border: 3px solid #FFFFFF;
   box-shadow:0 10px 22px rgba(183,204,51,0.22), 0 2px 8px rgba(47,45,46,0.12);
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;

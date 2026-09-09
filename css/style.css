@@ -763,11 +763,7 @@ footer > *{position:relative;z-index:1;}
      just outside it, then the soft outer glow, then a neutral shadow for depth.
      The 64px gap below matters too — with a smaller gap the next (opaque) card
      simply covers the glow before you can see it. */
-  box-shadow:
-    0 0 0 5px rgba(183,204,51,0.16),
-    0 0 34px rgba(183,204,51,0.42),
-    0 0 80px rgba(183,204,51,0.22),
-    0 24px 60px rgba(47,45,46,0.20);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   display:grid;
   grid-template-columns:1fr 1.1fr;
   transform-origin:top center;

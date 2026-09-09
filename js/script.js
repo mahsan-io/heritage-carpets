@@ -1415,13 +1415,12 @@ function buildCarouselMarkup(images){
     // "about" blocks on pages that supply `storySlides` (currently only
     // Furniture/Divano) — a single fixed-height section showing one slide at
     // a time, instead of several full-width blocks stacked one after another
-    // ---- stacked-card carousel (a deck you advance through) ----
-    // Cards sit layered on top of each other: the active one in front, the next
-    // two peeking behind it (offset down + scaled + dimmed) so it reads as a
-    // physical deck. Advancing brings the next card forward and sends the
-    // current one away. Driven by arrows, dots, keyboard and touch swipe —
-    // deliberately NOT tied to page scroll, so the section stays a fixed height
-    // and the visitor controls the pace.
+    // ---- scroll-triggered card stack (image + header + details per card) ----
+    // Pure CSS position:sticky does the actual stacking (each card pins at the
+    // same offset, so the next one visually slides up and covers it as the
+    // page continues to scroll — no scroll-jacking, no animation library).
+    // JS only handles: building the cards, and adding the fade+rise entrance
+    // via the same IntersectionObserver used for .reveal elsewhere on the site.
     const storySlider = root.querySelector('[data-role="cp-story-slider"]');
     if(storySlider && C.storySlides && C.storySlides.length){
       const logoWrap = root.querySelector('[data-role="cp-story-logo"]');
@@ -1430,6 +1429,8 @@ function buildCarouselMarkup(images){
           logoWrap.innerHTML = '<img src="'+C.storyLogo+'" alt="">';
           logoWrap.querySelector('img').addEventListener('error', function(){ logoWrap.style.display = 'none'; }, {once:true});
         } else {
+          // pages without a single brand logo (e.g. Flooring) shouldn't leave
+          // an empty 40px slot above the stack
           logoWrap.style.display = 'none';
         }
       }
@@ -1437,96 +1438,56 @@ function buildCarouselMarkup(images){
       const slides = C.storySlides;
       if(track){
         const moreLabel = (lang==='ar') ? 'التفاصيل ←' : 'See Details →';
-        const prevLabel = (lang==='ar') ? 'السابق' : 'Previous';
-        const nextLabel = (lang==='ar') ? 'التالي' : 'Next';
-
-        track.innerHTML =
-          '<div class="deck-viewport" data-role="deck-viewport">'+
-            slides.map((s,i)=>
-              '<article class="stack-card" data-index="'+i+'">'+
-                '<div class="stack-card-media"><img src="'+s.img+'" alt="" loading="lazy"></div>'+
-                '<div class="stack-card-body">'+
-                  '<div class="stack-card-step">'+(i+1)+' / '+slides.length+'</div>'+
-                  '<h3>'+s.t+'</h3><p>'+s.b+'</p>'+
-                  (s.href ? '<a class="btn-text stack-card-link" href="'+s.href+'">'+moreLabel+'</a>' : '')+
-                '</div>'+
-              '</article>'
-            ).join('')+
-          '</div>'+
-          '<div class="deck-controls">'+
-            '<button type="button" class="deck-arrow" data-role="deck-prev" aria-label="'+prevLabel+'">&#8249;</button>'+
-            '<div class="deck-dots" data-role="deck-dots">'+
-              slides.map((_,i)=>'<button type="button" class="deck-dot'+(i===0?' active':'')+'" data-index="'+i+'" aria-label="'+(i+1)+'"></button>').join('')+
+        track.innerHTML = slides.map((s,i)=>
+          '<article class="stack-card reveal" style="--i:'+i+'">'+
+            '<div class="stack-card-media"><img src="'+s.img+'" alt="" loading="lazy"></div>'+
+            '<div class="stack-card-body"><h3>'+s.t+'</h3><p>'+s.b+'</p>'+
+              (s.href ? '<a class="btn-text stack-card-link" href="'+s.href+'">'+moreLabel+'</a>' : '')+
             '</div>'+
-            '<button type="button" class="deck-arrow" data-role="deck-next" aria-label="'+nextLabel+'">&#8250;</button>'+
-          '</div>';
-
+          '</article>'
+        ).join('');
         track.querySelectorAll('img').forEach(img=>{
           img.addEventListener('error', function(){ img.closest('.stack-card').classList.add('no-media'); img.remove(); }, {once:true});
         });
+        // no explicit reveal call needed here: these cards exist in the DOM
+        // before DOMContentLoaded fires, so initCommon()'s own IntersectionObserver
+        // picks them up automatically, same as every other .reveal element.
 
-        const cards = Array.from(track.querySelectorAll('.stack-card'));
-        const dots = Array.from(track.querySelectorAll('.deck-dot'));
-        const DEPTH = 3; // how many cards are visible in the stack at once
-        let active = 0;
-
-        function paint(){
-          cards.forEach((el, i)=>{
-            // position relative to the active card, wrapping around the deck
-            let pos = (i - active + cards.length) % cards.length;
-            el.classList.toggle('is-active', pos === 0);
-            if(pos < DEPTH){
-              el.style.setProperty('--pos', pos);
-              el.removeAttribute('hidden');
-              el.setAttribute('aria-hidden', pos === 0 ? 'false' : 'true');
-            } else {
-              // cards deeper than the visible stack are taken out entirely so
-              // they can't be tabbed into or read by a screen reader
-              el.setAttribute('hidden', '');
-              el.setAttribute('aria-hidden', 'true');
-            }
-          });
-          dots.forEach((d,i)=>d.classList.toggle('active', i === active));
-        }
-        function go(i){ active = (i + cards.length) % cards.length; paint(); }
-
-        const prevBtn = track.querySelector('[data-role="deck-prev"]');
-        const nextBtn = track.querySelector('[data-role="deck-next"]');
-        if(prevBtn) prevBtn.addEventListener('click', ()=>go(active-1));
-        if(nextBtn) nextBtn.addEventListener('click', ()=>go(active+1));
-        dots.forEach(d=>d.addEventListener('click', ()=>go(parseInt(d.dataset.index,10))));
-
-        // clicking the front card advances too — matches how a physical deck behaves
-        track.querySelector('[data-role="deck-viewport"]').addEventListener('click', function(e){
-          if(e.target.closest('a, button')) return;      // don't hijack real links
-          const card = e.target.closest('.stack-card');
-          if(card && card.classList.contains('is-active')) go(active+1);
-        });
-
-        // keyboard: arrow keys when the deck has focus
-        storySlider.setAttribute('tabindex', '0');
-        storySlider.addEventListener('keydown', function(e){
-          if(e.key === 'ArrowRight'){ e.preventDefault(); go(active+1); }
-          else if(e.key === 'ArrowLeft'){ e.preventDefault(); go(active-1); }
-        });
-
-        // touch swipe
-        let sx = null;
-        const vp = track.querySelector('[data-role="deck-viewport"]');
-        vp.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive:true});
-        vp.addEventListener('touchend', function(e){
-          if(sx === null) return;
-          const dx = e.changedTouches[0].clientX - sx;
-          if(Math.abs(dx) > 45){
-            // in RTL the visual direction is mirrored, so swipe maps accordingly
-            const rtl = document.documentElement.getAttribute('dir') === 'rtl';
-            const forward = rtl ? dx > 0 : dx < 0;
-            go(active + (forward ? 1 : -1));
+        // Scroll-driven "minimize" effect: position:sticky alone makes each card
+        // pin and get covered abruptly. To make the covered (topmost) card shrink
+        // smoothly as the next one arrives, its scale has to track live scroll
+        // position — that part can't be done in pure CSS. Progress is measured
+        // from the NEXT card's own distance to the sticky offset, so the shrink
+        // is tied to actual position, not a timer — it reads as "minimize on
+        // scroll down" and naturally reverses (grows back) scrolling back up,
+        // rather than a one-way animation that would fight the sticky behaviour.
+        if(slides.length > 1){
+          const STICKY_TOP = 110;
+          let ticking = false;
+          function updateStack(){
+            ticking = false;
+            const cardsNow = track.querySelectorAll('.stack-card');
+            const buffer = Math.min(420, (window.innerHeight || 800) * 0.55);
+            cardsNow.forEach((el, i)=>{
+              const next = cardsNow[i+1];
+              if(!next){ el.style.transform = ''; return; }
+              const nextTop = next.getBoundingClientRect().top;
+              const progress = Math.min(1, Math.max(0, 1 - (nextTop - STICKY_TOP) / buffer));
+              el.style.transform = progress > 0.001 ? 'scale('+(1 - progress * 0.08).toFixed(4)+')' : '';
+            });
           }
-          sx = null;
-        }, {passive:true});
-
-        paint();
+          function onScroll(){
+            if(!ticking){ window.requestAnimationFrame(updateStack); ticking = true; }
+          }
+          if(reducedMotion){
+            // respect prefers-reduced-motion: keep the structural stack, skip
+            // the continuous scale animation entirely
+          } else {
+            window.addEventListener('scroll', onScroll, {passive:true});
+            window.addEventListener('resize', onScroll, {passive:true});
+            updateStack();
+          }
+        }
       }
     }
 

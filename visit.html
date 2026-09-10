@@ -58,7 +58,8 @@
     <div class="book-main">
       <div class="book-step">
         <h2>1. Choose a showroom</h2>
-        <p class="book-hint">All three are staffed by design consultants during opening hours.</p>
+        <p class="book-hint">Every showroom is staffed by design consultants during opening hours.</p>
+        <div class="book-brands" data-role="book-brands"></div>
         <div class="book-showrooms" data-role="book-showrooms"></div>
       </div>
       <div class="book-step">
@@ -186,7 +187,8 @@
     <div class="book-main">
       <div class="book-step">
         <h2>١. اختر صالة العرض</h2>
-        <p class="book-hint">الصالات الثلاث يعمل بها مستشارو تصميم خلال ساعات العمل.</p>
+        <p class="book-hint">يعمل في كل صالة عرض مستشارو تصميم خلال ساعات العمل.</p>
+        <div class="book-brands" data-role="book-brands"></div>
         <div class="book-showrooms" data-role="book-showrooms"></div>
       </div>
       <div class="book-step">
@@ -269,53 +271,12 @@
 
 <script src="js/data.js"></script>
 <script src="js/script.js"></script>
+<script src="js/visit-data.js"></script>
 <script>
-  Heritage.renderBookingPage({
-    showrooms: [
-      {key:'jeddah-ar-rawdah', label:'Jeddah — Ar Rawdah', hours:'Sat–Thu 10:00–23:00 · Fri 17:00–23:00',
-       slots:['10:00','12:00','14:00','16:00','18:00','20:00'], slotsFri:['17:00','19:00','21:00']},
-      {key:'jeddah-mishrifah', label:'Jeddah — Mishrifah', hours:'Sat–Thu 10:00–12:30, 17:00–22:30 · Fri 17:00–22:30',
-       slots:['10:00','11:30','17:00','19:00','21:00'], slotsFri:['17:00','19:00','21:00']},
-      {key:'riyadh-al-yasmin', label:'Riyadh — Al Yasmin', hours:'Hours on request',
-       slots:['11:00','13:00','17:00','19:00'], slotsFri:['17:00','19:00']},
-      {key:'video', label:'Video Consultation', hours:'Scheduled with a consultant',
-       slots:['10:00','12:00','14:00','16:00','18:00'], slotsFri:['17:00','19:00']}
-    ],
-    i18n: {
-      days:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-      months:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-      pickFirst:'Choose a showroom and a day to see available times.',
-      noSlots:'No times available on this day — please pick another.',
-      notSelected:'—',
-      sumLabels:{showroom:'Showroom', date:'Date', time:'Time', name:'Name', phone:'Phone', notes:'Notes'},
-      requestIntro:'Hello Heritage, I would like to request a showroom visit:',
-      emailSubject:'Showroom Visit Request'
-    }
-  }, document.querySelector('.lang-block[data-lang="en"]'));
+  Heritage.renderBookingPage(window.HeritageVisitConfig.en, document.querySelector('.lang-block[data-lang="en"]'));
 </script>
 <script>
-  Heritage.renderBookingPage({
-    showrooms: [
-      {key:'jeddah-ar-rawdah', label:'جدة — الروضة', hours:'السبت–الخميس ١٠:٠٠–٢٣:٠٠ · الجمعة ١٧:٠٠–٢٣:٠٠',
-       slots:['10:00','12:00','14:00','16:00','18:00','20:00'], slotsFri:['17:00','19:00','21:00']},
-      {key:'jeddah-mishrifah', label:'جدة — المشرفة', hours:'السبت–الخميس ١٠:٠٠–١٢:٣٠، ١٧:٠٠–٢٢:٣٠ · الجمعة ١٧:٠٠–٢٢:٣٠',
-       slots:['10:00','11:30','17:00','19:00','21:00'], slotsFri:['17:00','19:00','21:00']},
-      {key:'riyadh-al-yasmin', label:'الرياض — الياسمين', hours:'ساعات العمل عند الطلب',
-       slots:['11:00','13:00','17:00','19:00'], slotsFri:['17:00','19:00']},
-      {key:'video', label:'استشارة عبر الفيديو', hours:'يُحدد الموعد مع المستشار',
-       slots:['10:00','12:00','14:00','16:00','18:00'], slotsFri:['17:00','19:00']}
-    ],
-    i18n: {
-      days:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],
-      months:['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'],
-      pickFirst:'اختر صالة عرض ويومًا لعرض الأوقات المتاحة.',
-      noSlots:'لا توجد أوقات متاحة في هذا اليوم — يرجى اختيار يوم آخر.',
-      notSelected:'—',
-      sumLabels:{showroom:'صالة العرض', date:'التاريخ', time:'الوقت', name:'الاسم', phone:'الهاتف', notes:'ملاحظات'},
-      requestIntro:'مرحبًا التراث، أود طلب زيارة لصالة العرض:',
-      emailSubject:'طلب زيارة صالة العرض'
-    }
-  }, document.querySelector('.lang-block[data-lang="ar"]'));
+  Heritage.renderBookingPage(window.HeritageVisitConfig.ar, document.querySelector('.lang-block[data-lang="ar"]'));
 </script>
 </body>
 </html>

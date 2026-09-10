@@ -1163,8 +1163,9 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:52px 0 22px;}
   .product-grid{grid-template-columns:repeat(2,1fr);}
 }
 @media (max-width:768px){
-  .nav-links,.nav-right .lang-toggle,.nav-right .nav-cta{display:none;}
+  .nav-links,.nav-right .nav-cta{display:none;}
   .hamburger{display:flex;}
+  .nav-right{gap:14px;}
   .mobile-menu .menu-cta{
     display:inline-flex;align-items:center;justify-content:center;
     font-family:var(--font-body);font-size:15px;font-weight:600;

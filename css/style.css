@@ -758,14 +758,61 @@ footer > *{position:relative;z-index:1;}
 .sb-link{margin-top:20px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--brass-light);}
 
 /* ============ STORE LOCATOR (locations.html) ============ */
-.loc-tabs{display:flex;gap:2px;background:var(--line-light);margin-bottom:36px;flex-wrap:wrap;}
-.loc-tab{flex:1 1 200px;background:var(--parchment-2);padding:20px 24px;text-align:start;transition:.3s var(--ease);border-bottom:3px solid transparent;border-start-start-radius:var(--radius-md);border-start-end-radius:var(--radius-md);}
-.loc-tab:hover{background:var(--parchment);}
-.loc-tab.active{border-bottom-color:var(--brass);background:var(--parchment);}
-.loc-tab-name{display:block;font-family:var(--font-display);font-size:18px;color:var(--ink-text);}
-.loc-tab-count{display:block;margin-top:6px;font-size:11.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--madder);font-weight:700;}
-.loc-tagline{font-size:15.5px;opacity:0.75;margin-bottom:28px;max-width:60ch;}
+.loc-tabs{display:flex;gap:12px;margin-bottom:40px;flex-wrap:wrap;justify-content:center;}
+.loc-brand-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 26px;
+  font-family:var(--font-display);font-size:16px;color:var(--ink-text);
+  background:var(--parchment-2);
+  border:1.5px solid var(--line-light);
+  border-radius:var(--radius-pill);
+  transition:.3s var(--ease);
+}
+.loc-brand-btn:hover{border-color:var(--brass);transform:translateY(-2px);}
+.loc-brand-btn.active{background:var(--ink);border-color:var(--ink);color:var(--cream-text);}
+.loc-brand-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:22px;padding:0 6px;
+  font-size:11.5px;font-weight:700;
+  background:rgba(0,0,0,0.08);border-radius:var(--radius-pill);
+}
+.loc-brand-btn.active .loc-brand-count{background:var(--brass);color:var(--ink);}
+.loc-tagline{font-size:15.5px;opacity:0.75;margin-bottom:28px;max-width:60ch;text-align:center;margin-inline:auto;}
 .loc-nophone{margin-top:12px;font-size:13px;color:var(--cream-text-dim);opacity:0.7;}
+
+/* individual showroom tiles — a decorative pin visual stands in for the old
+   embedded map (which needed a live network request per branch just to show
+   a static-looking thumbnail); Get Directions is now the one clear action */
+.loc-cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+.loc-card{
+  background:var(--ink);border-radius:var(--radius-md);overflow:hidden;
+  display:flex;flex-direction:column;min-width:0;
+  box-shadow:0 4px 18px rgba(20,18,14,0.10);
+  transition:.35s var(--ease);
+}
+.loc-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(20,18,14,0.18);}
+.loc-card-visual{
+  aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 140% at 30% -10%, rgba(183,204,51,0.22) 0%, transparent 55%), var(--ink-3);
+  color:var(--brass-light);
+}
+.loc-card-visual svg{width:40px;height:40px;}
+.loc-card-body{padding:24px 26px 28px;}
+.loc-card-body .showroom-city{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--brass-light);font-weight:700;}
+.loc-card-body h3{font-size:19px;color:var(--cream-text);margin-top:8px;}
+.loc-card-body .addr{margin-top:10px;font-size:13.5px;color:var(--cream-text-dim);line-height:1.6;}
+.loc-card-body .hours{margin-top:12px;font-size:13px;color:var(--cream-text-dim);border-top:1px solid var(--line-dark);padding-top:12px;line-height:1.8;}
+.loc-card-body .hours b{color:var(--cream-text);font-weight:600;}
+.loc-card-body .phone{margin-top:12px;display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--brass-light);transition:.3s;}
+.loc-card-body .phone:hover{color:var(--cream-text);}
+.loc-directions-btn{display:flex;margin-top:20px;}
+@media (max-width:980px){
+  .loc-cards-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:640px){
+  .loc-cards-grid{grid-template-columns:1fr;}
+  .loc-brand-btn{flex:1 1 100%;justify-content:center;}
+}
 
 /* ============ CONTENT PAGES (furniture / flooring / about) ============ */
 
@@ -1124,7 +1171,18 @@ footer{background:var(--ink);color:var(--cream-text-dim);padding:52px 0 22px;}
 .book-step{margin-bottom:40px;}
 .book-step h2{font-size:20px;margin-bottom:6px;}
 .book-step .book-hint{font-size:14px;opacity:0.65;margin-bottom:18px;}
+.book-brands{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+.book-brand-btn{
+  padding:11px 22px;
+  font-size:13.5px;font-weight:600;
+  border:1.5px solid var(--line-light);border-radius:var(--radius-pill);
+  background:var(--parchment-2);color:var(--ink-text);
+  transition:.3s var(--ease);
+}
+.book-brand-btn:hover{border-color:var(--brass);}
+.book-brand-btn.active{background:var(--ink);border-color:var(--ink);color:var(--cream-text);}
 .book-showrooms{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.book-showrooms .slot-hint{grid-column:1/-1;}
 .date-strip{display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch;}
 .date-chip{flex:0 0 auto;width:76px;padding:12px 6px;border:1.5px solid var(--line-light);border-radius:var(--radius-md);background:var(--parchment-2);text-align:center;transition:.25s var(--ease);}
 .date-chip:hover{border-color:var(--brass);}

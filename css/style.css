@@ -792,11 +792,11 @@ footer > *{position:relative;z-index:1;}
 }
 .loc-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(20,18,14,0.18);}
 .loc-card-visual{
-  aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;
-  background:radial-gradient(120% 140% at 30% -10%, rgba(183,204,51,0.22) 0%, transparent 55%), var(--ink-3);
+  height:74px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 180% at 30% -30%, rgba(183,204,51,0.22) 0%, transparent 60%), var(--ink-3);
   color:var(--brass-light);
 }
-.loc-card-visual svg{width:40px;height:40px;}
+.loc-card-visual svg{width:28px;height:28px;}
 .loc-card-body{padding:24px 26px 28px;}
 .loc-card-body .showroom-city{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--brass-light);font-weight:700;}
 .loc-card-body h3{font-size:19px;color:var(--cream-text);margin-top:8px;}
@@ -906,7 +906,8 @@ a.cp-cat-heading:hover{color:var(--madder);}
 /* ============ BRAND SHOWCASE (About Us) ============ */
 .bs-brand{display:grid;grid-template-columns:1fr 1.3fr;gap:56px;align-items:start;padding:0;}
 .bs-media{position:sticky;top:96px;min-width:0;}
-.bs-media .motif{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--ink);}
+.bs-media .motif{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--ink);
+  border-radius:var(--radius-md);box-shadow:0 4px 18px rgba(20,18,14,0.10);}
 /* compact preview panels (Divano, Divano Elite, Carpet Land) have far less
    text than a full detail panel, so a tall 4:5 photo next to it left a large
    empty gap below the short copy — center the copy alongside a shorter photo
@@ -922,17 +923,23 @@ a.cp-cat-heading:hover{color:var(--madder);}
 .bs-logo img.logo-missing ~ .bs-logo-fallback{display:inline;}
 .bs-tagline{font-size:15px;font-style:italic;color:var(--madder);opacity:0.9;margin-bottom:22px;}
 .bs-intro{font-size:15.5px;line-height:1.8;opacity:0.85;margin-bottom:24px;}
-.bs-features{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-light);margin-bottom:28px;}
-.bs-feature{background:var(--parchment-2);padding:20px 18px;}
-.bs-feature h4{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--madder);font-weight:700;}
-.bs-feature p{margin-top:8px;font-size:13px;line-height:1.6;opacity:0.8;}
+.bs-features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+.bs-feature{
+  background:radial-gradient(120% 180% at 30% -30%, rgba(183,204,51,0.22) 0%, transparent 60%), var(--ink-3);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:var(--radius-md);
+  box-shadow:0 4px 18px rgba(20,18,14,0.10);
+  padding:20px 18px;
+  transition:.35s var(--ease);
+}
+.bs-feature:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(20,18,14,0.18);}
+.bs-feature h4{font-size:12.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--brass-light);font-weight:700;}
+.bs-feature p{margin-top:8px;font-size:13px;line-height:1.6;color:var(--cream-text-dim);}
 .bs-section{margin-bottom:26px;}
 .bs-section:last-child{margin-bottom:0;}
 .bs-section h4{font-size:16.5px;margin-bottom:10px;}
 .bs-section p{font-size:15px;line-height:1.8;opacity:0.85;}
 .bs-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;}
-.brand-tab-arrow{margin-inline-start:6px;font-size:13px;opacity:0.6;}
-.brand-tab-btn.is-link.active .brand-tab-arrow{opacity:1;}
 .bs-name-fallback{font-family:var(--font-display);font-size:26px;margin-bottom:16px;}
 .bs-highlights{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
 .bs-highlight{font-size:12px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;
@@ -942,62 +949,43 @@ a.cp-cat-heading:hover{color:var(--madder);}
 .cp-elite-section .section-head p{max-width:64ch;}
 .bs-actions .btn{flex:1 1 auto;}
 
-/* ============ BRAND TABS (brands.html) — crystal glass ============
-   The glass effect needs real colour behind it to blur, so the gradient
-   backdrop lives on .brand-tabs itself — a self-contained floating bar — NOT
-   on the section around it. The section keeps the page's normal white
-   background; only the tab row is dark, so the brand panel below it (text,
-   photos, everything) is completely unaffected. Each tab is a translucent,
-   blurred pill with a soft inset highlight along its top edge, simulating
-   light catching glass; the active tab brightens and lifts with a lime glow
-   rather than the old underline indicator. */
+/* ============ BRAND TABS (brands.html) ============
+   Matches the showroom cards on locations.html: same dark ink gradient
+   surface, same rounded corners, same soft shadow and lift-on-hover, so
+   the two pages read as one design system. The active tab is marked by a
+   thicker lime border plus a lime-tinted glow. */
 .brand-tabs{
-  display:flex;gap:12px;flex-wrap:wrap;
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
   margin-bottom:44px;
-  /*padding:16px;
-  border-radius:24px;
-  background:
-    radial-gradient(120% 140% at 15% 0%, rgba(183,204,51,0.22) 0%, transparent 55%),
-    radial-gradient(120% 140% at 85% 100%, rgba(89,85,86,0.18) 0%, transparent 55%),
-    linear-gradient(135deg, var(--ink) 0%, var(--ink-3) 100%);*/
-padding:0;
-background:transparent;
 }
 .brand-tab-btn{
-  flex:1 1 190px;
-  padding:18px 22px;
+  flex:1 1 190px;max-width:230px;
+  padding:16px 22px;
   text-align:center;
   font-family:var(--font-display);
-  font-size:17px;
+  font-size:16.5px;
   color:var(--cream-text);
-  /*background:rgba(255,255,255,0.10);*/
-  background:linear-gradient(135deg, var(--ink) 0%, var(--ink-3) 100%);
-  -webkit-backdrop-filter:blur(16px) saturate(160%);
-  backdrop-filter:blur(16px) saturate(160%);
-  border:1px solid rgba(255,255,255,0.22);
-  border-radius:var(--radius-pill);
-  box-shadow:0 8px 24px rgba(20,18,14,0.18), inset 0 1px 0 rgba(255,255,255,0.22);
-  transition:background .4s var(--ease), border-color .4s var(--ease), box-shadow .4s var(--ease), transform .4s var(--ease), color .4s var(--ease);
-}
-/* browsers without backdrop-filter support fall back to a plainer, slightly
-   more opaque glass tint so the tabs stay legible either way */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))){
-  .brand-tab-btn{background:rgba(255,255,255,0.14);}
+  background:radial-gradient(120% 180% at 30% -30%, rgba(183,204,51,0.22) 0%, transparent 60%), var(--ink-3);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:var(--radius-md);
+  box-shadow:0 4px 18px rgba(20,18,14,0.10);
+  transition:.35s var(--ease);
 }
 .brand-tab-btn:hover{
-/*  background:rgba(255,255,255,0.18);*/
-  border-color:rgba(255,255,255,0.32);
-  transform:translateY(-3px);
-  background:linear-gradient(135deg, #403d3e 0%, var(--ink-3) 100%);
-  box-shadow:0 14px 32px rgba(20,18,14,0.22), inset 0 1px 0 rgba(255,255,255,0.3);
+  transform:translateY(-5px);
+  border-color:rgba(255,255,255,0.3);
+  box-shadow:0 18px 40px rgba(20,18,14,0.18);
 }
 .brand-tab-btn.active{
   border-width:2.5px;
   border-color:rgba(183,204,51,0.85);
-  box-shadow:0 10px 30px rgba(183,204,51,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
+  transform:translateY(-3px);
+  box-shadow:0 14px 34px rgba(183,204,51,0.30);
 }
+.brand-tab-arrow{margin-inline-start:6px;font-size:13px;opacity:0.6;}
+.brand-tab-btn.is-link.active .brand-tab-arrow{opacity:1;}
 @media (max-width:640px){
-  .brand-tab-btn{flex:1 1 100%;}
+  .brand-tab-btn{flex:1 1 100%;max-width:none;}
   .bs-actions .btn{flex:1 1 100%;}
 }
 @media (prefers-reduced-motion: reduce){

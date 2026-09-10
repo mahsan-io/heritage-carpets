@@ -1492,6 +1492,21 @@ function buildCarouselMarkup(images){
     }
 
     // optional: a single service callout (currently Divano's Interior Design)
+    const eliteSection = root.querySelector('[data-role="cp-elite-section"]');
+    if(eliteSection){
+      if(C.elite){
+        eliteSection.hidden = false;
+        const setE = (role, txt) => { const el = root.querySelector('[data-role="'+role+'"]'); if(el) el.textContent = txt; };
+        setE('cp-elite-kicker', C.elite.kicker);
+        setE('cp-elite-title', C.elite.title);
+        setE('cp-elite-body', C.elite.body);
+        const tagsEl = root.querySelector('[data-role="cp-elite-tags"]');
+        if(tagsEl) tagsEl.innerHTML = (C.elite.highlights || []).map(h=>'<span class="bs-highlight">'+h+'</span>').join('');
+      } else {
+        eliteSection.hidden = true;
+      }
+    }
+
     const serviceSection = root.querySelector('[data-role="cp-service-section"]');
     if(serviceSection){
       if(C.service){
@@ -1589,8 +1604,10 @@ function buildCarouselMarkup(images){
 
     function renderTabs(){
       tabsEl.innerHTML = B.order.map(key=>{
-        const C = B.brands[key][lang] || B.brands[key].en;
-        return '<button type="button" class="brand-tab-btn'+(key===active?' active':'')+'" data-brand="'+key+'">'+C.name+'</button>';
+        const b = B.brands[key];
+        const C = b[lang] || b.en;
+        const linkMark = b.kind === 'link' ? '<span class="brand-tab-arrow" aria-hidden="true">&#8599;</span>' : '';
+        return '<button type="button" class="brand-tab-btn'+(key===active?' active':'')+(b.kind==='link'?' is-link':'')+'" data-brand="'+key+'">'+C.name+linkMark+'</button>';
       }).join('');
     }
 
@@ -1598,47 +1615,52 @@ function buildCarouselMarkup(images){
       const b = B.brands[active];
       const C = b[lang] || b.en;
       const folder = b.folder || 'Assets/brands/';
-      const logoSrc = folder+b.prefix+'_logo.png';
-      const photoImgs = [folder+b.prefix+'_1.jpg', folder+b.prefix+'_2.jpg', folder+b.prefix+'_3.jpg'];
+      const logoSrc = b.logo ? folder+b.logo : '';
+      const photoImgs = (b.photos || []).map(p => folder+p);
 
       const media = '<div class="bs-media"><div class="motif">'+motifSVG(b.motif,'#C9DC5E')+buildCarouselMarkup(photoImgs)+'</div></div>';
 
-      const logoBlock = '<div class="bs-logo">'+
-        '<img src="'+logoSrc+'" alt="'+C.name+'">'+
-        '<span class="bs-logo-fallback">'+C.name+'</span>'+
-      '</div>';
+      const logoBlock = logoSrc ? (
+        '<div class="bs-logo">'+
+          '<img src="'+logoSrc+'" alt="'+C.name+'">'+
+          '<span class="bs-logo-fallback">'+C.name+'</span>'+
+        '</div>'
+      ) : '<h3 class="bs-name-fallback">'+C.name+'</h3>';
 
       const introHTML = C.intro ? '<p class="bs-intro">'+C.intro+'</p>' : '';
 
-      const featuresHTML = (C.features && C.features.length)
-        ? '<div class="bs-features">'+C.features.map(f=>
-            '<div class="bs-feature"><h4>'+f.t+'</h4><p>'+f.b+'</p></div>'
-          ).join('')+'</div>'
-        : '';
+      let bodyExtra;
+      if(b.kind === 'link'){
+        const highlightsHTML = (C.highlights && C.highlights.length)
+          ? '<div class="bs-highlights">'+C.highlights.map(h=>'<span class="bs-highlight">'+h+'</span>').join('')+'</div>'
+          : '';
+        bodyExtra = highlightsHTML +
+          '<div class="bs-actions"><a class="btn btn-fill" href="'+b.target+'">'+T.visitPage+'</a></div>';
+      } else {
+        const featuresHTML = (C.features && C.features.length)
+          ? '<div class="bs-features">'+C.features.map(f=>
+              '<div class="bs-feature"><h4>'+f.t+'</h4><p>'+f.b+'</p></div>'
+            ).join('')+'</div>'
+          : '';
+        const sectionsHTML = (C.sections || []).map(s=>
+          '<div class="bs-section"><h4>'+s.t+'</h4><p>'+s.b+'</p></div>'
+        ).join('');
+        const extAttr = (href) => /^https?:\/\//.test(href) ? ' target="_blank" rel="noopener"' : '';
+        const actionsHTML = (b.actions && b.actions.length)
+          ? '<div class="bs-actions">'+b.actions.map(a=>
+              '<a class="btn '+(a.key==='products'?'btn-fill':'btn-outline dark')+'" href="'+a.href+'"'+extAttr(a.href)+'>'+(T[a.key]||a.key)+'</a>'
+            ).join('')+'</div>'
+          : '';
+        bodyExtra = featuresHTML + sectionsHTML + actionsHTML;
+      }
 
-      const sectionsHTML = C.sections.map(s=>
-        '<div class="bs-section"><h4>'+s.t+'</h4><p>'+s.b+'</p></div>'
-      ).join('');
-
-      const catLabel = lang==='ar' ? b.links.category.ar : b.links.category.en;
-      // external targets (e.g. Divano's own store) open in a new tab; internal
-      // site links (collections, locations, other content pages) stay in-page
-      const extAttr = (href) => /^https?:\/\//.test(href) ? ' target="_blank" rel="noopener"' : '';
-      const actionsHTML = '<div class="bs-actions">'+
-        '<a class="btn btn-fill" href="'+b.links.products+'"'+extAttr(b.links.products)+'>'+T.viewProducts+'</a>'+
-        '<a class="btn btn-outline dark" href="'+b.links.category.href+'"'+extAttr(b.links.category.href)+'>'+catLabel+'</a>'+
-        '<a class="btn btn-outline dark" href="'+b.links.locations+'"'+extAttr(b.links.locations)+'>'+T.findShowroom+'</a>'+
-      '</div>';
-
-      panelEl.innerHTML = '<article class="bs-brand">'+
+      panelEl.innerHTML = '<article class="bs-brand'+(b.kind==='link'?' is-link-preview':'')+'">'+
         media +
         '<div class="bs-body">'+
           logoBlock +
           '<p class="bs-tagline">'+C.tagline+'</p>' +
           introHTML +
-          featuresHTML +
-          sectionsHTML +
-          actionsHTML +
+          bodyExtra +
         '</div>'+
       '</article>';
 
@@ -1937,6 +1959,33 @@ function buildCarouselMarkup(images){
     root = root || document;
 
     renderVideoHeader(root.querySelector('[data-role="hero-video"]'), content.heroVideo, 'Heritage Carpet Company');
+
+    // ---- Our Brands: umbrella hierarchy (Heritage Group over its five brands) ----
+    // Reads straight from window.HeritageBrandShowcase (the same data brands.html
+    // uses), so the two never drift apart — one source of brand copy, two views
+    // of it. Every card links to that brand's own tab on brands.html; product
+    // links, "Branches" links etc. all live on brands.html itself now, not here.
+    const hierarchyEl = root.querySelector('[data-role="brand-hierarchy"]');
+    if(hierarchyEl && window.HeritageBrandShowcase){
+      const B = window.HeritageBrandShowcase;
+      const lang = root.getAttribute('data-lang') || 'en';
+      const parentKey = B.order[0];
+      const childKeys = B.order.slice(1);
+      const cardHTML = (key, isParent) => {
+        const b = B.brands[key];
+        const C = b[lang] || b.en;
+        const href = 'brands.html?brand=' + key;
+        return '<a class="'+(isParent?'brand-parent':'brand-child')+'" href="'+href+'">'+
+          '<div class="brand-mark" data-motif="'+b.motif+'"></div>'+
+          '<h3>'+C.name+'</h3>'+
+          '<p>'+C.tagline+'</p>'+
+        '</a>';
+      };
+      hierarchyEl.innerHTML =
+        cardHTML(parentKey, true) +
+        '<div class="brand-connector" aria-hidden="true"></div>' +
+        '<div class="brand-children">' + childKeys.map(k=>cardHTML(k, false)).join('') + '</div>';
+    }
 
     const timelineItems = root.querySelectorAll('.timeline-item');
     timelineItems.forEach(item=>{

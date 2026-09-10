@@ -1,156 +1,159 @@
 /* ======================================================================
-   HERITAGE GROUP — BRAND SHOWCASE (About Us page)
+   HERITAGE GROUP — OUR BRANDS PAGE (brands.html)
    ----------------------------------------------------------------------
-   One detailed profile per brand: Heritage, Divano, Platinum. Each brand's
-   content keeps its own natural shape rather than being forced into an
-   identical template — Divano is Mission/Story/Approach, Platinum has an
-   intro, a compact Mission/Values/Distinction trio, and two longer closing
-   passages, matching what was actually supplied for each brand.
+   Six entities in one row of tabs:
+     - heritage-group, heritage-carpets, platinum  -> "detail" tabs: clicking
+       shows that entity's own content in the panel below, same page.
+     - divano, divano-elite, carpet-land            -> "link" tabs: clicking
+       shows a lighter preview (tagline, intro, optional highlight tags) with
+       a single "Visit the Brand Page" button, since each already has a full
+       dedicated page and duplicating that content here would just be two
+       copies to keep in sync.
 
-   IMAGES — brand-prefixed filenames in Assets/brands/:
-     logo:  Assets/brands/{PREFIX}_logo.png
-     photo: Assets/brands/{PREFIX}_1.jpg  (optional {PREFIX}_2.jpg, _3.jpg
-            for a small rotating carousel, same convention as elsewhere)
-     PREFIX is H for Heritage, D for Divano, P for Platinum.
-   Until a file exists, the logo falls back to the brand name as text and
-   the photo falls back to the SVG motif — nothing breaks either way.
+   IMAGES — one folder per brand:
+     Assets/brands/heritage/     logo.png, 1.jpg, 2.jpg   (shared by the
+                                  Heritage Group overview AND Heritage Carpets)
+     Assets/brands/platinum/     logo.png, 1.jpg, 2.jpg, 3.jpg
+     Assets/brands/divano/       D_logo.png, D_0.jpg .. D_3.jpg  (unchanged —
+                                  already uploaded and in use by furniture.html)
+     Assets/brands/carpet_land/  logo.png, 1.jpg, 2.jpg, 3.jpg
+   Divano Elite has no folder of its own (it's a compact link card, not a full
+   detail panel) — it shows the arch motif instead of a photo.
+   Until a file exists, the same graceful fallbacks as everywhere else apply:
+   missing logo -> brand name as text, missing photo -> the SVG motif.
    ====================================================================== */
 window.HeritageBrandShowcase = (function(){
 
-  const order = ['heritage', 'platinum', 'divano'];
+  const order = ['heritage-group', 'heritage-carpets', 'platinum', 'divano', 'divano-elite', 'carpet-land'];
 
   const brands = {
 
-    heritage: {
-      prefix: 'H', motif: 'medallion',
-      links: {
-        products: 'collections.html',
-        category: { href:'projects.html', en:'Our Projects', ar:'مشاريعنا' },
-        locations: 'locations.html?brand=heritage'
-      },
+    /* ---------------- 1. Heritage Group — parent company overview ---------------- */
+    'heritage-group': {
+      kind:'detail', motif:'medallion', folder:'Assets/brands/heritage/', logo:'logo.png', photos:['1.jpg'],
+      actions:[ {key:'locations', href:'locations.html'} ],
       en: {
-        name: 'Heritage Carpets',
-        tagline: 'Handmade and bespoke carpets since 1975 — the house the group began with.',
-        sections: [
-          { t:'Our Mission',
-            b:'To bring the artistry of hand-knotted and hand-tufted carpet making to the homes, hotels and mosques of Saudi Arabia — sourcing the finest materials and never compromising on craftsmanship, provenance or comfort.' },
-          { t:'Our Story',
-            b:'Heritage opened its first showroom in Jeddah in 1975, importing hand-knotted carpets from Persia, Turkey and the wider Orient for a young and fast-growing Kingdom. As the country built, so did we — expanding from private residences into hotels, corporate headquarters, mosques and government projects, and building our own installation teams along the way. Fifty years on, Heritage remains the flagship of the group: the house where every commission still begins with a conversation about the space it will live in.' },
-          { t:'Our Craft',
-            b:"Every Heritage carpet is judged on what most catalogues leave out — knot density, wool and silk quality, and the hand of the weaver behind it. We work in the classical traditions of Isfahan, Tabriz and Anatolia alongside fully bespoke commissions, executed to a client's own dimensions, palette and pattern." }
+        name:'Heritage Group',
+        tagline:'One family of brands, five ways to furnish your world — since 1976.',
+        features:[
+          {t:'Our Mission', b:'To offer high-quality furnishing solutions that enhance spaces and evoke a sense of timeless elegance, and to provide customers with an exceptional buying experience that combines unique selections and innovative solutions.'},
+          {t:'Our Vision', b:"To grow, adapt, and thrive by forging partnerships with contractors and the real estate sector, in alignment with Vision 2030, to expand our reach and contribute to the Kingdom of Saudi Arabia's growth."},
+          {t:'Our Values', b:'Driven by Quality and Craftsmanship, we operate with absolute Integrity. Through Innovation and Sustainability, we maintain an unwavering Commitment to excellence in every project and partnership.'}
+        ],
+        sections:[
+          {t:'Our Story', b:'Beginning as a humble family business, we started weaving beautiful handmade Persian carpets in 1976, with a commitment to preserve centuries-old traditions.'},
+          {t:'Evolving with the Industry', b:'It was during this time that we started to transition into contemporary furnishing, becoming one of the pioneering brands to introduce modern and transitional designs in order to stay in tune with the changing preferences of our customers.'},
+          {t:'Building a Legacy', b:'Throughout years of exceptional craftsmanship, we established a strong presence across Saudi Arabia, allowing us to expand our operations to Canada and the UAE in the mid-90s, followed by Morocco in the early 2000s.'},
+          {t:'Local Expansion', b:"During the past decade of our nation's remarkable transformation, the Heritage brand continued to thrive, as demonstrated by the launch of a dozen new stores and locations."},
+          {t:'Bright Future', b:"Today, as one of the leaders in the market, we align with Saudi Arabia's Vision 2030, contributing to the growth and development of the furniture, carpet, and flooring solutions industries, while preserving our rich heritage and cultural identity."}
         ]
       },
       ar: {
-        name: 'التراث للسجاد',
-        tagline: 'سجاد يدوي وحصري منذ 1975 — الدار التي بدأت منها المجموعة.',
-        sections: [
-          { t:'مهمتنا',
-            b:'أن نُحضر فن السجاد المعقود والمعقود يدويًا إلى منازل وفنادق ومساجد المملكة العربية السعودية، منتقين أجود الخامات دون أي تنازل عن الحِرفية أو المنشأ أو الراحة.' },
-          { t:'قصتنا',
-            b:'افتتحت التراث صالة عرضها الأولى في جدة عام 1975، مستوردةً السجاد المعقود يدويًا من بلاد فارس وتركيا والشرق الأوسع لمملكة فتية سريعة النمو. ومع بناء الوطن نمونا معه — من المنازل الخاصة إلى الفنادق والمقار المؤسسية والمساجد والمشاريع الحكومية، مكوّنين فرق تركيب خاصة بنا على الطريق. وبعد خمسين عامًا، تبقى التراث الدار الرائدة للمجموعة، حيث يبدأ كل تكليف بحديث عن المساحة التي ستحتضنه.' },
-          { t:'حِرفتنا',
-            b:'تُقيَّم كل سجادة من التراث بما تُغفله معظم الكتالوجات — كثافة العقد، وجودة الصوف والحرير، ويد الحائك خلفها. نعمل ضمن التقاليد الكلاسيكية لأصفهان وتبريز والأناضول إلى جانب التصاميم الحصرية المنفذة وفق أبعاد العميل وألوانه ونقشه الخاص.' }
+        name:'مجموعة التراث',
+        tagline:'عائلة واحدة من العلامات، خمس طرق لتأثيث عالمك — منذ 1976.',
+        features:[
+          {t:'مهمتنا', b:'تقديم حلول تأثيث عالية الجودة تعزز جمال المساحات وتبعث إحساسًا بالأناقة الخالدة، وتوفير تجربة شراء استثنائية لعملائنا تجمع بين التشكيلات الفريدة والحلول المبتكرة.'},
+          {t:'رؤيتنا', b:'النمو والتكيف والازدهار من خلال بناء شراكات مع المقاولين والقطاع العقاري، بما يتماشى مع رؤية 2030، لتوسيع نطاقنا والمساهمة في نمو المملكة العربية السعودية.'},
+          {t:'قيمنا', b:'مدفوعون بالجودة والحِرفية، نعمل بنزاهة مطلقة. ومن خلال الابتكار والاستدامة، نحافظ على التزام راسخ بالتميز في كل مشروع وشراكة.'}
+        ],
+        sections:[
+          {t:'قصتنا', b:'بدأنا كعمل عائلي متواضع، حين شرعنا في نسج سجاد فارسي يدوي جميل عام 1976، بالتزام بالحفاظ على تقاليد عمرها قرون.'},
+          {t:'التطور مع الصناعة', b:'خلال تلك الفترة بدأنا التحول نحو التأثيث المعاصر، لنصبح من العلامات الرائدة في تقديم تصاميم حديثة وانتقالية تواكب تفضيلات عملائنا المتغيرة.'},
+          {t:'بناء إرث', b:'على مدى سنوات من الحِرفية الاستثنائية، رسخنا حضورًا قويًا في أنحاء المملكة العربية السعودية، ما مكّننا من التوسع إلى كندا والإمارات في منتصف التسعينيات، ثم المغرب في أوائل الألفية الجديدة.'},
+          {t:'التوسع المحلي', b:'خلال العقد الأخير من التحول اللافت الذي شهدته مملكتنا، واصلت علامة التراث ازدهارها، كما يتجلى في افتتاح عشرات المتاجر والمواقع الجديدة.'},
+          {t:'مستقبل واعد', b:'واليوم، وبصفتنا أحد رواد السوق، نتماشى مع رؤية المملكة العربية السعودية 2030، مساهمين في نمو وتطوير صناعات الأثاث والسجاد وحلول الأرضيات، مع الحفاظ على إرثنا الغني وهويتنا الثقافية.'}
         ]
       }
     },
 
-    divano: {
-      prefix: 'D', motif: 'sofa', folder: 'Assets/brands/divano/',
-      links: {
-        products: 'https://www.divanoksa.com',
-        category: { href:'furniture.html', en:'Explore Furniture', ar:'استكشف الأثاث' },
-        locations: 'locations.html?brand=divano'
-      },
-      en: {
-        name: 'Divano',
-        tagline: 'Italian-inspired luxury furniture, est. 2010.',
-        sections: [
-          { t:'Our Mission',
-            b:'At Divano, our mission is to provide you with the finest selection of luxurious furniture pieces that will transform your living space into a haven of comfort and elegance. As an ecommerce store specialising in high-quality furniture, we pride ourselves on offering high-quality furnishings and home accessories with Italian designs and limited editions, with customised services and a distinguished customer shopping experience.' },
-          { t:'Our Story',
-            b:"Our store was founded in 2010. Due to our commitment to the highest standards of craftsmanship and quality over the years, we have built a reputable reputation in Saudi Arabia. The Divano brand quickly became a trusted destination for those looking for high-quality furniture that will last for many years. We began to expand our product range and became one of the first brands to offer modern furniture with modern designs locally, in order to keep up with the latest developments and meet the ever-changing needs of our customers. Over the past few years, which have witnessed an incredible boom in Saudi Arabia, the Divano brand has continued to grow through the opening of many new stores and showrooms. Today, as one of the pioneers in the field, we continue to work and progress in accordance with Saudi Vision 2030, in order to contribute to the development of the furniture sector and preserve the rich heritage and unique identity that distinguishes our civilisation." },
-          { t:'Our Approach',
-            b:"At Divano, we understand the importance of creating a home that exudes elegance and style. That's why we have curated a selection of top-selling furniture items, including elegant sofas, stylish armchairs, stunning leather recliners, and modern sectional sofas. Our commitment to quality craftsmanship and attention to detail sets us apart, ensuring that every piece we offer is not only visually stunning but also built to last." }
-        ]
-      },
-      ar: {
-        name: 'ديفانو',
-        tagline: 'أثاث فاخر بلمسة إيطالية، تأسست عام 2010.',
-        sections: [
-          { t:'مهمتنا',
-            b:'في ديفانو، مهمتنا أن نقدم لك أرقى تشكيلة من قطع الأثاث الفاخرة التي تحوّل مساحة معيشتك إلى ملاذ من الراحة والأناقة. وبصفتنا متجرًا إلكترونيًا متخصصًا في الأثاث عالي الجودة، نفخر بتقديم مفروشات وإكسسوارات منزلية بتصاميم إيطالية وإصدارات محدودة، مع خدمات مخصصة وتجربة تسوق مميزة لعملائنا.' },
-          { t:'قصتنا',
-            b:'تأسس متجرنا عام 2010. وبفضل التزامنا بأعلى معايير الحِرفية والجودة على مر السنين، بنينا سمعة موثوقة في المملكة العربية السعودية. وسرعان ما أصبحت علامة ديفانو وجهة موثوقة لمن يبحثون عن أثاث عالي الجودة يدوم لسنوات طويلة. وبدأنا في توسيع تشكيلة منتجاتنا، لنصبح من أوائل العلامات التي تقدم أثاثًا عصريًا بتصاميم حديثة محليًا، لمواكبة أحدث التطورات وتلبية احتياجات عملائنا المتغيرة باستمرار. وعلى مدى السنوات الأخيرة التي شهدت ازدهارًا استثنائيًا في المملكة العربية السعودية، واصلت علامة ديفانو نموها من خلال افتتاح العديد من المتاجر وصالات العرض الجديدة. واليوم، وبصفتنا من رواد هذا المجال، نواصل العمل والتطور بما يتماشى مع رؤية السعودية 2030، إسهامًا منا في تطوير قطاع الأثاث والحفاظ على الإرث الغني والهوية الفريدة التي تميز حضارتنا.' },
-          { t:'منهجنا',
-            b:'في ديفانو، ندرك أهمية خلق منزل يفيض بالأناقة والرقي. لذا انتقينا تشكيلة من أكثر قطع الأثاث مبيعًا، تشمل الأرائك الأنيقة، والكراسي بذراعين العصرية، والكراسي الجلدية القابلة للاستلقاء الرائعة، والأرائك القطاعية الحديثة. والتزامنا بالحِرفية العالية والاهتمام بالتفاصيل هو ما يميزنا، ليضمن أن كل قطعة نقدمها ليست فقط أخّاذة بصريًا بل مصنوعة لتدوم.' }
-        ]
-      }
+    /* ---------------- 2. Heritage Carpets ---------------- */
+    'heritage-carpets': {
+      kind:'detail', motif:'medallion', folder:'Assets/brands/heritage/', logo:'logo.png', photos:['2.jpg'],
+      actions:[
+        {key:'products', href:'collections.html'},
+        {key:'projects', href:'projects.html'},
+        {key:'locations', href:'locations.html?brand=heritage'}
+      ],
+      en: { name:'Heritage Carpets',
+        tagline:'European and Central-Asian carpets, rugs, mats and moquette.',
+        intro:'Specialising in top-notch European and Central-Asian carpets, rugs, mats, and moquette, Heritage Carpets offers an extensive range of handmade, hand-tufted and machine-made rugs, with limitless customisation choices for retail and wholesale customers in terms of size, material, and source.',
+        sections:[] },
+      ar: { name:'التراث للسجاد',
+        tagline:'سجاد أوروبي وآسيوي وسطي، ومفروشات وموكيت.',
+        intro:'تتخصص التراث للسجاد في أرقى أنواع السجاد الأوروبي وسجاد آسيا الوسطى والمفروشات والموكيت، وتقدم تشكيلة واسعة من السجاد اليدوي والمعقود يدويًا والآلي، مع خيارات تخصيص غير محدودة لعملاء التجزئة والجملة من حيث المقاس والخامة والمصدر.',
+        sections:[] }
     },
 
+    /* ---------------- 3. Platinum Carpets ---------------- */
     platinum: {
-      prefix: 'P', motif: 'tile',
-      links: {
-        products: 'collections.html?category=machine-made',
-        category: { href:'flooring.html', en:'Flooring Solutions', ar:'حلول الأرضيات' },
-        locations: 'locations.html?brand=platinum'
-      },
-      en: {
-        name: 'Platinum Carpets',
-        tagline: 'Where Heritage Meets Modernity — 40 years of craftsmanship since 1985.',
-        intro: 'At Platinum, we believe that a carpet is not just a piece of furniture, but a masterpiece that reflects a rich heritage and craftsmanship passed down through generations. Our history in the field of carpets extends over 40 years, during which we have been committed to providing high-quality carpets that combine contemporary design with traditional authenticity. We are proud to present Platinum carpets, which embody our commitment to quality and elegant design.',
-        features: [
-          { t:'Our Mission', b:'To add a touch of luxury and comfort to every home by offering carpets made of the finest materials.' },
-          { t:'Our Values', b:'Quality, craftsmanship, creativity, and complete customer satisfaction.' },
-          { t:'Our Distinction', b:'Unique designs and high-quality materials — carpets made of the finest materials, with designs found nowhere else.' }
-        ],
-        sections: [
-          { t:'We Weave Stories Since 1985',
-            b:'Our story began in 1985, where we sought to provide the finest types of carpets. Today, after 40 years, we are still continuing this rich heritage. We are one family, working together with love and dedication to provide Platinum carpets that combine modernity and heritage. Each carpet is a story that tells of our love for craftsmanship and our attention to the finest details. Platinum carpets are a story told generation after generation — each one carrying within it a history and an inherited craftsmanship, adding a touch of authenticity and sophistication to your home. Each knot is woven with craftsmanship that carries within it a touch of creativity and heritage. We believe that a carpet is more than just a product — it is an investment in comfort and beauty that lasts a lifetime.' },
-          { t:'Towards a More Elegant Future',
-            b:'At Platinum, we see carpets as more than just a piece of furniture — they are an expression of your lifestyle. We believe that home is your sanctuary, and we want to help you create it in the most beautiful way. Platinum carpets are the embodiment of our vision for the future, combining traditional craftsmanship with contemporary design to deliver products that meet your needs and exceed your expectations. Choose from a wide range of designs inspired by nature and heritage.' }
-        ]
-      },
-      ar: {
-        name: 'بلاتينيوم للسجاد',
-        tagline: 'حيث يلتقي التراث بالحداثة — 40 عامًا من الحِرفية منذ 1985.',
-        intro: 'في بلاتينيوم، نؤمن أن السجادة ليست مجرد قطعة أثاث، بل تحفة فنية تعكس إرثًا غنيًا وحِرفية توارثتها الأجيال. يمتد تاريخنا في مجال السجاد لأكثر من 40 عامًا، التزمنا خلالها بتقديم سجاد عالي الجودة يجمع بين التصميم المعاصر والأصالة التقليدية. ويسعدنا أن نقدم سجاد بلاتينيوم، الذي يجسد التزامنا بالجودة والتصميم الأنيق.',
-        features: [
-          { t:'مهمتنا', b:'إضافة لمسة من الفخامة والراحة إلى كل منزل من خلال تقديم سجاد مصنوع من أجود الخامات.' },
-          { t:'قيمنا', b:'الجودة، والحِرفية، والإبداع، ورضا العملاء الكامل.' },
-          { t:'تميزنا', b:'تصاميم فريدة وخامات عالية الجودة — سجاد مصنوع من أجود الخامات، بتصاميم لا مثيل لها.' }
-        ],
-        sections: [
-          { t:'ننسج الحكايات منذ عام 1985',
-            b:'بدأت قصتنا عام 1985، حين سعينا لتقديم أرقى أنواع السجاد. واليوم، وبعد 40 عامًا، ما زلنا نواصل هذا الإرث الغني. نحن عائلة واحدة، نعمل معًا بحب وتفانٍ لنقدم سجاد بلاتينيوم الذي يجمع بين الحداثة والتراث. كل سجادة حكاية تروي عشقنا للحِرفية واهتمامنا بأدق التفاصيل. سجاد بلاتينيوم حكاية تُروى جيلًا بعد جيل، وكل سجادة تحمل في طياتها تاريخًا وحِرفية موروثة، لتضيف لمسة من الأصالة والرقي إلى منزلك. كل عقدة تُنسج بحِرفية تحمل بين طياتها لمسة من الإبداع والتراث. نؤمن أن السجاد أكثر من مجرد منتج، إنه استثمار في الراحة والجمال يدوم مدى الحياة.' },
-          { t:'نحو مستقبل أكثر أناقة',
-            b:'في بلاتينيوم، ننظر إلى السجاد كأكثر من مجرد قطعة أثاث، إنه تعبير عن أسلوب حياتك. نؤمن أن المنزل هو ملاذك، ونريد أن نساعدك على تصميمه بأجمل طريقة ممكنة. سجاد بلاتينيوم هو تجسيد لرؤيتنا للمستقبل، يجمع بين الحِرفية التقليدية والتصميم المعاصر ليقدم منتجات تلبي احتياجاتك وتفوق توقعاتك. اختر من بين مجموعة واسعة من التصاميم المستوحاة من الطبيعة والتراث.' }
-        ]
-      }
+      kind:'detail', motif:'tile', folder:'Assets/brands/platinum/', logo:'logo.png', photos:['1.jpg','2.jpg','3.jpg'],
+      actions:[
+        {key:'products', href:'collections.html?category=machine-made'},
+        {key:'locations', href:'locations.html?brand=platinum'}
+      ],
+      en: { name:'Platinum Carpets',
+        tagline:'Stylish, practical and affordable — for every retail need.',
+        intro:'Platinum caters to the various needs of retail customers with a diverse and distinctive range of home furniture solutions that are stylish, practical, and affordable.',
+        sections:[] },
+      ar: { name:'بلاتينيوم للسجاد',
+        tagline:'أنيقة وعملية وبأسعار مناسبة — لكل احتياجات التجزئة.',
+        intro:'تلبي بلاتينيوم احتياجات عملاء التجزئة المتنوعة من خلال تشكيلة متميزة ومتنوعة من حلول الأثاث المنزلي الأنيقة والعملية وبأسعار مناسبة.',
+        sections:[] }
+    },
+
+    /* ---------------- 4. Divano (link card -> furniture.html) ---------------- */
+    divano: {
+      kind:'link', target:'furniture.html', motif:'sofa', folder:'Assets/brands/divano/', logo:'D_logo.png', photos:['D_1.jpg'],
+      en: { name:'Divano', tagline:'Contemporary home-furnishing, engineered for value.',
+        intro:'The ideal choice for residential, commercial, and hospitality clients seeking contemporary home-furnishing solutions; every Divano product achieves the concept of "value for money" by offering the perfect balance between high quality and affordability.' },
+      ar: { name:'ديفانو', tagline:'تأثيث منزلي معاصر، مصمم ليمنحك أفضل قيمة.',
+        intro:'الخيار الأمثل لعملاء القطاع السكني والتجاري وقطاع الضيافة الباحثين عن حلول تأثيث منزلي معاصرة؛ يحقق كل منتج من ديفانو مفهوم "القيمة مقابل السعر" من خلال التوازن المثالي بين الجودة العالية والسعر المناسب.' }
+    },
+
+    /* ---------------- 5. Divano Elite (link card -> furniture.html) ---------------- */
+    'divano-elite': {
+      kind:'link', target:'furniture.html', motif:'frame',
+      en: { name:'Divano Elite', tagline:'Italian-inspired, limited edition, unmistakably yours.',
+        intro:'For those who love to stand out, Divano Elite presents exclusive, high-quality Italian-inspired home furniture and accessories available in limited editions, with more personalised services and a distinguished overall experience for customers.',
+        highlights:['Interior Design Solutions','Bespoke Orders'] },
+      ar: { name:'ديفانو إيليت', tagline:'بلمسة إيطالية، بإصدارات محدودة، تحمل توقيعك الخاص.',
+        intro:'لمن يعشقون التميز، تقدم ديفانو إيليت أثاثًا وإكسسوارات منزلية حصرية عالية الجودة بلمسة إيطالية، متوفرة بإصدارات محدودة، مع خدمات أكثر تخصيصًا وتجربة استثنائية شاملة لعملائنا.',
+        highlights:['حلول التصميم الداخلي','طلبات حسب الطلب'] }
+    },
+
+    /* ---------------- 6. Carpet Land (link card -> flooring.html) ---------------- */
+    'carpet-land': {
+      kind:'link', target:'flooring.html', motif:'floorplan', folder:'Assets/brands/carpet_land/', logo:'logo.png', photos:['1.jpg'],
+      en: { name:'Carpet Land', tagline:'Wholesale flooring, for every facility.',
+        // note: the source text read "BÓB market" — read here as "B2B market"
+        // (business-to-business); flagged for confirmation.
+        intro:'Carpet Land is a division dedicated to serving the wholesale market alongside the B2B market, supplying specialised flooring products that meet the requirements of various facilities such as mosques (Masjed), hotels, retail centres, private residences, sports arenas, and other commercial applications.' },
+      ar: { name:'كاربت لاند', tagline:'أرضيات بالجملة، لكل منشأة.',
+        intro:'كاربت لاند قسم مخصص لخدمة سوق الجملة إلى جانب قطاع الأعمال (B2B)، موردًا منتجات أرضيات متخصصة تلبي متطلبات منشآت متنوعة مثل المساجد وقاعات الصلاة والفنادق والمراكز التجارية والمساكن الخاصة والصالات الرياضية وغيرها من التطبيقات التجارية.' }
     }
   };
 
-   const video = {
-    // Plays each clip in order, advancing when one finishes, looping back to
-    // the first once the list is exhausted. Add or remove entries freely —
-    // one entry alone just loops continuously, same as a single-video header.
+  const video = {
     videos: [
       { src: 'Assets/HERITAGE.mp4', poster: 'Assets/hcc.png' },
       { src: 'Assets/divano.mp4',   poster: 'Assets/divano.png' },
-      { src: 'Assets/divano-1.mp4', poster: 'Assets/platinum.png' }
+      { src: 'Assets/divano-1.mp4', poster: 'Assets/divano.png' }
     ],
     embed: ''
   };
 
   const i18n = {
     en: {
-      kicker:'Our Brands', title:'Three Brands, One Standard',
-      lead:'Heritage, Platinum and Divano — each with its own identity, its own showrooms, and its own story. Select a brand to read it in full.',
-      viewProducts:'View Products', findShowroom:'Find a Showroom'
+      kicker:'Our Brands', title:'Six Brands, One Standard',
+      lead:'From handmade heritage carpets to contemporary furniture and wholesale flooring — explore each brand below.',
+      products:'View Products', projects:'Our Projects', locations:'Find a Showroom',
+      visitPage:'Visit the Brand Page'
     },
     ar: {
-      kicker:'علاماتنا التجارية', title:'ثلاث علامات، معيار واحد',
-      lead:'التراث وبلاتينيوم وديفانو — لكل منها هويتها وصالاتها وقصتها الخاصة. اختر علامة لقراءة قصتها كاملة.',
-      viewProducts:'عرض المنتجات', findShowroom:'اعثر على صالة عرض'
+      kicker:'علاماتنا التجارية', title:'ست علامات، معيار واحد',
+      lead:'من سجاد التراث اليدوي إلى الأثاث المعاصر وأرضيات الجملة — تصفح كل علامة أدناه.',
+      products:'عرض المنتجات', projects:'مشاريعنا', locations:'اعثر على صالة عرض',
+      visitPage:'زيارة صفحة العلامة'
     }
   };
 

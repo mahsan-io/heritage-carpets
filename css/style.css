@@ -252,7 +252,7 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
     background:transparent !important;
 }
 
-.nav-cta{display:inline-flex;padding:11px 20px;font-size:12px;}
+.nav-cta{display:inline-flex;padding:7px 16px;font-size:13px;font-weight:500;letter-spacing:0.03em;}
 .hamburger{display:none;width:24px;height:18px;position:relative;flex-direction:column;justify-content:space-between;}
 .hamburger span{display:block;height:1px;width:100%;background:var(--cream-text);transition:.3s var(--ease);}
 .hamburger.open span:nth-child(1){transform:translateY(8.5px) rotate(45deg);}

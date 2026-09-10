@@ -609,8 +609,9 @@ function buildCarouselMarkup(images){
   function renderBookingPage(config, root){
     root = root || document;
     const i18n = config.i18n;
-    const state = { showroom:null, date:null, slot:null, name:'', phone:'', phoneCode:'+966', notes:'' };
+    const state = { brand:null, showroom:null, date:null, slot:null, name:'', phone:'', phoneCode:'+966', notes:'' };
 
+    const brandsEl    = root.querySelector('[data-role="book-brands"]');
     const showroomsEl = root.querySelector('[data-role="book-showrooms"]');
     const datesEl     = root.querySelector('[data-role="book-dates"]');
     const slotsEl     = root.querySelector('[data-role="book-slots"]');
@@ -623,10 +624,44 @@ function buildCarouselMarkup(images){
     // same list used by the Bespoke Studio and Projects enquiry forms
     if(phoneCodeEl) phoneCodeEl.innerHTML = countryOptionsHTML(state.phoneCode);
 
-    // ---- showroom chooser ----
-    showroomsEl.innerHTML = config.showrooms.map(s=>
-      '<div class="option-card" data-showroom="'+s.key+'"><h4>'+s.label+'<span class="check"></span></h4><p>'+s.hours+'</p></div>'
-    ).join('');
+    // brand-grouped showrooms: config.showroomsByBrand[key].rooms. A flattened
+    // lookup list is kept alongside it so slotsFor()/labelFor() can find a
+    // room by key regardless of which brand is currently active — the
+    // selected room doesn't stop existing just because you switched brands
+    // to look around, only the visible LIST of choices changes.
+    const brandOrder = config.brandOrder || [];
+    const byBrand = config.showroomsByBrand || {};
+    const allRooms = [];
+    brandOrder.forEach(bk=>{ (byBrand[bk] && byBrand[bk].rooms || []).forEach(r=>allRooms.push(r)); });
+
+    function renderBrands(){
+      if(!brandsEl) return;
+      brandsEl.innerHTML = brandOrder.map(bk=>
+        '<button type="button" class="book-brand-btn'+(state.brand===bk?' active':'')+'" data-brand="'+bk+'">'+byBrand[bk].label+'</button>'
+      ).join('');
+    }
+
+    // ---- showroom chooser: only the active brand's rooms are listed ----
+    function renderShowrooms(){
+      if(!state.brand){
+        showroomsEl.innerHTML = '<p class="slot-hint">'+(i18n.pickBrand||'')+'</p>';
+        return;
+      }
+      const rooms = (byBrand[state.brand] && byBrand[state.brand].rooms) || [];
+      showroomsEl.innerHTML = rooms.map(s=>
+        '<div class="option-card'+(state.showroom===s.key?' selected':'')+'" data-showroom="'+s.key+'"><h4>'+s.label+'<span class="check"></span></h4><p>'+s.hours+'</p></div>'
+      ).join('');
+    }
+
+    if(brandsEl){
+      brandsEl.addEventListener('click', function(e){
+        const btn = e.target.closest('.book-brand-btn');
+        if(!btn || btn.dataset.brand === state.brand) return;
+        state.brand = btn.dataset.brand;
+        state.showroom = null; state.slot = null;
+        renderBrands(); renderShowrooms(); renderSlots(); renderSummary();
+      });
+    }
 
     // ---- next 14 days ----
     function buildDates(){
@@ -656,7 +691,7 @@ function buildCarouselMarkup(images){
     }
 
     function slotsFor(dateKey, showroomKey){
-      const sr = config.showrooms.filter(s=>s.key===showroomKey)[0];
+      const sr = allRooms.filter(s=>s.key===showroomKey)[0];
       if(!sr) return [];
       const d = new Date(dateKey + 'T00:00:00');
       return isFriday(d) ? sr.slotsFri : sr.slots;
@@ -678,7 +713,7 @@ function buildCarouselMarkup(images){
     }
 
     function labelFor(key){
-      const s = config.showrooms.filter(x=>x.key===key)[0];
+      const s = allRooms.filter(x=>x.key===key)[0];
       return s ? s.label : '';
     }
 
@@ -754,7 +789,7 @@ function buildCarouselMarkup(images){
       });
     });
 
-    renderDates(); renderSlots(); renderSummary();
+    renderBrands(); renderShowrooms(); renderDates(); renderSlots(); renderSummary();
   }
 
   /* ---------------- Room visualizer (room.html) ----------------
@@ -1712,9 +1747,8 @@ function buildCarouselMarkup(images){
       tabsEl.innerHTML = L.order.map(k=>{
         const b = L.brands[k];
         const name = lang==='ar' ? b.name_ar : b.name_en;
-        return '<button type="button" class="loc-tab'+(k===active?' active':'')+'" data-brand="'+k+'">'+
-          '<span class="loc-tab-name">'+name+'</span>'+
-          '<span class="loc-tab-count">'+T.branchCount.replace('{n}', b.branches.length)+'</span>'+
+        return '<button type="button" class="loc-brand-btn'+(k===active?' active':'')+'" data-brand="'+k+'">'+
+          name+' <span class="loc-brand-count">'+b.branches.length+'</span>'+
         '</button>';
       }).join('');
     }
@@ -1731,25 +1765,25 @@ function buildCarouselMarkup(images){
         const phone = br.tel
           ? '<a class="phone" href="tel:'+br.tel+'">&#9742; '+L.displayTel(br.tel)+'</a>'
           : '<div class="loc-nophone">'+T.noPhone+'</div>';
-        return '<div class="map-card">'+
-          '<div class="map-embed"><iframe src="https://www.google.com/maps?q='+q+'&output=embed" title="'+(name||city)+'" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'+
-          '<div class="map-card-body">'+
+        return '<article class="loc-card">'+
+          '<div class="loc-card-visual" aria-hidden="true">'+
+            '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M24 44s15-13.5 15-24A15 15 0 1 0 9 20c0 10.5 15 24 15 24z"/><circle cx="24" cy="20" r="5.5"/></svg>'+
+          '</div>'+
+          '<div class="loc-card-body">'+
             '<div class="showroom-city">'+city+'</div>'+
             (name ? '<h3>'+name+'</h3>' : '')+
             '<div class="addr">'+addr+'</div>'+
             (hours ? '<div class="hours">'+hours+'</div>' : '')+
             phone+
-            '<div class="map-actions">'+
-              '<a href="https://www.google.com/maps/dir/?api=1&destination='+q+'" target="_blank" rel="noopener">'+T.directions+' &rarr;</a>'+
-            '</div>'+
+            '<a class="btn btn-fill loc-directions-btn" href="https://www.google.com/maps/dir/?api=1&destination='+q+'" target="_blank" rel="noopener">'+T.directions+'</a>'+
           '</div>'+
-        '</div>';
+        '</article>';
       }).join('');
-      panelEl.innerHTML = '<p class="loc-tagline">'+tagline+'</p><div class="map-grid">'+cards+'</div>';
+      panelEl.innerHTML = '<p class="loc-tagline">'+tagline+'</p><div class="loc-cards-grid">'+cards+'</div>';
     }
 
     tabsEl.addEventListener('click', function(e){
-      const btn = e.target.closest('.loc-tab');
+      const btn = e.target.closest('.loc-brand-btn');
       if(!btn) return;
       active = btn.dataset.brand;
       renderTabs(); renderPanel();

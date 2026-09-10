@@ -139,6 +139,7 @@ h1,h2,h3,h4{font-family:var(--font-display);font-weight:500;line-height:1.18;let
 .eyebrow.on-dark{color:var(--brass-light);}
 .eyebrow.on-light{color:var(--madder);}
 
+.section{padding:120px 0;position:relative;}
 .section.brands-section{padding-top:48px;}
 .section-head{max-width:640px;margin-bottom:64px;}
 .section-head.center{margin-inline:auto;text-align:center;}
@@ -859,6 +860,13 @@ a.cp-cat-heading:hover{color:var(--madder);}
 .bs-brand{display:grid;grid-template-columns:1fr 1.3fr;gap:56px;align-items:start;padding:0;}
 .bs-media{position:sticky;top:96px;min-width:0;}
 .bs-media .motif{position:relative;aspect-ratio:4/5;overflow:hidden;background:var(--ink);}
+/* compact preview panels (Divano, Divano Elite, Carpet Land) have far less
+   text than a full detail panel, so a tall 4:5 photo next to it left a large
+   empty gap below the short copy — center the copy alongside a shorter photo
+   instead, so the two sides read as a deliberate pairing rather than a
+   mismatch */
+.bs-brand.is-link-preview{align-items:center;}
+.bs-brand.is-link-preview .bs-media .motif{aspect-ratio:4/3;}
 .bs-body{min-width:0;}
 .bs-logo{display:flex;align-items:center;min-height:44px;margin-bottom:16px;}
 .bs-logo img{max-height:44px;max-width:200px;width:auto;display:block;}
@@ -936,7 +944,8 @@ background:transparent;
   background:linear-gradient(135deg, #403d3e 0%, var(--ink-3) 100%);
   box-shadow:0 14px 32px rgba(20,18,14,0.22), inset 0 1px 0 rgba(255,255,255,0.3);
 }
-.brand-tab-btn.active{ 
+.brand-tab-btn.active{
+  border-width:2.5px;
   border-color:rgba(183,204,51,0.85);
   box-shadow:0 10px 30px rgba(183,204,51,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
 }

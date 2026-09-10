@@ -937,9 +937,9 @@ background:transparent;
   box-shadow:0 14px 32px rgba(20,18,14,0.22), inset 0 1px 0 rgba(255,255,255,0.3);
 }
 .brand-tab-btn.active{ 
-  background:rgba(183,204,51,0.85);
-  border-color:rgba(183,204,51,1);
-  color:#2f2d2e;
+  background:rgba(183,204,51,0.22);
+  border-color:rgba(183,204,51,0.85);
+  color:var(--brass-light);
   transform:translateY(-2px);
   box-shadow:0 10px 30px rgba(183,204,51,0.28), inset 0 1px 0 rgba(255,255,255,0.35);
 }

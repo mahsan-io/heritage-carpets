@@ -144,13 +144,13 @@ window.HeritageBrandShowcase = (function(){
 
   const i18n = {
     en: {
-      kicker:'Our Brands', title:'Six Brands, One Standard',
+      kicker:'Our Brands', title:'Five Brands, One Standard',
       lead:'From handmade heritage carpets to contemporary furniture and wholesale flooring — explore each brand below.',
       products:'View Products', projects:'Our Projects', locations:'Find a Showroom',
       visitPage:'Visit the Brand Page'
     },
     ar: {
-      kicker:'علاماتنا التجارية', title:'ست علامات، معيار واحد',
+      kicker:'علاماتنا التجارية', title:'خمسة علامات، معيار واحد',
       lead:'من سجاد التراث اليدوي إلى الأثاث المعاصر وأرضيات الجملة — تصفح كل علامة أدناه.',
       products:'عرض المنتجات', projects:'مشاريعنا', locations:'اعثر على صالة عرض',
       visitPage:'زيارة صفحة العلامة'

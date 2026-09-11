@@ -725,7 +725,9 @@ function buildCarouselMarkup(images){
 
     function renderSummary(){
       if(!summaryEl) return;
+      const brandLabel = state.brand && byBrand[state.brand] ? byBrand[state.brand].label : i18n.notSelected;
       const rows = [
+        [i18n.sumLabels.brand,    brandLabel],
         [i18n.sumLabels.showroom, state.showroom ? labelFor(state.showroom) : i18n.notSelected],
         [i18n.sumLabels.date,     prettyDate(state.date)],
         [i18n.sumLabels.time,     state.slot || i18n.notSelected],
@@ -740,6 +742,7 @@ function buildCarouselMarkup(images){
       if(emailBtn) emailBtn.classList.toggle('is-disabled', !ready);
       if(ready){
         const lines = [
+          i18n.sumLabels.brand+': '+brandLabel,
           i18n.sumLabels.showroom+': '+labelFor(state.showroom),
           i18n.sumLabels.date+': '+prettyDate(state.date),
           i18n.sumLabels.time+': '+state.slot,
@@ -782,10 +785,48 @@ function buildCarouselMarkup(images){
       if(el) el.addEventListener('input', function(){ state[f] = el.value; renderSummary(); });
     });
     if(phoneCodeEl) phoneCodeEl.addEventListener('change', function(){ state.phoneCode = phoneCodeEl.value; renderSummary(); });
+    // ---- record the booking to the Google Sheet (Apps Script web app) ----
+    // Apps Script can't return CORS headers, so this is sent as a
+    // fire-and-forget 'no-cors' POST: the row is written, but the browser
+    // is not allowed to read the reply. That means a failure here is
+    // SILENT — the visitor must never be blocked or shown an error because
+    // of it, so the WhatsApp/email step always proceeds either way.
+    // 'text/plain' is deliberate: it keeps this a "simple" request and
+    // avoids a CORS preflight that Apps Script would reject.
+    const bookingLang = root.getAttribute('data-lang') || 'en';
+    let lastSent = '';
+    function recordBooking(){
+      const url = config.webhookUrl;
+      if(!url) return;
+      const payload = {
+        brand:       state.brand && byBrand[state.brand] ? byBrand[state.brand].label : '',
+        showroom:    state.showroom ? labelFor(state.showroom) : '',
+        showroomKey: state.showroom || '',
+        date:        state.date || '',
+        time:        state.slot || '',
+        name:        state.name || '',
+        phone:       state.phone ? state.phoneCode + ' ' + state.phone : '',
+        notes:       state.notes || '',
+        language:    bookingLang,
+        submittedAt: new Date().toISOString()
+      };
+      const body = JSON.stringify(payload);
+      if(body === lastSent) return;   // don't double-log a double-click
+      lastSent = body;
+      try{
+        fetch(url, {
+          method:'POST', mode:'no-cors',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: body
+        }).catch(function(){});
+      }catch(err){}
+    }
+
     [confirmBtn, emailBtn].forEach(btn=>{
       if(!btn) return;
       btn.addEventListener('click', function(e){
-        if(btn.classList.contains('is-disabled')){ e.preventDefault(); }
+        if(btn.classList.contains('is-disabled')){ e.preventDefault(); return; }
+        recordBooking();
       });
     });
 

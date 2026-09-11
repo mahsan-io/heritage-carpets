@@ -24,7 +24,23 @@
    ====================================================================== */
 window.HeritageVisitConfig = (function(){
 
+  /* ======================================================================
+     GOOGLE SHEET CONNECTION — EDIT THIS ONE LINE
+     ----------------------------------------------------------------------
+     Paste the Apps Script web-app URL here (the one ending in /exec).
+     Set it to '' to switch recording off entirely; the form still works
+     and still opens WhatsApp/email, it just won't log to the sheet.
+
+     IMPORTANT: the URL must be the PUBLIC deployment. A URL containing
+     "/a/macros/<your-domain>/" is the domain-restricted form and will
+     only work for people already signed in to that Google Workspace —
+     ordinary website visitors will silently fail to record. See the
+     deployment notes supplied with this change.
+     ====================================================================== */
+  const BOOKING_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzAynGoyTU3AqPVpC11ZeUDjC-uHLkfZLOG5fJIgoIkt_f6a0Uv1oImP9srCRkYXxGc/exec';
+
   const en = {
+  webhookUrl: BOOKING_WEBHOOK_URL,
   brandOrder: ['heritage','platinum','divano'],
   showroomsByBrand: {
     heritage: { label:'Heritage Carpets', rooms:[
@@ -69,6 +85,7 @@ window.HeritageVisitConfig = (function(){
   };
 
   const ar = {
+  webhookUrl: BOOKING_WEBHOOK_URL,
   brandOrder: ['heritage','platinum','divano'],
   showroomsByBrand: {
     heritage: { label:'التراث للسجاد', rooms:[

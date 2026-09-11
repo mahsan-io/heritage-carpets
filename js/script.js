@@ -18,6 +18,57 @@ window.Heritage = (function(){
   // or a custom checkout domain if one is mapped in Shopify settings.
   const SHOPIFY_STORE = 'https://heritage-carpet.myshopify.com';
 
+  /* ======================================================================
+     GOOGLE SHEET RECORDING — EDIT THESE URLS
+     ----------------------------------------------------------------------
+     One Apps Script web-app URL per form, so each form can write to its own
+     separate sheet. Paste the deployment URL (ending in /exec) against the
+     matching form. Leave a value as '' to switch recording off for that
+     form — it keeps working and still opens WhatsApp/email, it just won't
+     log anything.
+
+     The Visit form's URL lives separately, in js/visit-data.js, because
+     that page already has its own data file.
+
+     Each URL must come from a deployment with "Who has access: Anyone",
+     otherwise visitors who aren't signed in to your Google Workspace will
+     silently fail to record. See GOOGLE-SHEET-SETUP.md.
+     ====================================================================== */
+  const SHEET_WEBHOOKS = {
+    projects: '',   // <-- Projects enquiry form  (projects.html)
+    bespoke:  ''    // <-- Bespoke Studio wizard  (bespoke.html)
+  };
+
+  /* Fire-and-forget POST to an Apps Script endpoint.
+     Apps Script cannot return CORS headers, so this is sent 'no-cors':
+     the row is written but the browser may not read the reply, which means
+     a failure here is SILENT. Nothing about the visitor's journey may
+     depend on it — every caller sends the WhatsApp/email step regardless.
+     'text/plain' keeps this a "simple" request and avoids a CORS preflight
+     that Apps Script would reject. */
+  const sheetSendHistory = {};
+  function sendToSheet(url, payload){
+    if(!url) return;
+    let body, dedupeKey;
+    try{
+      body = JSON.stringify(payload);
+      // the dedupe key must EXCLUDE submittedAt — it changes on every click,
+      // which would make each payload look unique and defeat the check
+      const copy = {};
+      Object.keys(payload).forEach(k=>{ if(k !== 'submittedAt') copy[k] = payload[k]; });
+      dedupeKey = JSON.stringify(copy);
+    }catch(err){ return; }
+    if(sheetSendHistory[url] === dedupeKey) return;  // ignore a double-click
+    sheetSendHistory[url] = dedupeKey;
+    try{
+      fetch(url, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: body
+      }).catch(function(){});
+    }catch(err){}
+  }
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------------- Shared icon set (commercial solutions cards) ---------------- */
@@ -785,20 +836,11 @@ function buildCarouselMarkup(images){
       if(el) el.addEventListener('input', function(){ state[f] = el.value; renderSummary(); });
     });
     if(phoneCodeEl) phoneCodeEl.addEventListener('change', function(){ state.phoneCode = phoneCodeEl.value; renderSummary(); });
-    // ---- record the booking to the Google Sheet (Apps Script web app) ----
-    // Apps Script can't return CORS headers, so this is sent as a
-    // fire-and-forget 'no-cors' POST: the row is written, but the browser
-    // is not allowed to read the reply. That means a failure here is
-    // SILENT — the visitor must never be blocked or shown an error because
-    // of it, so the WhatsApp/email step always proceeds either way.
-    // 'text/plain' is deliberate: it keeps this a "simple" request and
-    // avoids a CORS preflight that Apps Script would reject.
+    // ---- record the booking to its Google Sheet (see sendToSheet above) ----
     const bookingLang = root.getAttribute('data-lang') || 'en';
-    let lastSent = '';
     function recordBooking(){
-      const url = config.webhookUrl;
-      if(!url) return;
-      const payload = {
+      sendToSheet(config.webhookUrl, {
+        form:        'visit',
         brand:       state.brand && byBrand[state.brand] ? byBrand[state.brand].label : '',
         showroom:    state.showroom ? labelFor(state.showroom) : '',
         showroomKey: state.showroom || '',
@@ -809,17 +851,7 @@ function buildCarouselMarkup(images){
         notes:       state.notes || '',
         language:    bookingLang,
         submittedAt: new Date().toISOString()
-      };
-      const body = JSON.stringify(payload);
-      if(body === lastSent) return;   // don't double-log a double-click
-      lastSent = body;
-      try{
-        fetch(url, {
-          method:'POST', mode:'no-cors',
-          headers:{'Content-Type':'text/plain;charset=utf-8'},
-          body: body
-        }).catch(function(){});
-      }catch(err){}
+      });
     }
 
     [confirmBtn, emailBtn].forEach(btn=>{
@@ -1461,7 +1493,23 @@ function buildCarouselMarkup(images){
       form.addEventListener('input', refresh);
       form.addEventListener('change', refresh);
       [waBtn, emBtn].forEach(b=>{
-        if(b) b.addEventListener('click', function(e){ if(b.classList.contains('is-disabled')) e.preventDefault(); });
+        if(b) b.addEventListener('click', function(e){
+          if(b.classList.contains('is-disabled')){ e.preventDefault(); return; }
+          sendToSheet(SHEET_WEBHOOKS.projects, {
+            form:        'projects',
+            name:        val('name'),
+            company:     val('company'),
+            email:       val('email'),
+            phone:       val('phone') ? val('phoneCode')+' '+val('phone') : '',
+            projectType: val('type'),
+            location:    val('location'),
+            sizeSqm:     val('size'),
+            timeline:    val('timeline'),
+            details:     val('details'),
+            language:    lang,
+            submittedAt: new Date().toISOString()
+          });
+        });
       });
       refresh();
     }
@@ -2650,6 +2698,32 @@ function buildCarouselMarkup(images){
       if(sendBtn){
         updateSendState();
         sendBtn.addEventListener('click', function(){
+          // record to the Bespoke sheet before handing off to the mail client.
+          // Labels are resolved the same way buildMailto() does them, so the
+          // sheet row and the email the client receives always agree.
+          const dash = '';
+          const lbl = (list, key)=>{ const f = key ? (list.find(x=>x.key===key)||{}) : {}; return f.label || dash; };
+          const dims = state.shape==='custom' ? (state.customShapeDesc||dash) :
+            state.shape==='round' ? ('\u00d8 '+state.widthM.toFixed(1)+i18n.unitSuffix) :
+            (state.widthM.toFixed(1)+i18n.unitSuffix+' x '+(state.shape==='square'?state.widthM.toFixed(1):state.lengthM.toFixed(1))+i18n.unitSuffix);
+          sendToSheet(SHEET_WEBHOOKS.bespoke, {
+            form:          'bespoke',
+            room:          lbl(config.rooms, state.room),
+            shape:         lbl(config.shapes, state.shape),
+            dimensions:    dims,
+            material:      lbl(config.materials, state.material),
+            colour:        state.customHex ? state.customHex.toUpperCase() : lbl(config.colors, state.color),
+            pattern:       lbl(config.patterns, state.pattern),
+            designNotes:   state.notes || '',
+            name:          state.name || '',
+            email:         state.email || '',
+            phone:         state.phone ? state.phoneCode+' '+state.phone : '',
+            showroom:      lbl(config.showrooms, state.showroom),
+            contactMethod: lbl(config.contactMethods, state.contactMethod),
+            referenceImages: (state.files||[]).length,
+            language:      root.getAttribute('data-lang') || 'en',
+            submittedAt:   new Date().toISOString()
+          });
           window.location.href = buildMailto();
           const success = stepContainer.querySelector('#'+uid('submitSuccess'));
           const grid = stepContainer.querySelector('.contact-grid');

@@ -35,8 +35,8 @@ window.Heritage = (function(){
      silently fail to record. See GOOGLE-SHEET-SETUP.md.
      ====================================================================== */
   const SHEET_WEBHOOKS = {
-    projects: '',   // <-- Projects enquiry form  (projects.html)
-    bespoke:  ''    // <-- Bespoke Studio wizard  (bespoke.html)
+    projects: 'https://script.google.com/macros/s/AKfycbw7cmtZL70yTOK9AyfQYYw4CEsmVsdLU5t65OyOMz-LAZqangjRoQwucObXCksvwamb1w/exec',   // <-- Projects enquiry form  (projects.html)
+    bespoke:  'https://script.google.com/macros/s/AKfycbxk-VdkICkaD8rEcqlltnZl_QnLIG1o0Kcobz0nua1jeUIvrYNMUl9unshd6I5EfQAQ9A/exec'    // <-- Bespoke Studio wizard  (bespoke.html)
   };
 
   /* Fire-and-forget POST to an Apps Script endpoint.

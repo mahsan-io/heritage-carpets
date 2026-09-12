@@ -900,13 +900,18 @@ function buildCarouselMarkup(images){
     const changeBtn  = root.querySelector('[data-role="room-change"]');
     const statusEl   = root.querySelector('[data-role="room-status"]');
 
-    const scaleInput = root.querySelector('[data-role="room-scale"]');
-    const rotInput   = root.querySelector('[data-role="room-rotate"]');
-    const perspInput = root.querySelector('[data-role="room-perspective"]');
     const opacInput  = root.querySelector('[data-role="room-opacity"]');
 
-    const DEFAULTS = { x:0.5, y:0.68, scale:0.55, rot:0, persp:0.55, opacity:1 };
-    const view = Object.assign({ room:null, rug:null }, DEFAULTS);
+    const RW = window.HeritageRoomWarp;
+
+    const compareInput = root.querySelector('[data-role="room-compare"]');
+    const blendInput   = root.querySelector('[data-role="room-blend"]');
+    const samplesEl    = root.querySelector('[data-role="room-samples"]');
+
+    // `corners` replaces the old scale/rot/persp trio: the rug's four floor
+    // corners in canvas pixels, dragged directly by the user.
+    const DEFAULTS = { scale:0.55, rot:0, opacity:1, blend:0.55, shadow:0.6, compare:1 };
+    const view = Object.assign({ room:null, rug:null, corners:null, showHandles:true }, DEFAULTS);
 
     function say(msg, kind){
       if(!statusEl) return;
@@ -956,25 +961,146 @@ function buildCarouselMarkup(images){
         .catch(()=>motifImage(p).then(img=>({img:img, fallback:true})));
     }
 
+    /* ---------------- warped, blended rug rendering ----------------
+       Two changes from the original:
+       1. The rug is mapped through a homography onto four draggable corners,
+          so it follows the real floor instead of being squashed vertically.
+       2. It is composited partly with 'multiply', which lets the floor's own
+          shadows and highlights fall across it. Without that it reads as a
+          sticker pasted over the photo. */
+    const layer = document.createElement('canvas');
+    const lctx = layer.getContext('2d');
+
+    function drawWarpedRug(target, alpha){
+      if(!view.rug || !view.corners) return;
+      const H = RW.unitSquareToQuad(view.corners[0], view.corners[1], view.corners[2], view.corners[3]);
+      if(!H || !RW.isConvex(view.corners)) return;
+
+      const img = view.rug;
+      const iw = img.naturalWidth || img.width || 1;
+      const ih = img.naturalHeight || img.height || 1;
+
+      // Subdivision: each cell is drawn as two affine triangles, which is an
+      // approximation of the projective map. More cells = less error but more
+      // draw calls; 14 is indistinguishable from exact at these sizes while
+      // staying smooth to drag on a phone.
+      const N = 14;
+      target.save();
+      target.globalAlpha = alpha;
+      for(let i=0;i<N;i++){
+        for(let j=0;j<N;j++){
+          const u0=i/N, u1=(i+1)/N, v0=j/N, v1=(j+1)/N;
+          const p00=RW.applyHomography(H,u0,v0), p10=RW.applyHomography(H,u1,v0),
+                p11=RW.applyHomography(H,u1,v1), p01=RW.applyHomography(H,u0,v1);
+          const s00={x:u0*iw,y:v0*ih}, s10={x:u1*iw,y:v0*ih},
+                s11={x:u1*iw,y:v1*ih}, s01={x:u0*iw,y:v1*ih};
+          drawTriangle(target, img, s00,s10,s11, p00,p10,p11);
+          drawTriangle(target, img, s00,s11,s01, p00,p11,p01);
+        }
+      }
+      target.restore();
+    }
+
+    /* Draws one texture-mapped triangle by solving the affine transform that
+       carries the source triangle onto the destination, then clipping to it.
+       The 0.5px outset closes the hairline seams that otherwise appear
+       between adjacent triangles. */
+    function drawTriangle(c, img, s0, s1, s2, d0, d1, d2){
+      const den = s0.x*(s2.y-s1.y) - s1.x*s2.y + s2.x*s1.y + (s1.x-s2.x)*s0.y;
+      if(Math.abs(den) < 1e-9) return;
+      const m11 = -(s0.y*(d2.x-d1.x) - s1.y*d2.x + s2.y*d1.x + (s1.y-s2.y)*d0.x)/den;
+      const m12 =  (s1.y*d2.y + s0.y*(d1.y-d2.y) - s2.y*d1.y + (s2.y-s1.y)*d0.y)/den;
+      const m21 =  (s0.x*(d2.x-d1.x) - s1.x*d2.x + s2.x*d1.x + (s1.x-s2.x)*d0.x)/den;
+      const m22 = -(s1.x*d2.y + s0.x*(d1.y-d2.y) - s2.x*d1.y + (s2.x-s1.x)*d0.y)/den;
+      const dx  =  (s0.x*(s2.y*d1.x - s1.y*d2.x) + s0.y*(s1.x*d2.x - s2.x*d1.x)
+                    + (s2.x*s1.y - s1.x*s2.y)*d0.x)/den;
+      const dy  =  (s0.x*(s2.y*d1.y - s1.y*d2.y) + s0.y*(s1.x*d2.y - s2.x*d1.y)
+                    + (s2.x*s1.y - s1.x*s2.y)*d0.y)/den;
+
+      c.save();
+      c.beginPath();
+      const cx=(d0.x+d1.x+d2.x)/3, cy=(d0.y+d1.y+d2.y)/3;
+      const out=(p)=>{ const l=Math.hypot(p.x-cx,p.y-cy)||1; return { x:p.x+(p.x-cx)/l*0.5, y:p.y+(p.y-cy)/l*0.5 }; };
+      const o0=out(d0), o1=out(d1), o2=out(d2);
+      c.moveTo(o0.x,o0.y); c.lineTo(o1.x,o1.y); c.lineTo(o2.x,o2.y); c.closePath();
+      c.clip();
+      c.transform(m11, m12, m21, m22, dx, dy);
+      c.drawImage(img, 0, 0);
+      c.restore();
+    }
+
     function draw(){
       const W = canvas.width, H = canvas.height;
       ctx.clearRect(0,0,W,H);
       if(view.room) ctx.drawImage(view.room, 0, 0, W, H);
-      if(!view.rug) return;
+      if(!view.rug || !view.corners) return;
 
-      const rugW = W * view.scale;
-      const ratio = (view.rug.naturalHeight || view.rug.height || 1) / (view.rug.naturalWidth || view.rug.width || 1);
-      const rugH = rugW * ratio;
+      if(layer.width !== W || layer.height !== H){ layer.width = W; layer.height = H; }
+      lctx.clearRect(0,0,W,H);
+      drawWarpedRug(lctx, 1);
 
+      // compare wipe: only reveal the rug to the right of the split
+      const split = Math.round(W * view.compare);
       ctx.save();
-      ctx.globalAlpha = view.opacity;
-      ctx.translate(W * view.x, H * view.y);
-      ctx.rotate(view.rot * Math.PI / 180);
-      ctx.transform(1, 0, 0, Math.max(0.12, view.persp), 0, 0);
-      ctx.shadowColor = 'rgba(0,0,0,0.45)';
-      ctx.shadowBlur = rugW * 0.05;
-      ctx.shadowOffsetY = rugH * 0.04;
-      ctx.drawImage(view.rug, -rugW/2, -rugH/2, rugW, rugH);
+      if(view.compare < 1){
+        ctx.beginPath();
+        ctx.rect(0, 0, split, H);
+        ctx.clip();
+      }
+
+      // contact shadow, so the rug sits on the floor rather than floating
+      if(view.shadow > 0){
+        ctx.save();
+        ctx.globalAlpha = 0.30 * view.shadow;
+        ctx.filter = 'blur(' + Math.max(2, W*0.012) + 'px)';
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        const c = view.corners;
+        ctx.moveTo(c[0].x, c[0].y+2); ctx.lineTo(c[1].x, c[1].y+2);
+        ctx.lineTo(c[2].x, c[2].y+4); ctx.lineTo(c[3].x, c[3].y+4);
+        ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+
+      // normal pass keeps the rug's true colour; multiply pass picks up the
+      // floor's light. `blend` slides between "vivid" and "photographic".
+      const base = view.opacity;
+      ctx.globalAlpha = base * (1 - 0.45 * view.blend);
+      ctx.drawImage(layer, 0, 0);
+      if(view.blend > 0){
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.globalAlpha = base * view.blend;
+        ctx.drawImage(layer, 0, 0);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+      ctx.restore();
+
+      if(view.compare < 1){
+        ctx.save();
+        ctx.strokeStyle = '#B7CC33'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(split, 0); ctx.lineTo(split, H); ctx.stroke();
+        ctx.restore();
+      }
+      drawHandles();
+    }
+
+    function drawHandles(){
+      if(!view.showHandles || !view.corners || view.compare < 1) return;
+      const c = view.corners;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(183,204,51,0.9)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6,5]);
+      ctx.beginPath();
+      ctx.moveTo(c[0].x,c[0].y);
+      for(let i=1;i<4;i++) ctx.lineTo(c[i].x,c[i].y);
+      ctx.closePath(); ctx.stroke();
+      ctx.setLineDash([]);
+      c.forEach(p=>{
+        ctx.beginPath(); ctx.arc(p.x, p.y, 9, 0, Math.PI*2);
+        ctx.fillStyle = '#B7CC33'; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = '#2F2D2E'; ctx.stroke();
+      });
       ctx.restore();
     }
 
@@ -1008,20 +1134,66 @@ function buildCarouselMarkup(images){
       const reader = new FileReader();
       reader.onerror = ()=>say(i18n.readFailed || 'Could not read that file.', 'warn');
       reader.onload = function(e){
-        loadImage(e.target.result).then(img=>{
-          view.room = img;
-          fitCanvasTo(img);
-          if(stageWrap) stageWrap.hidden = false;
-          if(dropZone) dropZone.classList.add('has-room');
-          setEnabled(true);
-          say('');
-          return refreshRug();
-        }).then(draw).catch(()=>{
+        loadImage(e.target.result).then(applyRoomImage).catch(()=>{
           say(i18n.photoFailed || 'That photo could not be opened. Try another image.', 'warn');
         });
       };
       reader.readAsDataURL(file);
     }
+
+    /* ---- sample rooms ----
+       Most visitors never upload a photo — the upload is the biggest drop-off
+       in this tool. These are real Heritage project interiors already in the
+       repo, so someone can try a rug in a room within one click of landing.
+       A thumbnail whose file is missing removes itself rather than showing a
+       broken image. */
+    const SAMPLE_ROOMS = [
+      { src:'Assets/projects/villa-majlis-jeddah.jpg',    label:'Majlis',        label_ar:'مجلس' },
+      { src:'Assets/projects/family-villa-riyadh.jpg',    label:'Living Room',   label_ar:'غرفة معيشة' },
+      { src:'Assets/projects/palace-reception-hall.jpg',  label:'Reception',     label_ar:'قاعة استقبال' },
+      { src:'Assets/projects/royal-guest-residence.jpg',  label:'Guest Room',    label_ar:'غرفة ضيوف' },
+      { src:'Assets/projects/boutique-hotel-riyadh.jpg',  label:'Hotel Suite',   label_ar:'جناح فندقي' },
+      { src:'Assets/projects/hotel-lobby-jeddah.jpg',     label:'Lobby',         label_ar:'بهو' }
+    ];
+
+    function applyRoomImage(img){
+      view.room = img;
+      view.corners = null;              // re-fit the rug to the new photo
+      fitCanvasTo(img);
+      if(stageWrap) stageWrap.hidden = false;
+      if(dropZone) dropZone.classList.add('has-room');
+      setEnabled(true);
+      say('');
+      return refreshRug().then(()=>{ ensureCorners(); draw(); });
+    }
+
+    function buildSamples(){
+      if(!samplesEl) return;
+      samplesEl.innerHTML = SAMPLE_ROOMS.map((s,i)=>
+        '<button type="button" class="room-sample" data-sample="'+i+'">'+
+          '<img src="'+s.src+'" alt="" loading="lazy">'+
+          '<span>'+(lang==='ar' ? s.label_ar : s.label)+'</span>'+
+        '</button>').join('');
+      samplesEl.querySelectorAll('img').forEach(img=>{
+        img.addEventListener('error', function(){
+          const b = img.closest('.room-sample');
+          if(b) b.remove();
+          if(!samplesEl.querySelector('.room-sample')) samplesEl.hidden = true;
+        }, {once:true});
+      });
+      samplesEl.addEventListener('click', function(e){
+        const b = e.target.closest('[data-sample]');
+        if(!b) return;
+        const s = SAMPLE_ROOMS[parseInt(b.dataset.sample,10)];
+        if(!s) return;
+        say(i18n.loading || 'Loading photo…');
+        loadImage(s.src)
+          .then(applyRoomImage)
+          .catch(()=> say(i18n.photoFailed || 'That photo could not be opened.', 'warn'));
+        samplesEl.querySelectorAll('.room-sample').forEach(x=>x.classList.toggle('active', x===b));
+      });
+    }
+    buildSamples();
 
     if(dropZone && fileInput){
       dropZone.addEventListener('click', function(e){
@@ -1054,87 +1226,117 @@ function buildCarouselMarkup(images){
       el.addEventListener('input', handler);
       el.addEventListener('change', handler); // some mobile browsers only fire change
     };
-    bind(scaleInput, 'scale', v=>parseFloat(v)/100);
-    bind(rotInput,   'rot',   v=>parseFloat(v));
-    bind(perspInput, 'persp', v=>parseFloat(v)/100);
     bind(opacInput,  'opacity', v=>parseFloat(v)/100);
+    bind(blendInput, 'blend',   v=>parseFloat(v)/100);
+    bind(compareInput, 'compare', v=>parseFloat(v)/100);
 
     /* ---- Direct manipulation on the canvas ----
-       One finger  : drag to reposition
-       Two fingers : pinch to resize, twist to rotate, and a vertical two-finger
-                     drag adjusts the floor angle
-       Wheel       : resize on desktop
-       The sliders stay in sync so the two ways of working never disagree. */
+       Drag a corner handle : reshape the rug to match the floor
+       Drag inside the rug  : slide the whole rug around
+       Two fingers / wheel  : resize, and twist to rotate
+       Corner dragging is the point of the rewrite — the old "floor angle"
+       slider asked the user to guess a number; now they just pull the
+       corners onto the floor they can see. */
     const pointers = new Map();
-    let gesture = null;          // snapshot taken when the 2nd finger lands
-    let dragging = false;
+    let gesture = null;
+    let dragCorner = -1;
+    let dragAll = false;
+    let dragFrom = null;
 
-    function localPoint(e){
+    function canvasPoint(e){
       const r = canvas.getBoundingClientRect();
       if(!r.width || !r.height) return null;
-      return { x:(e.clientX - r.left) / r.width, y:(e.clientY - r.top) / r.height, r:r };
+      return { x:(e.clientX - r.left) / r.width * canvas.width,
+               y:(e.clientY - r.top)  / r.height * canvas.height };
     }
 
-    function syncSliders(){
-      if(scaleInput) scaleInput.value = Math.round(view.scale * 100);
-      if(rotInput)   rotInput.value   = Math.round(view.rot);
-      if(perspInput) perspInput.value = Math.round(view.persp * 100);
+    function handleRadius(){
+      // handles must stay comfortably tappable regardless of canvas scale
+      const r = canvas.getBoundingClientRect();
+      const cssToCanvas = r.width ? canvas.width / r.width : 1;
+      return Math.max(14, 22 * cssToCanvas);
     }
 
-    function twoFingerState(){
-      const pts = Array.from(pointers.values());
-      const a = pts[0], b = pts[1];
-      const dx = b.x - a.x, dy = b.y - a.y;
-      return {
-        dist: Math.hypot(dx, dy),
-        angle: Math.atan2(dy, dx) * 180 / Math.PI,
-        midY: (a.y + b.y) / 2
-      };
+    function ensureCorners(){
+      if(view.corners || !view.rug) return;
+      const W = canvas.width, H = canvas.height;
+      const ratio = (view.rug.naturalHeight || 1) / (view.rug.naturalWidth || 1);
+      const w = W * view.scale;
+      view.corners = RW.defaultCorners(W*0.5, H*0.68, w, w*ratio*0.75);
+    }
+
+    function commitCorners(next){
+      if(!RW.isConvex(next)) return;                   // refuse a bow-tie
+      view.corners = RW.clampCornersToCanvas(next, canvas.width, canvas.height, 60);
+      draw();
     }
 
     canvas.addEventListener('pointerdown', function(e){
       if(!view.rug || !view.room) return;
       canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
-      pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
-
+      pointers.set(e.pointerId, e);
+      const p = canvasPoint(e); if(!p) return;
+      ensureCorners();
       if(pointers.size === 1){
-        dragging = true;
-        const p = localPoint(e);
-        if(p){ view.x = Math.min(1, Math.max(0, p.x)); view.y = Math.min(1, Math.max(0, p.y)); draw(); }
-      } else if(pointers.size === 2){
-        dragging = false;                     // hand over to the pinch/rotate gesture
-        const st = twoFingerState();
-        gesture = { dist:st.dist, angle:st.angle, midY:st.midY,
-                    scale:view.scale, rot:view.rot, persp:view.persp };
+        dragCorner = RW.hitCorner(view.corners, p.x, p.y, handleRadius());
+        dragAll = dragCorner === -1 && RW.pointInQuad(view.corners, p.x, p.y);
+        dragFrom = p;
+        view.showHandles = true;
+      }else if(pointers.size === 2){
+        dragCorner = -1; dragAll = false;
+        gesture = twoFingerState();
       }
     });
 
     canvas.addEventListener('pointermove', function(e){
       if(!pointers.has(e.pointerId)) return;
-      pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
-      e.preventDefault();
+      pointers.set(e.pointerId, e);
+      if(!view.rug || !view.corners) return;
+      const p = canvasPoint(e); if(!p) return;
 
       if(pointers.size >= 2 && gesture){
-        const st = twoFingerState();
-        if(gesture.dist > 0){
-          view.scale = Math.min(1.6, Math.max(0.10, gesture.scale * (st.dist / gesture.dist)));
-        }
-        let delta = st.angle - gesture.angle;
-        while(delta > 180) delta -= 360;
-        while(delta < -180) delta += 360;
-        view.rot = Math.max(-180, Math.min(180, gesture.rot + delta));
-        // two fingers sliding up/down together flattens or lifts the floor plane
-        const rect = canvas.getBoundingClientRect();
-        if(rect.height){
-          const dy = (st.midY - gesture.midY) / rect.height;
-          view.persp = Math.min(1, Math.max(0.12, gesture.persp + dy));
-        }
-        syncSliders();
-        draw();
-      } else if(dragging){
-        const p = localPoint(e);
-        if(p){ view.x = Math.min(1, Math.max(0, p.x)); view.y = Math.min(1, Math.max(0, p.y)); draw(); }
+        const now = twoFingerState();
+        if(!now) return;
+        const factor = now.dist / (gesture.dist || 1);
+        let next = RW.scaleCorners(gesture.corners, Math.min(3, Math.max(0.3, factor)));
+        next = RW.rotateCorners(next, now.angle - gesture.angle);
+        commitCorners(next);
+        return;
       }
+      e.preventDefault && e.preventDefault();
+      if(dragCorner > -1){
+        const next = view.corners.map((c,i)=> i===dragCorner ? { x:p.x, y:p.y } : c);
+        commitCorners(next);
+      }else if(dragAll && dragFrom){
+        const next = RW.translateCorners(view.corners, p.x - dragFrom.x, p.y - dragFrom.y);
+        dragFrom = p;
+        commitCorners(next);
+      }
+    });
+
+    function twoFingerState(){
+      const pts = Array.from(pointers.values());
+      const a = pts[0], b = pts[1];
+      if(!a || !b) return null;
+      const dx = b.clientX - a.clientX, dy = b.clientY - a.clientY;
+      return { dist: Math.hypot(dx, dy) || 1, angle: Math.atan2(dy, dx),
+               corners: view.corners.slice() };
+    }
+
+    function endPointer(e){
+      pointers.delete(e.pointerId);
+      if(pointers.size < 2) gesture = null;
+      if(pointers.size === 0){ dragCorner = -1; dragAll = false; dragFrom = null; }
+    }
+    canvas.addEventListener('pointerup', endPointer);
+    canvas.addEventListener('pointercancel', endPointer);
+    canvas.addEventListener('pointerleave', function(e){ if(pointers.has(e.pointerId)) endPointer(e); });
+
+    canvas.addEventListener('wheel', function(e){
+      if(!view.rug || !view.room) return;
+      e.preventDefault();
+      ensureCorners();
+      commitCorners(RW.scaleCorners(view.corners, e.deltaY > 0 ? 0.96 : 1.04));
     }, {passive:false});
 
     function endPointer(e){
@@ -1151,22 +1353,14 @@ function buildCarouselMarkup(images){
     canvas.addEventListener('pointercancel', endPointer);
     canvas.addEventListener('pointerleave', function(e){ if(pointers.has(e.pointerId)) endPointer(e); });
 
-    // wheel to resize, so desktop users aren't forced to the slider
-    canvas.addEventListener('wheel', function(e){
-      if(!view.rug || !view.room) return;
-      e.preventDefault();
-      view.scale = Math.min(1.6, Math.max(0.10, view.scale + (e.deltaY > 0 ? -0.03 : 0.03)));
-      syncSliders();
-      draw();
-    }, {passive:false});
-
     if(resetBtn){
       resetBtn.addEventListener('click', function(){
         Object.assign(view, DEFAULTS);
-        if(scaleInput) scaleInput.value = 55;
-        if(rotInput) rotInput.value = 0;
-        if(perspInput) perspInput.value = 55;
+        view.corners = null;            // rebuilt on the next draw
+        ensureCorners();
         if(opacInput) opacInput.value = 100;
+        if(blendInput) blendInput.value = 55;
+        if(compareInput) compareInput.value = 100;
         draw();
       });
     }

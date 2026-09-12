@@ -65,6 +65,10 @@
         <p>Shoot from standing height, with the floor filling the lower half of the frame. Nothing is uploaded — the photo stays on your device.</p>
         <input type="file" accept="image/*" capture="environment" data-role="room-file" style="display:none;">
       </div>
+      <div class="room-samples-wrap">
+        <p class="room-samples-label">Or try one of our rooms</p>
+        <div class="room-samples" data-role="room-samples"></div>
+      </div>
       <div class="room-canvas-wrap" data-role="room-stage" hidden>
         <canvas data-role="room-canvas" width="1000" height="700"></canvas>
       </div>
@@ -77,10 +81,10 @@
         <select data-role="room-rug"></select>
       </div>
       <div class="room-controls is-locked" data-role="room-controls">
-        <div class="room-field"><label>Size</label><input type="range" min="15" max="120" value="55" data-role="room-scale"></div>
-        <div class="room-field"><label>Rotation</label><input type="range" min="-45" max="45" value="0" data-role="room-rotate"></div>
-        <div class="room-field"><label>Floor angle</label><input type="range" min="12" max="100" value="55" data-role="room-perspective"></div>
+        <p class="room-hint">Drag the four corner dots onto your floor to match the perspective. Drag inside the rug to move it; pinch or scroll to resize.</p>
+        <div class="room-field"><label>Blend into floor</label><input type="range" min="0" max="100" value="55" data-role="room-blend"></div>
         <div class="room-field"><label>Opacity</label><input type="range" min="30" max="100" value="100" data-role="room-opacity"></div>
+        <div class="room-field"><label>Compare</label><input type="range" min="0" max="100" value="100" data-role="room-compare"></div>
         <div class="room-actions">
           <a class="btn btn-fill" data-role="room-download" href="#">Download Preview</a>
           <button type="button" class="btn btn-outline dark" data-role="room-change">Change Photo</button>
@@ -195,6 +199,10 @@
         <p>صوّر من مستوى الوقوف، بحيث تملأ الأرضية النصف السفلي من الإطار. لا تُرفع أي صورة — تبقى على جهازك.</p>
         <input type="file" accept="image/*" capture="environment" data-role="room-file" style="display:none;">
       </div>
+      <div class="room-samples-wrap">
+        <p class="room-samples-label">أو جرّب إحدى غرفنا</p>
+        <div class="room-samples" data-role="room-samples"></div>
+      </div>
       <div class="room-canvas-wrap" data-role="room-stage" hidden>
         <canvas data-role="room-canvas" width="1000" height="700"></canvas>
       </div>
@@ -207,10 +215,10 @@
         <select data-role="room-rug"></select>
       </div>
       <div class="room-controls is-locked" data-role="room-controls">
-        <div class="room-field"><label>المقاس</label><input type="range" min="15" max="120" value="55" data-role="room-scale"></div>
-        <div class="room-field"><label>الدوران</label><input type="range" min="-45" max="45" value="0" data-role="room-rotate"></div>
-        <div class="room-field"><label>زاوية الأرضية</label><input type="range" min="12" max="100" value="55" data-role="room-perspective"></div>
+        <p class="room-hint">اسحب النقاط الأربع على أرضيتك لمطابقة المنظور. اسحب داخل السجادة لتحريكها، أو استخدم الإصبعين أو عجلة الفأرة لتغيير الحجم.</p>
+        <div class="room-field"><label>الدمج مع الأرضية</label><input type="range" min="0" max="100" value="55" data-role="room-blend"></div>
         <div class="room-field"><label>الشفافية</label><input type="range" min="30" max="100" value="100" data-role="room-opacity"></div>
+        <div class="room-field"><label>قبل / بعد</label><input type="range" min="0" max="100" value="100" data-role="room-compare"></div>
         <div class="room-actions">
           <a class="btn btn-fill" data-role="room-download" href="#">تنزيل المعاينة</a>
           <button type="button" class="btn btn-outline dark" data-role="room-change">تغيير الصورة</button>
@@ -272,6 +280,7 @@
 </div>
 
 <script src="js/data.js"></script>
+<script src="js/room-warp.js"></script>
 <script src="js/script.js"></script>
 <script>
   Heritage.renderRoomVisualizer({

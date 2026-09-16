@@ -650,13 +650,22 @@ footer > *{position:relative;z-index:1;}
   animation:clientsScroll 36s linear infinite;
 }
 .clients-marquee:hover .clients-track{animation-play-state:paused;}
-/* second row scrolls the opposite way in LTR; in RTL the pair swaps as a whole
-   (same mirroring convention used everywhere else on the site), so the two
-   rows always move opposite each other regardless of language. */
-.clients-track.clients-track-reverse{animation-direction:reverse;}
-[dir="rtl"] .clients-track{animation-direction:reverse;}
-[dir="rtl"] .clients-track.clients-track-reverse{animation-direction:normal;}
+
+/* Direction handling.
+   In LTR the track's left edge sits at the container's left edge and the
+   overflow runs off to the RIGHT, so translating to -50% pulls unseen
+   content into view and lands exactly on the seam of the duplicated set.
+
+   In RTL a flex row lays out right-to-left: the track's RIGHT edge aligns
+   with the container and the overflow runs off to the LEFT. Translating to
+   -50% there pushes the content further away from the viewport instead of
+   into it, which empties the row — the bug that showed as one short row and
+   a large blank space. RTL therefore needs the mirrored keyframe. */
 @keyframes clientsScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@keyframes clientsScrollRtl{from{transform:translateX(0);}to{transform:translateX(50%);}}
+[dir="rtl"] .clients-track{animation-name:clientsScrollRtl;}
+/* the second row always runs opposite the first, in either language */
+.clients-track.clients-track-reverse{animation-direction:reverse;}
 .client-logo{
   flex-shrink:0;
   width:136px;height:136px;

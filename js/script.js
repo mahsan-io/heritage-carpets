@@ -2475,20 +2475,80 @@ function buildCarouselMarkup(images){
   /* ---------------- Collections / PLP page render (called once per language block) ---------------- */
   function renderCollectionsPage(config, root){
     root = root || document;
-    const PRODUCTS = config.products;
     const L = config.labels;
     const i18n = config.i18n;
-    const state = { category:new Set(), material:new Set(), color:new Set(), size:new Set(), room:new Set(), sort:'featured' };
+
+    /* ---------------- category structure ----------------
+       The raw data carries nine tags, which is far too many choices to put in
+       front of a shopper. They collapse into three that match how carpets are
+       actually bought — and, usefully, onto the group's own brands:
+
+         Handmade      -> persian, turkish, oriental   (Heritage Carpets)
+         Machine-Made  -> contemporary                 (Platinum Carpets)
+         Commercial    -> contract / hospitality       (Carpet Land)
+
+       The old tags aren't thrown away: they become a second row of "style"
+       chips that appears only once a primary category is chosen, so an
+       existing link like ?category=persian still lands exactly where it used
+       to — on Persian pieces — rather than 404-ing a bookmark.
+
+       Furniture and accessories are excluded outright: this page is the rug
+       catalogue, and Divano furniture lives on furniture.html and its own
+       store. */
+    const MAJORS = [
+      { key:'handmade',     tags:['handmade','persian','turkish','oriental'],
+        styles:['persian','turkish','oriental'] },
+      { key:'machine-made', tags:['machine-made','contemporary'],
+        styles:['contemporary'] },
+      { key:'commercial',   tags:['commercial'], styles:[] }
+    ];
+    const EXCLUDED = ['furniture','accessories'];
+
+    // this page only ever lists rugs and flooring
+    const PRODUCTS = config.products.filter(p =>
+      !(p.category || []).some(c => EXCLUDED.indexOf(c) > -1));
+
+    /* Two commercial carpet tiles are also tagged machine-made, so a naive
+       "does it carry the tag" test put them in both buckets and the three
+       counts summed to 18 against a 16-piece catalogue. Each product is
+       therefore assigned to exactly ONE major, resolved in priority order:
+       a contract carpet tile is shopped as Commercial first, whatever it is
+       made of. MAJORS order defines that priority. */
+    const MAJOR_PRIORITY = ['commercial', 'handmade', 'machine-made'];
+
+    function majorForProduct(p){
+      for(const key of MAJOR_PRIORITY){
+        const m = MAJORS.filter(x => x.key === key)[0];
+        if(m && p.category.some(c => m.tags.indexOf(c) > -1)) return m.key;
+      }
+      return null;
+    }
+
+    const majorOf = (key) => MAJORS.filter(m => m.tags.indexOf(key) > -1)[0] || null;
+
+    const state = { major:null, style:new Set(), material:new Set(), color:new Set(),
+                    size:new Set(), room:new Set(), sort:'featured' };
 
     const params = new URLSearchParams(window.location.search);
     const qCat = params.get('category');
-    if(qCat && L.category[qCat]) state.category.add(qCat);
+    if(qCat && EXCLUDED.indexOf(qCat) === -1){
+      const m = majorOf(qCat);
+      if(m){
+        state.major = m.key;
+        // a legacy style link (?category=persian) preselects that style too
+        if(m.styles.indexOf(qCat) > -1) state.style.add(qCat);
+      }
+    }
 
     function count(group, key){
       return PRODUCTS.filter(p=>{
-        if(group==='category') return p.category.includes(key);
+        if(group==='style' || group==='major') return p.category.includes(key);
         return p[group]===key;
       }).length;
+    }
+
+    function countMajor(m){
+      return PRODUCTS.filter(p => majorForProduct(p) === m.key).length;
     }
 
     function renderCheckGroup(role, labels, groupKey){
@@ -2498,6 +2558,31 @@ function buildCarouselMarkup(images){
         const checked = state[groupKey].has(key) ? 'checked' : '';
         return '<label class="filter-option"><input type="checkbox" data-group="'+groupKey+'" value="'+key+'" '+checked+'> '+labels[key]+' <span class="count">'+count(groupKey,key)+'</span></label>';
       }).join('');
+    }
+
+    /* primary category bar — the main navigation of the page now */
+    function renderMajorBar(){
+      const el = root.querySelector('[data-role="category-bar"]');
+      if(!el) return;
+      const all = '<button type="button" class="cat-pill'+(state.major===null?' active':'')+'" data-major="">'+
+                  (i18n.allPieces || 'All')+'<span class="cat-pill-count">'+PRODUCTS.length+'</span></button>';
+      el.innerHTML = all + MAJORS.map(m=>
+        '<button type="button" class="cat-pill'+(state.major===m.key?' active':'')+'" data-major="'+m.key+'">'+
+          (L.category[m.key] || m.key)+'<span class="cat-pill-count">'+countMajor(m)+'</span></button>'
+      ).join('');
+    }
+
+    /* style chips, shown only when the chosen category actually has styles */
+    function renderStyleBar(){
+      const el = root.querySelector('[data-role="style-bar"]');
+      if(!el) return;
+      const m = state.major ? majorOf(state.major) : null;
+      if(!m || !m.styles.length){ el.innerHTML = ''; el.hidden = true; return; }
+      el.hidden = false;
+      el.innerHTML = m.styles.map(s=>
+        '<button type="button" class="style-chip'+(state.style.has(s)?' active':'')+'" data-style="'+s+'">'+
+          (L.category[s] || s)+'</button>'
+      ).join('');
     }
 
     function renderColorSwatches(){
@@ -2510,7 +2595,8 @@ function buildCarouselMarkup(images){
     }
 
     function renderFilters(){
-      renderCheckGroup('filter-category', L.category, 'category');
+      renderMajorBar();
+      renderStyleBar();
       renderCheckGroup('filter-material', L.material, 'material');
       renderColorSwatches();
       renderCheckGroup('filter-size', L.size, 'size');
@@ -2518,7 +2604,12 @@ function buildCarouselMarkup(images){
     }
 
     function matches(p){
-      const catOk = state.category.size===0 || p.category.some(c=>state.category.has(c));
+      let catOk = true;
+      if(state.major){
+        catOk = majorForProduct(p) === state.major;
+        // a chosen style narrows within the category, it doesn't replace it
+        if(catOk && state.style.size) catOk = p.category.some(c => state.style.has(c));
+      }
       const matOk = state.material.size===0 || state.material.has(p.material);
       const colOk = state.color.size===0 || state.color.has(p.color);
       const sizeOk = state.size.size===0 || state.size.has(p.size);
@@ -2535,9 +2626,14 @@ function buildCarouselMarkup(images){
 
     function renderChips(){
       const chips = [];
-      ['category','material','color','size','room'].forEach(group=>{
+      if(state.major){
+        chips.push('<span class="chip" data-group="major" data-val="'+state.major+'">'+
+          (L.category[state.major]||state.major)+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
+      }
+      ['style','material','color','size','room'].forEach(group=>{
         state[group].forEach(val=>{
-          chips.push('<span class="chip" data-group="'+group+'" data-val="'+val+'">'+L[group][val]+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
+          const lbl = (group==='style' ? L.category[val] : L[group][val]) || val;
+          chips.push('<span class="chip" data-group="'+group+'" data-val="'+val+'">'+lbl+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
         });
       });
       const chipsEl = root.querySelector('[data-role="chips"]');
@@ -2589,6 +2685,28 @@ function buildCarouselMarkup(images){
 
     function refreshAll(){ renderFilters(); renderProducts(); }
 
+    const catBar = root.querySelector('[data-role="category-bar"]');
+    if(catBar){
+      catBar.addEventListener('click', function(e){
+        const b = e.target.closest('[data-major]');
+        if(!b) return;
+        const key = b.dataset.major || null;
+        if(state.major !== key) state.style.clear();   // styles belong to a category
+        state.major = key;
+        refreshAll();
+      });
+    }
+    const styleBar = root.querySelector('[data-role="style-bar"]');
+    if(styleBar){
+      styleBar.addEventListener('click', function(e){
+        const b = e.target.closest('[data-style]');
+        if(!b) return;
+        const v = b.dataset.style;
+        if(state.style.has(v)) state.style.delete(v); else state.style.add(v);
+        refreshAll();
+      });
+    }
+
     const filtersPanel = root.querySelector('[data-role="filters"]');
     if(filtersPanel){
       filtersPanel.addEventListener('change', function(e){
@@ -2615,14 +2733,16 @@ function buildCarouselMarkup(images){
         const btn = e.target.closest('button');
         if(!btn) return;
         const chip = btn.closest('.chip');
-        state[chip.dataset.group].delete(chip.dataset.val);
+        if(chip.dataset.group === 'major'){ state.major = null; state.style.clear(); }
+        else state[chip.dataset.group].delete(chip.dataset.val);
         refreshAll();
       });
     }
     const clearBtn = root.querySelector('[data-role="clear-filters"]');
     if(clearBtn){
       clearBtn.addEventListener('click', function(){
-        ['category','material','color','size','room'].forEach(g=>state[g].clear());
+        state.major = null;
+        ['style','material','color','size','room'].forEach(g=>state[g].clear());
         refreshAll();
       });
     }

@@ -2417,8 +2417,13 @@ function buildCarouselMarkup(images){
     const clientsTracks = root.querySelectorAll('[data-role^="clients-track"]');
     clientsTracks.forEach(clientsTrack=>{
       const CLIENTS_FOLDER = 'Assets/Clients/';
-      const CLIENTS_ATTEMPT_COUNT = 16;
-      const CLIENTS_EXTENSIONS = ['png', 'jpg'];
+      // Assets/Clients currently holds 1..22. Raise this when more are added;
+      // a number that doesn't exist simply removes itself, so overshooting is
+      // harmless while undershooting silently drops logos.
+      const CLIENTS_ATTEMPT_COUNT = 22;
+      // .jfif is included because two of the supplied files use it — without
+      // it those two always failed and were removed from the row.
+      const CLIENTS_EXTENSIONS = ['png', 'jpg', 'jfif'];
       const nums = [];
       for(let i=1;i<=CLIENTS_ATTEMPT_COUNT;i++){ nums.push(i); }
       const renderSet = () => nums.map(n=>
@@ -2434,9 +2439,34 @@ function buildCarouselMarkup(images){
           } else {
             const wrap = img.closest('.client-logo');
             if(wrap) wrap.remove();
+            ensureWideEnough();
           }
         });
       });
+
+      /* The loop works by translating exactly 50% of the track, which lands on
+         the seam of the duplicated set. That is only seamless while one set is
+         at least as wide as the visible strip — if enough logo files are
+         missing the row becomes short and a visible gap sweeps through. Keep
+         doubling until it is wide enough (bounded, so a folder with one logo
+         can't spin forever). */
+      let balancing = false;
+      function ensureWideEnough(){
+        if(balancing) return;
+        balancing = true;
+        requestAnimationFrame(()=>{
+          balancing = false;
+          const strip = clientsTrack.parentElement;
+          if(!strip || !clientsTrack.children.length) return;
+          const need = strip.clientWidth || 0;
+          let guard = 0;
+          while(clientsTrack.scrollWidth / 2 < need && guard++ < 4){
+            clientsTrack.innerHTML += clientsTrack.innerHTML;
+          }
+        });
+      }
+      ensureWideEnough();
+      window.addEventListener('resize', ensureWideEnough, { passive:true });
     });
 
     initCarousels(root);

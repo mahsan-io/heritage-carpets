@@ -2531,7 +2531,18 @@ function buildCarouselMarkup(images){
        two plain dropdowns because they genuinely narrow a search; material and
        room type were dropped — material's list was half furniture values that
        no longer exist here, and room type barely moved the result set. */
-    const state = { major:null, style:new Set(), color:'', size:'', sort:'featured' };
+    const state = { major:null, style:new Set(), color:'', size:'', sort:'featured', view:'large' };
+
+    /* Remember the layout the visitor picked. Someone who prefers the list
+       almost always prefers it on the next visit too, and re-picking it every
+       time is a small irritation that adds up. Wrapped because storage can be
+       unavailable (private mode, blocked cookies) and that must not break the
+       page. */
+    const VIEW_KEY = 'heritage.collections.view';
+    try{
+      const saved = localStorage.getItem(VIEW_KEY);
+      if(saved === 'large' || saved === 'medium' || saved === 'list') state.view = saved;
+    }catch(err){}
 
     const params = new URLSearchParams(window.location.search);
     const qCat = params.get('category');
@@ -2591,9 +2602,23 @@ function buildCarouselMarkup(images){
       }).join('');
     }
 
+    function applyView(){
+      const grid = root.querySelector('[data-role="product-grid"]');
+      if(grid){
+        grid.classList.remove('view-large','view-medium','view-list');
+        grid.classList.add('view-' + state.view);
+      }
+      root.querySelectorAll('[data-role="view-switch"] .view-btn').forEach(b=>{
+        const on = b.dataset.view === state.view;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+    }
+
     function renderFilters(){
       renderMajorBar();
       renderStyleBar();
+      applyView();
       fillSelect('filter-size-select',  L.size,  state.size);
       fillSelect('filter-color-select', L.color, state.color);
     }
@@ -2702,6 +2727,17 @@ function buildCarouselMarkup(images){
         const v = b.dataset.style;
         if(state.style.has(v)) state.style.delete(v); else state.style.add(v);
         refreshAll();
+      });
+    }
+
+    const viewSwitch = root.querySelector('[data-role="view-switch"]');
+    if(viewSwitch){
+      viewSwitch.addEventListener('click', function(e){
+        const b = e.target.closest('[data-view]');
+        if(!b || b.dataset.view === state.view) return;
+        state.view = b.dataset.view;
+        try{ localStorage.setItem(VIEW_KEY, state.view); }catch(err){}
+        applyView();
       });
     }
 

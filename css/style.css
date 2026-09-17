@@ -1496,3 +1496,26 @@ html[lang="ar"] *{letter-spacing:normal !important;}
   .category-bar{gap:8px;}
   .cat-pill{flex:1 1 calc(50% - 4px);justify-content:center;padding:12px 14px;font-size:14px;}
 }
+
+/* ============ COLLECTIONS — single-column toolbar layout ============
+   The left filter sidebar is gone; every control sits above the grid. With
+   16 rugs a persistent sidebar cost a third of the page width to filter a
+   set small enough to scan by eye, and it needed a separate drawer on
+   mobile — two layouts to maintain for one job. */
+.plp-layout{display:block;padding:56px 0 120px;}
+.plp-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  flex-wrap:wrap;padding:16px 0 18px;border-top:1px solid var(--line-light);
+  border-bottom:1px solid var(--line-light);margin-bottom:22px;}
+.plp-toolbar-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.plp-toolbar .sort-select{min-width:150px;}
+.plp-clear{font-size:12.5px;font-weight:600;color:var(--madder);padding:10px 16px;
+  border:1px solid var(--line-light);border-radius:var(--radius-pill);
+  background:transparent;transition:.25s var(--ease);}
+.plp-clear:hover{border-color:var(--brass);background:var(--parchment-2);}
+@media (max-width:640px){
+  .plp-toolbar{flex-direction:column;align-items:stretch;}
+  .plp-toolbar-controls{display:grid;grid-template-columns:1fr 1fr;}
+  .plp-toolbar .sort-select{min-width:0;width:100%;}
+  .plp-toolbar-controls .sort-select:last-of-type{grid-column:1 / -1;}
+  .plp-clear{grid-column:1 / -1;}
+}

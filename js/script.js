@@ -46,6 +46,22 @@ window.Heritage = (function(){
      depend on it — every caller sends the WhatsApp/email step regardless.
      'text/plain' keeps this a "simple" request and avoids a CORS preflight
      that Apps Script would reject. */
+  /* ---------------- phone validation ----------------
+     One rule, used by every form on the site: exactly 10 digits, nothing but
+     digits. Spaces and dashes a person types are ignored rather than
+     rejected, because "0552 144 855" is the same number and refusing it is
+     just pedantry. A phone number is now required everywhere — previously
+     the Projects form accepted an email instead, and Bespoke and the booking
+     page did not ask for one at all. */
+  const PHONE_DIGITS = 10;
+
+  function phoneDigits(v){
+    return String(v == null ? '' : v).replace(/[^0-9]/g, '');
+  }
+  function isValidPhone(v){
+    return phoneDigits(v).length === PHONE_DIGITS;
+  }
+
   const sheetSendHistory = {};
   function sendToSheet(url, payload){
     if(!url) return;
@@ -142,8 +158,31 @@ window.Heritage = (function(){
   function phoneFieldHTML(codeAttr, numberAttr, selectedCode, numberValue){
     return '<div class="phone-field">'+
       '<select class="phone-code" '+codeAttr+'>'+countryOptionsHTML(selectedCode)+'</select>'+
-      '<input type="tel" class="field-input phone-number" '+numberAttr+' value="'+(numberValue||'').replace(/"/g,'&quot;')+'" placeholder="5X XXX XXXX">'+
-    '</div>';
+      '<input type="tel" inputmode="numeric" required aria-required="true" maxlength="18" '+
+        'class="field-input phone-number" '+numberAttr+' value="'+(numberValue||'').replace(/"/g,'&quot;')+'" placeholder="05X XXX XXXX">'+
+    '</div>'+
+    '<p class="phone-hint" data-role="phone-hint" hidden></p>';
+  }
+
+  /* Shows the reason a submit button is disabled. A greyed-out button with no
+     explanation is the most common way a form quietly loses someone — they
+     assume it's broken rather than that a field is short. Only complains once
+     the visitor has actually typed something. */
+  function updatePhoneHint(inputEl, lang){
+    if(!inputEl) return;
+    const wrap = inputEl.closest('.phone-field');
+    const hint = wrap && wrap.parentElement
+      ? wrap.parentElement.querySelector('[data-role="phone-hint"]') : null;
+    const raw = inputEl.value || '';
+    const digits = phoneDigits(raw);
+    const bad = raw.trim().length > 0 && digits.length !== PHONE_DIGITS;
+    inputEl.classList.toggle('is-invalid', bad);
+    if(!hint) return;
+    if(!bad){ hint.hidden = true; return; }
+    hint.hidden = false;
+    hint.textContent = (lang === 'ar')
+      ? 'يجب أن يتكون رقم الجوال من 10 أرقام (أدخلت ' + digits.length + ').'
+      : 'Mobile number must be 10 digits (you have entered ' + digits.length + ').';
   }
 
   function motifSVG(type, color){
@@ -788,7 +827,7 @@ function buildCarouselMarkup(images){
       summaryEl.innerHTML = rows.map(r=>
         '<div class="preview-summary-row summary-light"><span>'+r[0]+'</span><span>'+r[1]+'</span></div>'
       ).join('');
-      const ready = !!(state.showroom && state.date && state.slot && state.name.trim());
+      const ready = !!(state.showroom && state.date && state.slot && state.name.trim() && isValidPhone(state.phone));
       if(confirmBtn) confirmBtn.classList.toggle('is-disabled', !ready);
       if(emailBtn) emailBtn.classList.toggle('is-disabled', !ready);
       if(ready){
@@ -833,7 +872,11 @@ function buildCarouselMarkup(images){
     });
     ['name','phone','notes'].forEach(f=>{
       const el = root.querySelector('[data-role="book-'+f+'"]');
-      if(el) el.addEventListener('input', function(){ state[f] = el.value; renderSummary(); });
+      if(el) el.addEventListener('input', function(){
+        state[f] = el.value;
+        if(f === 'phone') updatePhoneHint(el, root.getAttribute('data-lang') || 'en');
+        renderSummary();
+      });
     });
     if(phoneCodeEl) phoneCodeEl.addEventListener('change', function(){ state.phoneCode = phoneCodeEl.value; renderSummary(); });
     // ---- record the booking to its Google Sheet (see sendToSheet above) ----
@@ -1661,7 +1704,8 @@ function buildCarouselMarkup(images){
       const note  = form.querySelector('[data-role="pv-form-note"]');
 
       function refresh(){
-        const ready = !!(val('name') && (val('email') || val('phone')));
+        updatePhoneHint(form.querySelector('[data-f="phone"]'), lang);
+        const ready = !!(val('name') && isValidPhone(val('phone')));
         [waBtn, emBtn].forEach(b=>{ if(b) b.classList.toggle('is-disabled', !ready); });
         note.textContent = ready ? F.note : F.required;
         if(!ready){
@@ -2986,6 +3030,7 @@ function buildCarouselMarkup(images){
         const el = stepContainer.querySelector('#'+uid(base));
         if(el) el.addEventListener('input', function(){
           state[base.replace('Input','')] = el.value;
+          if(base === 'phoneInput') updatePhoneHint(el, root.getAttribute('data-lang') || 'en');
           updateSendState();
         });
       });
@@ -3044,7 +3089,7 @@ function buildCarouselMarkup(images){
       const sendBtn = stepContainer.querySelector('#'+uid('sendBtn'));
       if(!sendBtn) return;
       const validEmail = /\S+@\S+\.\S+/.test(state.email);
-      sendBtn.disabled = !(state.name.trim() && validEmail);
+      sendBtn.disabled = !(state.name.trim() && validEmail && isValidPhone(state.phone));
     }
 
     function updateContinueState(){
@@ -3149,5 +3194,5 @@ function buildCarouselMarkup(images){
 
   document.addEventListener('DOMContentLoaded', initCommon);
 
-  return { SHOPIFY_STORE, sendToSheet, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderBrandsPage, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
+  return { SHOPIFY_STORE, sendToSheet, isValidPhone, phoneDigits, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderBrandsPage, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
 })();

@@ -1792,3 +1792,9 @@ body[data-page="home"] .hero + .section{padding-top:56px;}
   .hc-log{padding:12px 14px;}
   .hc-disclaimer{display:none;}
 }
+
+/* ============ PHONE VALIDATION FEEDBACK ============ */
+.phone-hint{margin-top:6px;font-size:11.5px;line-height:1.5;color:#B4462F;}
+.phone-hint[hidden]{display:none;}
+.field-input.phone-number.is-invalid{border-color:#B4462F;}
+.field-input.phone-number.is-invalid:focus{outline-color:#B4462F;}

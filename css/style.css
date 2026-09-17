@@ -1741,3 +1741,87 @@ body[data-page="home"] .clients-section{padding-bottom:44px;}
 /* the hero already fills the viewport — the first section under it does not
    need a full measure of padding on top as well */
 body[data-page="home"] .hero + .section{padding-top:56px;}
+
+/* ============ HERITAGE ASSISTANT (chat widget) ============
+   Sits where the WhatsApp float used to; WhatsApp is now reached from inside
+   the panel, carrying the conversation with it. */
+.hc-chat{position:fixed;inset-inline-end:22px;bottom:22px;z-index:1100;
+  display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
+.hc-bubble{position:relative;width:56px;height:56px;border-radius:50%;
+  background:var(--brass);color:var(--ink);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(20,18,14,0.28);transition:.3s var(--ease);order:2;}
+.hc-bubble:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(20,18,14,0.34);}
+.hc-bubble-dot{position:absolute;top:2px;inset-inline-end:2px;width:11px;height:11px;
+  border-radius:50%;background:#3BBF6B;border:2px solid var(--brass);}
+.hc-chat.is-open .hc-bubble-dot{display:none;}
+
+/* Height budget: 90px is consumed below the panel (bubble 56 + gap 12 +
+   bottom offset 22) and the fixed nav occupies ~76px at the top, so the
+   panel can never exceed 100vh - 182px without running under the header.
+   The nav is z-index:1000 and would slice across it. */
+.hc-panel{order:1;width:min(370px,calc(100vw - 32px));max-height:min(560px,calc(100vh - 182px));
+  display:flex;flex-direction:column;background:var(--parchment-2);
+  border:1px solid var(--line-light);border-radius:16px;overflow:hidden;
+  box-shadow:0 24px 60px rgba(20,18,14,0.28);}
+.hc-panel[hidden]{display:none;}
+
+.hc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:16px 18px;background:var(--ink);color:var(--cream-text);}
+.hc-head-text{display:flex;flex-direction:column;line-height:1.3;}
+.hc-head-text strong{font-family:var(--font-display);font-size:16px;}
+.hc-head-text span{font-size:11.5px;opacity:0.65;margin-top:2px;}
+.hc-close{color:var(--cream-text);opacity:0.7;font-size:15px;padding:4px;transition:.2s;}
+.hc-close:hover{opacity:1;}
+
+.hc-log{flex:1 1 auto;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;}
+.hc-msg{display:flex;}
+.hc-msg-bot{justify-content:flex-start;}
+.hc-msg-user{justify-content:flex-end;}
+.hc-bubble-msg{max-width:84%;padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.65;}
+.hc-msg-bot .hc-bubble-msg{background:var(--parchment);border:1px solid var(--line-light);
+  border-start-start-radius:4px;}
+.hc-msg-user .hc-bubble-msg{background:var(--ink);color:var(--cream-text);border-start-end-radius:4px;}
+.hc-bubble-msg a{color:var(--madder);font-weight:600;text-decoration:underline;text-underline-offset:2px;}
+.hc-msg-user .hc-bubble-msg a{color:var(--brass-light);}
+.hc-bubble-msg b{font-weight:700;}
+
+.hc-typing{display:flex;gap:4px;align-items:center;padding:14px;}
+.hc-typing span{width:6px;height:6px;border-radius:50%;background:var(--ink-text);opacity:0.35;
+  animation:hcTyping 1.1s infinite;}
+.hc-typing span:nth-child(2){animation-delay:.15s;}
+.hc-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes hcTyping{0%,60%,100%{transform:translateY(0);opacity:0.3;}30%{transform:translateY(-4px);opacity:0.8;}}
+
+.hc-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 12px;}
+.hc-chip{font-size:11.5px;font-weight:600;padding:7px 12px;border-radius:var(--radius-pill);
+  border:1px solid var(--line-light);background:transparent;color:var(--ink-text);transition:.25s;}
+.hc-chip:hover{border-color:var(--brass);background:var(--parchment);}
+.hc-chip-human{border-color:rgba(59,191,107,0.5);color:#2E8B57;}
+
+.hc-form{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line-light);}
+.hc-input{flex:1 1 auto;min-width:0;border:1px solid var(--line-light);border-radius:var(--radius-pill);
+  padding:11px 16px;font-size:13.5px;font-family:inherit;color:var(--ink-text);background:var(--parchment);}
+.hc-input:focus{outline:none;border-color:var(--brass);}
+.hc-send{flex:0 0 auto;width:40px;height:40px;border-radius:50%;background:var(--brass);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;transition:.25s;}
+.hc-send:hover{transform:scale(1.05);}
+[dir="rtl"] .hc-send svg{transform:scaleX(-1);}
+
+.hc-human{display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px;background:#25D366;color:#fff;font-size:13px;font-weight:600;transition:.25s;}
+.hc-human:hover{background:#1FB457;}
+.hc-disclaimer{font-size:10.5px;text-align:center;opacity:0.55;padding:8px 14px 10px;line-height:1.5;}
+
+@media (max-width:520px){
+  .hc-chat{inset-inline-end:14px;bottom:14px;}
+  /* phone: bubble 52 + gap 12 + bottom 14 = 78 below, nav ~70 above */
+  .hc-panel{max-height:calc(100vh - 160px);}
+  .hc-bubble{width:52px;height:52px;}
+}
+/* very short windows (a laptop with devtools open, landscape phone): keep the
+   panel usable rather than letting it collapse to a sliver */
+@media (max-height:620px){
+  .hc-panel{max-height:calc(100vh - 150px);}
+  .hc-log{padding:12px 14px;}
+  .hc-disclaimer{display:none;}
+}

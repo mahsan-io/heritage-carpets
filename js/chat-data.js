@@ -193,7 +193,7 @@ window.HeritageChat = (function(){
       apptTime:'And what time?',
       apptName:'What name should I put it under?',
       apptPhone:'And a phone number, so the showroom can confirm with you?',
-      apptPhoneInvalid:'The mobile number needs to be 10 digits. For example 0552144855.',
+      apptPhoneInvalid:'The mobile number needs to be 9 or 10 digits. For example 552144855 or 0552144855.',
       apptSummary:'Thank you, {name}. Here is your request:<br><br>'+
         '<b>Brand:</b> {brand}<br><b>Showroom:</b> {room}<br>'+
         '<b>Date:</b> {day}<br><b>Time:</b> {time}<br><b>Phone:</b> {phone}<br><br>'+
@@ -220,7 +220,7 @@ window.HeritageChat = (function(){
       apptTime:'وفي أي وقت؟',
       apptName:'باسم من أسجل الموعد؟',
       apptPhone:'ورقم الهاتف، ليتمكن فريق صالة العرض من تأكيد الموعد معك؟',
-      apptPhoneInvalid:'يجب أن يتكون رقم الجوال من 10 أرقام. مثال: 0552144855.',
+      apptPhoneInvalid:'يجب أن يتكون رقم الجوال من 9 أو 10 أرقام. مثال: 552144855 أو 0552144855.',
       apptSummary:'شكرًا لك، {name}. هذا طلبك:<br><br>'+
         '<b>العلامة:</b> {brand}<br><b>صالة العرض:</b> {room}<br>'+
         '<b>التاريخ:</b> {day}<br><b>الوقت:</b> {time}<br><b>الهاتف:</b> {phone}<br><br>'+

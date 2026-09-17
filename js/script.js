@@ -53,13 +53,19 @@ window.Heritage = (function(){
      just pedantry. A phone number is now required everywhere — previously
      the Projects form accepted an email instead, and Bespoke and the booking
      page did not ask for one at all. */
-  const PHONE_DIGITS = 10;
+  /* 9 or 10 digits, because both forms are legitimate alongside the +966
+     country code already selected in the field:
+        552144855   — 9 digits, the national number
+        0552144855  — 10 digits, the same number with its leading zero
+     Accepting only one of them would reject a correctly written number from
+     roughly half the people who type it. */
+  const PHONE_LENGTHS = [9, 10];
 
   function phoneDigits(v){
     return String(v == null ? '' : v).replace(/[^0-9]/g, '');
   }
   function isValidPhone(v){
-    return phoneDigits(v).length === PHONE_DIGITS;
+    return PHONE_LENGTHS.indexOf(phoneDigits(v).length) > -1;
   }
 
   const sheetSendHistory = {};
@@ -175,14 +181,14 @@ window.Heritage = (function(){
       ? wrap.parentElement.querySelector('[data-role="phone-hint"]') : null;
     const raw = inputEl.value || '';
     const digits = phoneDigits(raw);
-    const bad = raw.trim().length > 0 && digits.length !== PHONE_DIGITS;
+    const bad = raw.trim().length > 0 && !isValidPhone(raw);
     inputEl.classList.toggle('is-invalid', bad);
     if(!hint) return;
     if(!bad){ hint.hidden = true; return; }
     hint.hidden = false;
     hint.textContent = (lang === 'ar')
-      ? 'يجب أن يتكون رقم الجوال من 10 أرقام (أدخلت ' + digits.length + ').'
-      : 'Mobile number must be 10 digits (you have entered ' + digits.length + ').';
+      ? 'يجب أن يتكون رقم الجوال من 9 أو 10 أرقام (أدخلت ' + digits.length + ').'
+      : 'Mobile number must be 9 or 10 digits (you have entered ' + digits.length + ').';
   }
 
   function motifSVG(type, color){
@@ -3194,5 +3200,5 @@ function buildCarouselMarkup(images){
 
   document.addEventListener('DOMContentLoaded', initCommon);
 
-  return { SHOPIFY_STORE, sendToSheet, isValidPhone, phoneDigits, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderBrandsPage, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
+  return { SHOPIFY_STORE, sendToSheet, isValidPhone, phoneDigits, PHONE_LENGTHS, motifSVG, renderHomePage, renderCollectionsPage, renderBespokeStudio, renderProductPage, renderProjectsPage, renderContentPage, renderBrandsPage, renderLocationsPage, renderOffersPage, renderBookingPage, renderRoomVisualizer, setLanguage, resolveImages, buildCarouselMarkup, initCarousels };
 })();

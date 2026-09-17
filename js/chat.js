@@ -205,10 +205,11 @@
      person, not dialled by a machine — so the bar is "does this contain
      enough digits to be a phone number". */
   function looksLikePhone(v){
-    // same rule as every form on the site — exactly 10 digits
+    // same rule as every form on the site — 9 or 10 digits
     const ok = window.Heritage && window.Heritage.isValidPhone;
     if(ok) return ok(v);
-    return String(v).replace(/[^0-9]/g, '').length === 10;
+    const n = String(v).replace(/[^0-9]/g, '').length;
+    return n === 9 || n === 10;
   }
 
   function apptName(name){

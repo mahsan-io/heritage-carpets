@@ -183,16 +183,20 @@ window.HeritageChat = (function(){
       fallback:'I am not certain about that one. A colleague can answer it properly — shall I pass this conversation to WhatsApp?',
       handoffNote:'Opening WhatsApp with your conversation attached…',
       botLabel:'Assistant', youLabel:'You',
-      transcriptHeader:'— Conversation from the website —',
+      summaryHeader:'— Enquiry from the website —',
+      sumBrand:'Brand', sumRoom:'Showroom', sumDate:'Date', sumTime:'Time',
+      sumName:'Name', sumPhone:'Phone', sumAsked:'Asked about',
       disclaimer:'Automated replies. For anything specific, talk to a person.',
       apptBrand:'Of course. Which brand would you like to visit?',
       apptRoom:'Which showroom suits you?',
       apptDay:'Which day works for you?',
       apptTime:'And what time?',
-      apptName:'Last thing — what name should I put it under?',
+      apptName:'What name should I put it under?',
+      apptPhone:'And a phone number, so the showroom can confirm with you?',
+      apptPhoneInvalid:'That does not look like a phone number — could you check it? For example 0552144855 or +966 55 214 4855.',
       apptSummary:'Thank you, {name}. Here is your request:<br><br>'+
         '<b>Brand:</b> {brand}<br><b>Showroom:</b> {room}<br>'+
-        '<b>Date:</b> {day}<br><b>Time:</b> {time}<br><br>'+
+        '<b>Date:</b> {day}<br><b>Time:</b> {time}<br><b>Phone:</b> {phone}<br><br>'+
         'This is not confirmed yet — send it to our team on WhatsApp below and '+
         'they will confirm the slot with you.',
       apptUnavailable:'I can take you to the booking page for that.<br><br>'+
@@ -206,16 +210,20 @@ window.HeritageChat = (function(){
       fallback:'لست متأكدًا من هذه. يمكن لأحد زملائي الإجابة بدقة — هل أنقل المحادثة إلى واتساب؟',
       handoffNote:'جارٍ فتح واتساب مع نص المحادثة…',
       botLabel:'المساعد', youLabel:'أنت',
-      transcriptHeader:'— محادثة من الموقع —',
+      summaryHeader:'— طلب من الموقع —',
+      sumBrand:'العلامة', sumRoom:'صالة العرض', sumDate:'التاريخ', sumTime:'الوقت',
+      sumName:'الاسم', sumPhone:'الهاتف', sumAsked:'استفسر عن',
       disclaimer:'ردود آلية. للاستفسارات الخاصة، تحدث مع أحد موظفينا.',
       apptBrand:'بكل سرور. أي علامة ترغب بزيارتها؟',
       apptRoom:'أي صالة عرض تناسبك؟',
       apptDay:'أي يوم يناسبك؟',
       apptTime:'وفي أي وقت؟',
-      apptName:'أخيرًا — باسم من أسجل الموعد؟',
+      apptName:'باسم من أسجل الموعد؟',
+      apptPhone:'ورقم الهاتف، ليتمكن فريق صالة العرض من تأكيد الموعد معك؟',
+      apptPhoneInvalid:'لا يبدو هذا رقم هاتف — هل يمكنك التحقق منه؟ مثال: 0552144855 أو +966 55 214 4855.',
       apptSummary:'شكرًا لك، {name}. هذا طلبك:<br><br>'+
         '<b>العلامة:</b> {brand}<br><b>صالة العرض:</b> {room}<br>'+
-        '<b>التاريخ:</b> {day}<br><b>الوقت:</b> {time}<br><br>'+
+        '<b>التاريخ:</b> {day}<br><b>الوقت:</b> {time}<br><b>الهاتف:</b> {phone}<br><br>'+
         'لم يتم التأكيد بعد — أرسل الطلب إلى فريقنا عبر واتساب أدناه وسيؤكدون لك الموعد.',
       apptUnavailable:'يمكنني نقلك إلى صفحة الحجز.<br><br>'+
         '<a href="visit.html">احجز زيارة ←</a>'

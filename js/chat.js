@@ -130,7 +130,7 @@
      nothing is stored, and no appointment is confirmed by the assistant
      itself, which would be a promise the site can't keep. */
   const V = window.HeritageVisitConfig ? window.HeritageVisitConfig[lang] : null;
-  const appt = { active:false, step:0, brand:null, brandLabel:'', room:null, roomLabel:'', day:'', time:'', name:'' };
+  const appt = { active:false, step:0, brand:null, brandLabel:'', room:null, roomLabel:'', day:'', time:'', name:'', phone:'', done:false };
 
   const APPT_TIMES = ['11:00','13:00','17:00','19:00'];
 
@@ -140,7 +140,8 @@
       return;
     }
     appt.active = true; appt.step = 1;
-    appt.brand = appt.room = null; appt.day = appt.time = appt.name = '';
+    appt.brand = appt.room = null; appt.day = appt.time = appt.name = appt.phone = '';
+    appt.done = false;
     botReply(T.apptBrand, null);
     setTimeout(()=> renderApptOptions(
       V.brandOrder.map(k=>({ value:k, label:V.showroomsByBrand[k].label }))
@@ -199,22 +200,72 @@
     }
   }
 
-  function apptFinish(name){
+  /* Light validation only. A stricter rule would reject legitimate formats
+     (with or without +966, spaces, a leading 0) and the number is read by a
+     person, not dialled by a machine — so the bar is "does this contain
+     enough digits to be a phone number". */
+  function looksLikePhone(v){
+    const digits = String(v).replace(/[^0-9]/g, '');
+    return digits.length >= 8 && digits.length <= 15;
+  }
+
+  function apptName(name){
     appt.name = name;
+    appt.step = 6;
+    botReply(T.apptPhone, null);
+    setTimeout(()=> input.focus(), 460);
+  }
+
+  function apptFinish(phone){
+    if(!looksLikePhone(phone)){
+      botReply(T.apptPhoneInvalid, null);
+      return;                       // stay on step 6 and let them try again
+    }
+    appt.phone = phone.trim();
     appt.active = false;
+    appt.done = true;
+
+    recordAppointment();
+
     const summary = T.apptSummary
       .replace('{brand}', appt.brandLabel)
       .replace('{room}', appt.roomLabel)
       .replace('{day}', appt.day)
       .replace('{time}', appt.time)
-      .replace('{name}', name);
+      .replace('{name}', appt.name)
+      .replace('{phone}', appt.phone);
     botReply(summary, ['human']);
-    // the handoff link picks this up automatically from the transcript
+  }
+
+  /* Written to the same Google Sheet as the booking page, through the same
+     helper, so a request started in the chat lands in the same place as one
+     made on visit.html. `source` marks where it came from — otherwise the two
+     are indistinguishable in the sheet and you cannot tell whether the chat is
+     earning its place. */
+  function recordAppointment(){
+    const send = window.Heritage && window.Heritage.sendToSheet;
+    const url = V && V.webhookUrl;
+    if(!send || !url) return;
+    send(url, {
+      form:'visit',
+      source:'chat',
+      brand: appt.brandLabel,
+      showroom: appt.roomLabel,
+      showroomKey: appt.room || '',
+      date: appt.day,
+      time: appt.time,
+      name: appt.name,
+      phone: appt.phone,
+      notes:'',
+      language: lang,
+      submittedAt: new Date().toISOString()
+    });
   }
 
   function handleUserText(text){
     addMessage('user', escapeHtml(text));
-    if(appt.active && appt.step === 5){ apptFinish(text); return; }
+    if(appt.active && appt.step === 5){ apptName(text); return; }
+    if(appt.active && appt.step === 6){ apptFinish(text); return; }
     const intent = C.match(text, lang);
     if(intent){
       if(intent.id === 'booking'){ apptStart(); return; }
@@ -237,34 +288,37 @@
      a long conversation would otherwise produce a link some clients refuse to
      open. The most recent messages are the ones that matter to whoever picks
      it up. */
-  const MAX_TRANSCRIPT_CHARS = 1200;
+  /* WhatsApp receives a SUMMARY, not the full log. A wall of transcript is
+     slow to read on a phone and mostly repeats answers that came from this
+     site anyway — what the colleague needs is who it is, what they want, and
+     the booking details if there are any. Keeps the link short too. */
+  function buildSummary(){
+    const L = [];
+    L.push(T.summaryHeader);
 
-  function buildTranscript(){
-    const lines = [];
-    for(let i = history.length - 1; i >= 0; i--){
-      const h = history[i];
-      const line = (h.who === 'user' ? T.youLabel : T.botLabel) + ': ' + h.text;
-      const next = line + '\n' + lines.join('\n');
-      if(next.length > MAX_TRANSCRIPT_CHARS) break;
-      lines.unshift(line);
+    if(appt.done){
+      L.push('');
+      L.push(T.sumBrand + ': ' + appt.brandLabel);
+      L.push(T.sumRoom  + ': ' + appt.roomLabel);
+      L.push(T.sumDate  + ': ' + appt.day);
+      L.push(T.sumTime  + ': ' + appt.time);
+      L.push(T.sumName  + ': ' + appt.name);
+      L.push(T.sumPhone + ': ' + appt.phone);
+      return L.join('\n');
     }
-    /* Bot answers are long and the customer's questions are short, so a
-       trimmed transcript could end up as nothing but our own replies —
-       useless to the colleague picking it up, who needs to know what was
-       actually asked. Make sure at least the latest question survives. */
-    if(!lines.some(l => l.indexOf(T.youLabel + ':') === 0)){
-      for(let i = history.length - 1; i >= 0; i--){
-        if(history[i].who === 'user'){
-          lines.unshift(T.youLabel + ': ' + history[i].text);
-          break;
-        }
-      }
+
+    // no booking: send what they actually asked, most recent first
+    const asked = history.filter(h => h.who === 'user').slice(-3);
+    if(asked.length){
+      L.push('');
+      L.push(T.sumAsked + ':');
+      asked.forEach(a => L.push('• ' + a.text));
     }
-    return T.transcriptHeader + '\n' + lines.join('\n');
+    return L.join('\n');
   }
 
   function updateHandoff(){
-    const url = 'https://wa.me/' + C.WHATSAPP + '?text=' + encodeURIComponent(buildTranscript());
+    const url = 'https://wa.me/' + C.WHATSAPP + '?text=' + encodeURIComponent(buildSummary());
     humanBtn.setAttribute('href', url);
   }
 
@@ -329,7 +383,7 @@
   // expose for testing and for a future model integration
   window.HeritageChatWidget = {
     open: openChat, close: closeChat, history: history,
-    ask: handleUserText, transcript: buildTranscript,
+    ask: handleUserText, summary: buildSummary,
     startAppointment: apptStart, appointment: appt
   };
 })();

@@ -1575,3 +1575,69 @@ html[lang="ar"] *{letter-spacing:normal !important;}
   .view-list .product-actions .btn-outline{display:none;}
   .view-switch{order:-1;}
 }
+
+/* ============ HOMEPAGE — tighter rhythm & redesigned sections ============
+   Scoped to body[data-page="home"] so every other page keeps its original
+   spacing. The homepage stacks twelve sections, and at 120px top and bottom
+   each that added up to a page that felt mostly empty between content. */
+body[data-page="home"] .section{padding:76px 0;}
+body[data-page="home"] .section.on-dark + .section.on-dark{padding-top:0;}
+body[data-page="home"] .section-head{margin-bottom:0;}
+
+/* Header row: heading on one side, its call-to-action on the other.
+   Previously each section ended with a centred link sitting on a 48px margin,
+   which is what created the large blank bands. Moving it up into the header
+   removes the dead space and gives the eye somewhere to go immediately. */
+.home-head{display:flex;align-items:flex-end;justify-content:space-between;
+  gap:32px;flex-wrap:wrap;margin-bottom:34px;}
+.home-head .section-head{margin-bottom:0;flex:1 1 420px;}
+.home-head-cta{flex:0 0 auto;white-space:nowrap;}
+
+/* trailing links that remain elsewhere on the page */
+.home-more{margin-top:28px;text-align:center;}
+.home-testi-slides{margin-top:28px;}
+.home-marquee-2{margin-top:16px;}
+
+/* --- Featured collections: real cards instead of hairline-separated tiles --- */
+body[data-page="home"] .collections-grid{
+  grid-template-columns:repeat(4,1fr);gap:16px;background:transparent;}
+body[data-page="home"] .collection-card{
+  aspect-ratio:4/5;border-radius:var(--radius-md);overflow:hidden;
+  box-shadow:0 4px 18px rgba(20,18,14,0.10);
+  transition:transform .4s var(--ease),box-shadow .4s var(--ease);}
+body[data-page="home"] .collection-card:hover{
+  transform:translateY(-6px);box-shadow:0 20px 44px rgba(20,18,14,0.20);}
+
+/* --- Bespoke journey: a readable grid of steps, not a cramped single row --- */
+body[data-page="home"] .journey{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;background:transparent;}
+body[data-page="home"] .journey-step{
+  border-radius:var(--radius-md);padding:26px 24px;min-width:0;
+  border:1px solid rgba(255,255,255,0.10);
+  transition:background .35s var(--ease),transform .35s var(--ease),border-color .35s var(--ease);}
+body[data-page="home"] .journey-step:hover{transform:translateY(-4px);border-color:rgba(183,204,51,0.5);}
+body[data-page="home"] .journey-step.active{border-color:var(--brass);}
+
+@media (max-width:1100px){
+  body[data-page="home"] .collections-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media (max-width:860px){
+  body[data-page="home"] .section{padding:56px 0;}
+  body[data-page="home"] .collections-grid{grid-template-columns:repeat(2,1fr);}
+  body[data-page="home"] .journey{grid-template-columns:repeat(2,1fr);}
+  .home-head{margin-bottom:26px;}
+  .home-head-cta{width:100%;}
+}
+@media (max-width:560px){
+  body[data-page="home"] .collections-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+  body[data-page="home"] .journey{grid-template-columns:1fr;}
+  body[data-page="home"] .collection-card{padding:18px;}
+}
+
+/* In a grid, row height follows the tallest card — so with the accordion
+   behaviour an expanded step left its neighbours padded with blank space.
+   On the homepage the descriptions are short, so showing them all removes
+   both the empty space and the need to click to read anything. `.active`
+   stays as a highlight for the step being hovered or tapped. */
+body[data-page="home"] .journey-step .jdesc{opacity:0.8;max-height:none;margin-top:10px;}
+body[data-page="home"] .journey-step.active .jdesc{opacity:1;}

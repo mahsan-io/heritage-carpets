@@ -59,44 +59,21 @@
 
 <div class="container-wide">
   <div class="plp-layout">
-    <!-- ============ FILTERS ============ -->
-    <aside class="filters" data-role="filters">
-      <button class="filters-close" data-role="filters-close" aria-label="Close filters">✕</button>
-      <div class="filter-group">
-        <h4>Material</h4>
-        <div data-role="filter-material"></div>
-      </div>
-      <div class="filter-group">
-        <h4>Color</h4>
-        <div class="color-swatches" data-role="filter-color"></div>
-      </div>
-      <div class="filter-group">
-        <h4>Size</h4>
-        <div data-role="filter-size"></div>
-      </div>
-      <div class="filter-group">
-        <h4>Room Type</h4>
-        <div data-role="filter-room"></div>
-      </div>
-      <div class="filter-group" style="border-bottom:none;">
-        <h4>Price</h4>
-        <p class="price-note">Open any piece for full specification, provenance and care details. For pricing and availability, enquire or visit a showroom.</p>
-      </div>
-      <button class="clear-filters" data-role="clear-filters">Clear all filters</button>
-    </aside>
-
-    <!-- ============ PRODUCT GRID ============ -->
     <main>
-      <button class="mobile-filter-toggle" data-role="mobile-filter-toggle">Filter Collections</button>
       <div class="category-bar" data-role="category-bar"></div>
       <div class="style-bar" data-role="style-bar" hidden></div>
-      <div class="plp-main-head">
+      <div class="plp-toolbar">
         <div class="result-count" data-role="result-count"></div>
-        <select class="sort-select" data-role="sort-select">
-          <option value="featured">Sort: Featured</option>
-          <option value="newest">Sort: Newest</option>
-          <option value="name">Sort: Name A–Z</option>
-        </select>
+        <div class="plp-toolbar-controls">
+          <select class="sort-select" data-role="filter-size-select"><option value="">All sizes</option></select>
+          <select class="sort-select" data-role="filter-color-select"><option value="">All colours</option></select>
+          <select class="sort-select" data-role="sort-select">
+            <option value="featured">Sort: Featured</option>
+            <option value="newest">Sort: Newest</option>
+            <option value="name">Sort: Name A–Z</option>
+          </select>
+          <button type="button" class="plp-clear" data-role="clear-filters">Clear</button>
+        </div>
       </div>
       <div class="chips" data-role="chips"></div>
       <div class="product-grid reveal" data-role="product-grid"></div>
@@ -212,49 +189,26 @@
 
 <div class="container-wide">
   <div class="plp-layout">
-    <!-- ============ FILTERS ============ -->
-    <aside class="filters" data-role="filters">
-      <button class="filters-close" data-role="filters-close" aria-label="إغلاق الفلاتر">✕</button>
-      <div class="filter-group">
-        <h4>الخامة</h4>
-        <div data-role="filter-material"></div>
-      </div>
-      <div class="filter-group">
-        <h4>اللون</h4>
-        <div class="color-swatches" data-role="filter-color"></div>
-      </div>
-      <div class="filter-group">
-        <h4>المقاس</h4>
-        <div data-role="filter-size"></div>
-      </div>
-      <div class="filter-group">
-        <h4>نوع الغرفة</h4>
-        <div data-role="filter-room"></div>
-      </div>
-      <div class="filter-group" style="border-bottom:none;">
-        <h4>السعر</h4>
-        <p class="price-note">افتح أي قطعة للاطلاع على المواصفات الكاملة والمنشأ وتعليمات العناية. وللاستفسار عن الأسعار والتوفر، تواصل معنا أو زر صالة العرض.</p>
-      </div>
-      <button class="clear-filters" data-role="clear-filters">مسح جميع الفلاتر</button>
-    </aside>
-
-    <!-- ============ PRODUCT GRID ============ -->
     <main>
-      <button class="mobile-filter-toggle" data-role="mobile-filter-toggle">تصفية المجموعات</button>
       <div class="category-bar" data-role="category-bar"></div>
       <div class="style-bar" data-role="style-bar" hidden></div>
-      <div class="plp-main-head">
+      <div class="plp-toolbar">
         <div class="result-count" data-role="result-count"></div>
-        <select class="sort-select" data-role="sort-select">
-          <option value="featured">الترتيب: مميز</option>
-          <option value="newest">الترتيب: الأحدث</option>
-          <option value="name">الترتيب: الاسم (أ-ي)</option>
-        </select>
+        <div class="plp-toolbar-controls">
+          <select class="sort-select" data-role="filter-size-select"><option value="">كل المقاسات</option></select>
+          <select class="sort-select" data-role="filter-color-select"><option value="">كل الألوان</option></select>
+          <select class="sort-select" data-role="sort-select">
+            <option value="featured">الترتيب: مميز</option>
+            <option value="newest">الترتيب: الأحدث</option>
+            <option value="name">الترتيب: الاسم أ–ي</option>
+          </select>
+          <button type="button" class="plp-clear" data-role="clear-filters">مسح</button>
+        </div>
       </div>
       <div class="chips" data-role="chips"></div>
       <div class="product-grid reveal" data-role="product-grid"></div>
       <div class="empty-state" data-role="empty-state">
-        <p>لا توجد قطع مطابقة للفلاتر الحالية. جرّب إزالة بعضها، أو تحدث مع مستشار تصميم حول تفصيل قطعة حصرية بدلاً من ذلك.</p>
+        <p>لا توجد قطع مطابقة لاختياراتك. جرّب مسح بعض الفلاتر، أو تحدث مع أحد مستشاري التصميم لتصميم خاص.</p>
       </div>
     </main>
   </div>

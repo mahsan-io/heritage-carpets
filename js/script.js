@@ -2526,8 +2526,12 @@ function buildCarouselMarkup(images){
 
     const majorOf = (key) => MAJORS.filter(m => m.tags.indexOf(key) > -1)[0] || null;
 
-    const state = { major:null, style:new Set(), material:new Set(), color:new Set(),
-                    size:new Set(), room:new Set(), sort:'featured' };
+    /* Simplified to what actually decides a rug purchase: which family it
+       belongs to, and (once that's chosen) the style. Size and colour stay as
+       two plain dropdowns because they genuinely narrow a search; material and
+       room type were dropped — material's list was half furniture values that
+       no longer exist here, and room type barely moved the result set. */
+    const state = { major:null, style:new Set(), color:'', size:'', sort:'featured' };
 
     const params = new URLSearchParams(window.location.search);
     const qCat = params.get('category');
@@ -2540,24 +2544,8 @@ function buildCarouselMarkup(images){
       }
     }
 
-    function count(group, key){
-      return PRODUCTS.filter(p=>{
-        if(group==='style' || group==='major') return p.category.includes(key);
-        return p[group]===key;
-      }).length;
-    }
-
     function countMajor(m){
       return PRODUCTS.filter(p => majorForProduct(p) === m.key).length;
-    }
-
-    function renderCheckGroup(role, labels, groupKey){
-      const el = root.querySelector('[data-role="'+role+'"]');
-      if(!el) return;
-      el.innerHTML = Object.keys(labels).map(key=>{
-        const checked = state[groupKey].has(key) ? 'checked' : '';
-        return '<label class="filter-option"><input type="checkbox" data-group="'+groupKey+'" value="'+key+'" '+checked+'> '+labels[key]+' <span class="count">'+count(groupKey,key)+'</span></label>';
-      }).join('');
     }
 
     /* primary category bar — the main navigation of the page now */
@@ -2585,22 +2573,29 @@ function buildCarouselMarkup(images){
       ).join('');
     }
 
-    function renderColorSwatches(){
-      const el = root.querySelector('[data-role="filter-color"]');
+    /* Dropdown options are built from the products actually on the page, so a
+       value can never appear that would return zero results — the old static
+       material list still offered Velvet and Solid Wood after furniture was
+       removed from this catalogue. */
+    function fillSelect(role, labels, current){
+      const el = root.querySelector('[data-role="'+role+'"]');
       if(!el) return;
-      el.innerHTML = Object.keys(L.color).map(key=>{
-        const active = state.color.has(key) ? ' active' : '';
-        return '<span class="swatch'+active+'" style="background:'+L.colorHex[key]+'" data-color="'+key+'" data-label="'+L.color[key]+'" title="'+L.color[key]+'"></span>';
+      const present = Object.keys(labels).filter(k =>
+        PRODUCTS.some(p => (role.indexOf('size') > -1 ? p.size : p.color) === k));
+      const first = el.querySelector('option[value=""]');
+      const allLabel = first ? first.textContent : '';
+      el.innerHTML = '<option value="">'+allLabel+'</option>' + present.map(k=>{
+        const n = PRODUCTS.filter(p => (role.indexOf('size') > -1 ? p.size : p.color) === k).length;
+        const short = labels[k].split(' (')[0];
+        return '<option value="'+k+'"'+(current===k?' selected':'')+'>'+short+' ('+n+')</option>';
       }).join('');
     }
 
     function renderFilters(){
       renderMajorBar();
       renderStyleBar();
-      renderCheckGroup('filter-material', L.material, 'material');
-      renderColorSwatches();
-      renderCheckGroup('filter-size', L.size, 'size');
-      renderCheckGroup('filter-room', L.room, 'room');
+      fillSelect('filter-size-select',  L.size,  state.size);
+      fillSelect('filter-color-select', L.color, state.color);
     }
 
     function matches(p){
@@ -2610,11 +2605,9 @@ function buildCarouselMarkup(images){
         // a chosen style narrows within the category, it doesn't replace it
         if(catOk && state.style.size) catOk = p.category.some(c => state.style.has(c));
       }
-      const matOk = state.material.size===0 || state.material.has(p.material);
-      const colOk = state.color.size===0 || state.color.has(p.color);
-      const sizeOk = state.size.size===0 || state.size.has(p.size);
-      const roomOk = state.room.size===0 || p.room.some(r=>state.room.has(r));
-      return catOk && matOk && colOk && sizeOk && roomOk;
+      const colOk  = !state.color || p.color === state.color;
+      const sizeOk = !state.size  || p.size  === state.size;
+      return catOk && colOk && sizeOk;
     }
 
     function sortProducts(list){
@@ -2630,7 +2623,12 @@ function buildCarouselMarkup(images){
         chips.push('<span class="chip" data-group="major" data-val="'+state.major+'">'+
           (L.category[state.major]||state.major)+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
       }
-      ['style','material','color','size','room'].forEach(group=>{
+      ['color','size'].forEach(g=>{
+        if(!state[g]) return;
+        const lbl = (L[g][state[g]] || state[g]).split(' (')[0];
+        chips.push('<span class="chip" data-group="'+g+'" data-val="'+state[g]+'">'+lbl+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
+      });
+      ['style'].forEach(group=>{
         state[group].forEach(val=>{
           const lbl = (group==='style' ? L.category[val] : L[group][val]) || val;
           chips.push('<span class="chip" data-group="'+group+'" data-val="'+val+'">'+lbl+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
@@ -2707,42 +2705,33 @@ function buildCarouselMarkup(images){
       });
     }
 
-    const filtersPanel = root.querySelector('[data-role="filters"]');
-    if(filtersPanel){
-      filtersPanel.addEventListener('change', function(e){
-        if(e.target.matches('input[type=checkbox]')){
-          const group = e.target.dataset.group, val = e.target.value;
-          if(e.target.checked) state[group].add(val); else state[group].delete(val);
-          refreshAll();
-        }
-      });
-    }
-    const filterColorEl = root.querySelector('[data-role="filter-color"]');
-    if(filterColorEl){
-      filterColorEl.addEventListener('click', function(e){
-        const sw = e.target.closest('.swatch');
-        if(!sw) return;
-        const val = sw.dataset.color;
-        if(state.color.has(val)) state.color.delete(val); else state.color.add(val);
+    ['filter-size-select','filter-color-select'].forEach(role=>{
+      const el = root.querySelector('[data-role="'+role+'"]');
+      if(!el) return;
+      el.addEventListener('change', function(){
+        state[role.indexOf('size') > -1 ? 'size' : 'color'] = el.value;
         refreshAll();
       });
-    }
+    });
+
     const chipsContainer = root.querySelector('[data-role="chips"]');
     if(chipsContainer){
       chipsContainer.addEventListener('click', function(e){
         const btn = e.target.closest('button');
         if(!btn) return;
         const chip = btn.closest('.chip');
-        if(chip.dataset.group === 'major'){ state.major = null; state.style.clear(); }
-        else state[chip.dataset.group].delete(chip.dataset.val);
+        const g = chip.dataset.group;
+        if(g === 'major'){ state.major = null; state.style.clear(); }
+        else if(g === 'color' || g === 'size'){ state[g] = ''; }
+        else state[g].delete(chip.dataset.val);
         refreshAll();
       });
     }
     const clearBtn = root.querySelector('[data-role="clear-filters"]');
     if(clearBtn){
       clearBtn.addEventListener('click', function(){
-        state.major = null;
-        ['style','material','color','size','room'].forEach(g=>state[g].clear());
+        state.major = null; state.color = ''; state.size = '';
+        state.style.clear();
         refreshAll();
       });
     }
@@ -2754,15 +2743,8 @@ function buildCarouselMarkup(images){
       });
     }
 
-    const overlay = root.querySelector('[data-role="filters-overlay"]');
-    const mobileToggle = root.querySelector('[data-role="mobile-filter-toggle"]');
-    const filtersClose = root.querySelector('[data-role="filters-close"]');
-    function openFilters(){ if(filtersPanel) filtersPanel.classList.add('open'); if(overlay) overlay.classList.add('open'); }
-    function closeFilters(){ if(filtersPanel) filtersPanel.classList.remove('open'); if(overlay) overlay.classList.remove('open'); }
-    if(mobileToggle) mobileToggle.addEventListener('click', openFilters);
-    if(filtersClose) filtersClose.addEventListener('click', closeFilters);
-    if(overlay) overlay.addEventListener('click', closeFilters);
-
+    // the mobile filter drawer is gone with the sidebar: every control now
+    // lives in the toolbar, which is reachable at any width without a drawer
     refreshAll();
   }
 

@@ -1798,3 +1798,189 @@ body[data-page="home"] .hero + .section{padding-top:56px;}
 .phone-hint[hidden]{display:none;}
 .field-input.phone-number.is-invalid{border-color:#B4462F;}
 .field-input.phone-number.is-invalid:focus{outline-color:#B4462F;}
+
+/* ======================================================================
+   CLAYMORPHISM LAYER
+   ----------------------------------------------------------------------
+   A depth system layered on top of the existing stylesheet. It deliberately
+   declares NO new colours: every shadow is built from --ink (the brand's own
+   deep grey) at low alpha, every highlight from white, and every accent
+   reuses --brass / --madder. Change a brand colour above and this layer
+   follows automatically.
+
+   Shadow recipe — the thing that separates clay from a generic drop shadow:
+     1. a wide, soft ambient shadow for the lift
+     2. a tighter, darker contact shadow so the object looks attached
+     3. an inset white highlight on the top edge, as if lit from above
+   Recessed surfaces (inputs) invert 1 and 2 inward and drop the highlight to
+   the bottom edge, which is what makes a field read as carved in rather than
+   raised out.
+   ====================================================================== */
+:root{
+  --clay-radius:16px;
+  --clay-radius-lg:26px;
+  --clay-radius-sm:12px;
+
+  /* --ink is 47,45,46 — kept literal here because rgba() cannot take a hex var */
+  --clay-shadow:
+    0 18px 40px rgba(47,45,46,0.10),
+    0 6px 14px rgba(47,45,46,0.07),
+    inset 0 1px 0 rgba(255,255,255,0.75);
+  --clay-shadow-hover:
+    0 26px 54px rgba(47,45,46,0.15),
+    0 10px 20px rgba(47,45,46,0.09),
+    inset 0 1px 0 rgba(255,255,255,0.85);
+  --clay-shadow-sm:
+    0 8px 20px rgba(47,45,46,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+  --clay-shadow-inset:
+    inset 0 2px 5px rgba(47,45,46,0.09),
+    inset 0 -1px 0 rgba(255,255,255,0.85);
+  --clay-shadow-pressed:
+    inset 0 3px 7px rgba(47,45,46,0.16);
+
+  /* on dark surfaces the same recipe needs a darker ambient and a fainter
+     highlight, or the edge looks like a white outline rather than light */
+  --clay-shadow-dark:
+    0 18px 40px rgba(16,14,15,0.30),
+    0 6px 14px rgba(16,14,15,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.10);
+  --clay-shadow-dark-hover:
+    0 26px 54px rgba(16,14,15,0.38),
+    0 10px 20px rgba(16,14,15,0.26),
+    inset 0 1px 0 rgba(255,255,255,0.16);
+
+  --clay-highlight:inset 0 1px 0 rgba(255,255,255,0.75);
+  --clay-transition:.32s cubic-bezier(.22,.61,.36,1);
+  --clay-lift:-4px;
+}
+
+/* ---------------- reusable components ---------------- */
+.clay-card,.clay-panel{
+  border-radius:var(--clay-radius-lg);
+  box-shadow:var(--clay-shadow);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition);
+}
+.clay-card:hover{transform:translateY(var(--clay-lift));box-shadow:var(--clay-shadow-hover);}
+.clay-section{border-radius:var(--clay-radius-lg);}
+.clay-badge{border-radius:var(--radius-pill);box-shadow:var(--clay-shadow-sm);}
+.clay-button{border-radius:var(--radius-pill);box-shadow:var(--clay-shadow-sm);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition);}
+.clay-button:hover{transform:translateY(-2px);box-shadow:var(--clay-shadow);}
+.clay-button:active{transform:translateY(0);box-shadow:var(--clay-shadow-pressed);}
+.clay-input{border-radius:var(--clay-radius-sm);box-shadow:var(--clay-shadow-inset);}
+.clay-nav{border-radius:var(--radius-pill);box-shadow:var(--clay-shadow);}
+
+/* ---------------- buttons ----------------
+   Colour untouched: only elevation, and a genuine pressed state on :active
+   which the site did not have before. */
+.btn{box-shadow:var(--clay-shadow-sm);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition), background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease);}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--clay-shadow);}
+.btn:active{transform:translateY(0);box-shadow:var(--clay-shadow-pressed);}
+.btn.is-disabled,.btn[disabled],button[disabled]{box-shadow:none;transform:none;}
+.btn-text{box-shadow:none;}
+.btn-text:hover{transform:none;box-shadow:none;}
+
+/* ---------------- navigation ----------------
+   A floating rounded bar once scrolled, flush while at the top so the hero
+   still runs edge to edge. */
+/* the scroll state class is `solid`, applied in script.js at 40px */
+.nav.solid,.nav.static-solid{
+  box-shadow:0 1px 0 var(--line-dark), 0 14px 34px rgba(16,14,15,0.28);
+}
+
+/* ---------------- cards ---------------- */
+.product-card,.collection-card,.loc-card,.brand-child,.brand-parent,
+.bs-feature,.option-card,.cp-feature,.stack-card,.testi-card,
+.showroom-brand-card,.commercial-card,.map-card,.project-item{
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition), border-color var(--clay-transition);
+}
+.product-card,.collection-card,.loc-card,.option-card,.testi-card,.map-card{
+  border-radius:var(--clay-radius);
+  box-shadow:var(--clay-shadow);
+}
+.product-card:hover,.collection-card:hover,.loc-card:hover,.map-card:hover{
+  transform:translateY(var(--clay-lift));
+  box-shadow:var(--clay-shadow-hover);
+}
+.project-item{border-radius:var(--clay-radius);box-shadow:var(--clay-shadow-sm);}
+.project-item:hover{box-shadow:var(--clay-shadow-hover);}
+
+/* dark-surface cards take the dark recipe so the highlight reads as light,
+   not as a white border */
+.loc-card,.stack-card,.bs-feature,.brand-parent{
+  box-shadow:var(--clay-shadow-dark);
+}
+.loc-card:hover,.bs-feature:hover,.brand-parent:hover{
+  box-shadow:var(--clay-shadow-dark-hover);
+}
+
+/* ---------------- media containers ---------------- */
+.hero-photo,.pv-video,.bs-media .motif,.solution-media .motif,
+.stack-card-media,.cp-block-media .motif,.pdp-gallery,.room-canvas-wrap{
+  border-radius:var(--clay-radius);
+}
+.pv-gallery,.pv-gallery-track{border-radius:var(--clay-radius-lg);}
+
+/* ---------------- forms: recessed, not raised ---------------- */
+.field-input,.sort-select,.phone-code,.phone-number,
+.notes-field textarea,.room-field select,.hc-input,.r3d-search{
+  border-radius:var(--clay-radius-sm);
+  box-shadow:var(--clay-shadow-inset);
+  transition:box-shadow var(--clay-transition), border-color .25s var(--ease);
+}
+.field-input:focus,.sort-select:focus,.notes-field textarea:focus,.hc-input:focus{
+  box-shadow:var(--clay-shadow-inset), 0 0 0 3px rgba(183,204,51,0.22);
+  outline:none;
+}
+/* the phone field is one control split in two — keep its joined edges square */
+.phone-field .phone-code{border-start-end-radius:0;border-end-end-radius:0;}
+.phone-field .phone-number{border-start-start-radius:0;border-end-start-radius:0;}
+
+/* ---------------- tabs & chips ---------------- */
+.brand-tab-btn,.loc-brand-btn,.cat-pill,.book-brand-btn,.filter-btn,.r3d-tab{
+  box-shadow:var(--clay-shadow-sm);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition), background .3s var(--ease), border-color .3s var(--ease), color .3s var(--ease);
+}
+.brand-tab-btn:hover,.loc-brand-btn:hover,.cat-pill:hover,.book-brand-btn:hover,.filter-btn:hover{
+  transform:translateY(-2px);box-shadow:var(--clay-shadow);
+}
+/* active tabs keep their existing colours — the accent stays on the border,
+   as the rest of the site already does */
+.brand-tab-btn.active,.loc-brand-btn.active,.cat-pill.active,.book-brand-btn.active{
+  box-shadow:var(--clay-shadow-dark);
+}
+.style-chip,.chip,.date-chip,.slot-chip,.hc-chip{
+  box-shadow:var(--clay-shadow-sm);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition), background .25s var(--ease), border-color .25s var(--ease);
+}
+.date-chip:hover,.slot-chip:hover,.style-chip:hover{transform:translateY(-2px);}
+.date-chip.selected,.slot-chip.selected{box-shadow:var(--clay-shadow-pressed);}
+
+/* ---------------- floating widgets ---------------- */
+.hc-panel{border-radius:var(--clay-radius-lg);box-shadow:var(--clay-shadow-dark-hover);}
+.hc-bubble{box-shadow:var(--clay-shadow);}
+.hc-bubble:hover{box-shadow:var(--clay-shadow-hover);}
+.hc-bubble-msg{box-shadow:var(--clay-shadow-sm);}
+.clients-marquee{border-radius:var(--clay-radius-lg);}
+
+/* ---------------- footer ---------------- */
+footer .footer-top{border-radius:var(--clay-radius-lg);}
+
+/* ---------------- motion ---------------- */
+@media (prefers-reduced-motion: reduce){
+  .btn,.btn:hover,.btn:active,
+  .product-card,.collection-card,.loc-card,.map-card,.project-item,
+  .brand-tab-btn,.loc-brand-btn,.cat-pill,.book-brand-btn,.filter-btn,
+  .date-chip,.slot-chip,.style-chip,.hc-bubble{
+    transition:none;transform:none;
+  }
+}
+
+/* ---------------- responsive ----------------
+   Large radii look right on a wide card and wrong on a narrow one, so they
+   step down rather than staying fixed. */
+@media (max-width:640px){
+  :root{--clay-radius-lg:20px;--clay-radius:14px;--clay-radius-sm:10px;--clay-lift:-3px;}
+}

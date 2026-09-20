@@ -2010,7 +2010,10 @@ footer .footer-top{border-radius:var(--clay-radius-lg);}
 }
 
 /* recessed areas: the page itself reads as the carved-out layer */
-.filters,.plp-toolbar,.book-summary,.studio-preview{background:var(--clay-surface);}
+/* .studio-preview is deliberately NOT in this list: it is the dark live
+   preview panel and its summary text is cream, so painting it with the light
+   recessed tone left white text on a near-white panel — invisible. */
+.filters,.plp-toolbar,.book-summary{background:var(--clay-surface);}
 
 /* form fields sit *into* the surface rather than on it */
 .field-input,.sort-select,.phone-code,.phone-number,
@@ -2236,4 +2239,108 @@ body[data-page="home"] .journey-step:hover{transform:translateY(-3px);box-shadow
 
 @media (prefers-reduced-motion: reduce){
   .nav-links a{transition:none;}
+}
+
+/* ======================================================================
+   NAV: HIDDEN AT THE TOP, REVEALED ON SCROLL (all pages)
+   ----------------------------------------------------------------------
+   The bar slides up out of view while the visitor is at the top of the page
+   and drops back in once they scroll past 40px. script.js already toggles
+   `.solid` at that threshold, so no JavaScript change is needed — the class
+   simply now controls visibility as well as appearance.
+
+   `static-solid` pages (everything except the homepage) are included so the
+   behaviour is identical sitewide, as asked.
+   ====================================================================== */
+.nav{
+  transform:translateY(-100%);
+  opacity:0;
+  pointer-events:none;
+  transition:transform .42s var(--ease), opacity .3s var(--ease), padding .4s var(--ease);
+}
+.nav.solid{
+  transform:translateY(0);
+  opacity:1;
+  pointer-events:auto;
+}
+/* Keyboard users must never lose the nav: if anything inside it takes focus
+   while it is hidden, it comes back. Without this, tabbing from the top of
+   the page moves focus into an invisible bar. */
+.nav:focus-within{
+  transform:translateY(0);
+  opacity:1;
+  pointer-events:auto;
+}
+/* An open mobile menu must keep its bar on screen regardless of scroll.
+   The menu is a SIBLING of <nav>, not a child, so :has() on the nav would
+   never match — this has to look forward from the nav instead. Without it,
+   tapping the hamburger at the top of the page opens the menu while its own
+   close button stays hidden. */
+.nav:has(~ .mobile-menu.open),
+.lang-block:has(.mobile-menu.open) .nav{
+  transform:translateY(0);
+  opacity:1;
+  pointer-events:auto;
+}
+@media (prefers-reduced-motion: reduce){
+  .nav{transition:opacity .2s linear;}
+}
+
+/* ======================================================================
+   BUTTONS — CLAY SURFACE COLOUR
+   ----------------------------------------------------------------------
+   A dedicated clay tone for buttons, as requested. It is a warm olive-brass
+   derived from the existing --brass (#B7CC33) and --madder (#6E7C1F) rather
+   than an unrelated hue, so it still reads as the same brand — a deeper,
+   more tactile version of the lime already in use.
+
+   The gradient is what makes it clay: a lighter top and a darker foot, so
+   the surface curves, plus a bright inner top edge and a shaded underside.
+   ====================================================================== */
+:root{
+  --clay-btn-top:#C4D84A;      /* lifted --brass — the lit face */
+  --clay-btn-base:#93A82A;     /* between --brass and --madder — the shaded foot */
+  --clay-btn-edge:#7C8F22;     /* deepest tone, for the underside line */
+  --clay-btn-ink:#2A2718;      /* near-black with a warm cast, for label text */
+}
+
+.btn-fill,.nav-cta,.hc-send,.book-confirm,.btn.btn-fill{
+  background:linear-gradient(180deg, var(--clay-btn-top) 0%, var(--clay-btn-base) 100%);
+  border:none;
+  color:var(--clay-btn-ink);
+  box-shadow:
+    0 6px 14px rgba(47,45,46,0.22),
+    0 2px 4px rgba(47,45,46,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -2px 0 var(--clay-btn-edge);
+  transition:transform .28s var(--ease), box-shadow .28s var(--ease), filter .28s var(--ease);
+}
+.btn-fill:hover,.nav-cta:hover,.hc-send:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.04);
+  box-shadow:
+    0 12px 24px rgba(47,45,46,0.28),
+    0 4px 8px rgba(47,45,46,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.65),
+    inset 0 -2px 0 var(--clay-btn-edge);
+}
+/* pressed: the foot collapses and the shading moves inside, which is what a
+   real button does when you push it */
+.btn-fill:active,.nav-cta:active,.hc-send:active{
+  transform:translateY(1px);
+  box-shadow:
+    0 1px 2px rgba(47,45,46,0.2),
+    inset 0 3px 7px rgba(47,45,46,0.32),
+    inset 0 -1px 0 rgba(255,255,255,0.18);
+}
+.btn-fill.is-disabled,.btn-fill[disabled],.btn.is-disabled{
+  background:linear-gradient(180deg, #CFD8A8 0%, #BCC594 100%);
+  color:rgba(42,39,24,0.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.4);
+  transform:none;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .btn-fill,.btn-fill:hover,.btn-fill:active,
+  .nav-cta,.nav-cta:hover,.nav-cta:active{transition:none;transform:none;}
 }

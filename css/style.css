@@ -1984,3 +1984,152 @@ footer .footer-top{border-radius:var(--clay-radius-lg);}
 @media (max-width:640px){
   :root{--clay-radius-lg:20px;--clay-radius:14px;--clay-radius-sm:10px;--clay-lift:-3px;}
 }
+
+/* ======================================================================
+   CLAY REFINEMENTS
+   ====================================================================== */
+
+/* ---- carousel arrows: pointer devices only ----
+   The arrows were opacity:0 until :hover. A touch screen has no hover, but it
+   does emulate one on tap — so they appeared and then stayed stuck over the
+   image. Hiding them where there is no real hover leaves the dots and swipe,
+   which is how people navigate a carousel on a phone anyway. */
+@media (hover:none),(pointer:coarse){
+  .carousel-arrow{display:none;}
+  .motif-carousel .carousel-dots{opacity:1;}
+}
+
+/* ---- clay surface tones ----
+   Same palette, softened. Pure #FFFFFF cards on a #F2F2F1 page give almost no
+   tonal separation, so the clay shadows were doing all the work alone. These
+   are the existing hues nudged a step apart: the page sits slightly deeper,
+   cards lift slightly warmer. No new hue is introduced — every value below is
+   the same grey-warm family already in the palette. */
+:root{
+  --parchment:#EDEDEB;        /* was #F2F2F1 — page recedes a touch */
+  --parchment-2:#FBFBFA;      /* was #FFFFFF — cards read as a surface, not a hole */
+  --clay-surface:#F6F6F4;     /* mid tone for recessed areas */
+}
+
+/* recessed areas: the page itself reads as the carved-out layer */
+.filters,.plp-toolbar,.book-summary,.studio-preview{background:var(--clay-surface);}
+
+/* form fields sit *into* the surface rather than on it */
+.field-input,.sort-select,.phone-code,.phone-number,
+.notes-field textarea,.room-field select,.hc-input,.r3d-search{
+  background:var(--clay-surface);
+}
+.field-input:focus,.sort-select:focus,.notes-field textarea:focus,.hc-input:focus{
+  background:var(--parchment-2);
+}
+
+/* a touch more lift on the raised surfaces now that the page is deeper */
+.product-card,.collection-card,.option-card,.testi-card,.map-card{
+  background:var(--parchment-2);
+}
+
+/* ======================================================================
+   CLAY REFINEMENTS
+   ====================================================================== */
+
+/* 1. "View All Collections" was invisible: .btn-outline is the variant made
+      for dark sections (cream text), but this button sits on the light
+      Featured Collections band. Fixed here rather than in markup so it holds
+      whether or not the `dark` modifier is present on the element. */
+.home-collections .home-head-cta,
+.section:not(.on-dark) .home-head-cta.btn-outline{
+  border-color:rgba(47,45,46,0.28);
+  color:var(--ink-text);
+}
+.home-collections .home-head-cta:hover,
+.section:not(.on-dark) .home-head-cta.btn-outline:hover{
+  border-color:var(--madder);
+  color:var(--madder);
+}
+
+/* 2. Carousel arrows off on touch screens. They sat on top of the artwork,
+      and on a phone the carousel is already swipeable — the arrows were
+      covering the rug rather than helping anyone browse it. Dots still show
+      position, and the auto-advance is unaffected. */
+@media (max-width:860px){
+  .carousel-arrow{display:none;}
+}
+@media (hover:none){
+  .carousel-arrow{display:none;}
+}
+
+/* 3. Tonal depth on clay surfaces.
+      Same palette, no new hues — each raised surface gets a very slight
+      vertical gradient between its own colour and a fractionally darker
+      version of itself, which is what makes a clay surface look curved
+      rather than flat. Recessed surfaces run the gradient the other way. */
+.product-card,.collection-card,.option-card,.testi-card,.map-card,
+.cat-pill,.loc-brand-btn,.brand-tab-btn,.book-brand-btn,.filter-btn,
+.hc-bubble-msg,.date-chip,.slot-chip{
+  background-image:linear-gradient(180deg,
+    rgba(255,255,255,0.55) 0%,
+    rgba(255,255,255,0) 42%,
+    rgba(47,45,46,0.035) 100%);
+}
+/* on dark clay the same idea, inverted in strength */
+.loc-card,.stack-card,.bs-feature,.brand-parent,.hc-panel,
+.cat-pill.active,.loc-brand-btn.active,.brand-tab-btn.active,.book-brand-btn.active{
+  background-image:linear-gradient(180deg,
+    rgba(255,255,255,0.10) 0%,
+    rgba(255,255,255,0) 45%,
+    rgba(16,14,15,0.16) 100%);
+}
+/* filled buttons get a gentle sheen; the lime itself is unchanged */
+.btn-fill,.hc-send,.hc-bubble{
+  background-image:linear-gradient(180deg,
+    rgba(255,255,255,0.28) 0%,
+    rgba(255,255,255,0) 48%,
+    rgba(47,45,46,0.10) 100%);
+}
+.btn-fill:active,.hc-send:active{
+  background-image:linear-gradient(180deg,
+    rgba(47,45,46,0.12) 0%,
+    rgba(255,255,255,0) 60%);
+}
+/* recessed fields: gradient runs dark-to-light, the inverse of a raised face */
+.field-input,.sort-select,.notes-field textarea,.hc-input,.phone-number,.phone-code{
+  background-image:linear-gradient(180deg,
+    rgba(47,45,46,0.05) 0%,
+    rgba(255,255,255,0) 30%,
+    rgba(255,255,255,0.4) 100%);
+}
+
+/* 4. Navigation as a floating clay bar.
+      At the top of the page it stays flush so the hero runs edge to edge;
+      once scrolled it lifts into a rounded, raised surface. */
+.nav.solid,.nav.static-solid{
+  background-image:linear-gradient(180deg,
+    rgba(255,255,255,0.07) 0%,
+    rgba(255,255,255,0) 55%,
+    rgba(16,14,15,0.22) 100%);
+  box-shadow:
+    0 14px 34px rgba(16,14,15,0.30),
+    0 4px 10px rgba(16,14,15,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  border-bottom:none;
+}
+.nav-links a{transition:color .3s var(--ease), transform .3s var(--ease);}
+.nav-links a:hover{transform:translateY(-1px);}
+/* the language pill and menu button read as tactile controls */
+.lang-toggle,.hamburger{
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition);
+}
+.lang-toggle{
+  box-shadow:0 4px 12px rgba(16,14,15,0.28), inset 0 1px 0 rgba(255,255,255,0.14);
+}
+.lang-toggle:hover{transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(16,14,15,0.34), inset 0 1px 0 rgba(255,255,255,0.18);}
+.lang-toggle:active{transform:translateY(0);
+  box-shadow:inset 0 2px 5px rgba(16,14,15,0.4);}
+.nav-cta{box-shadow:var(--clay-shadow-sm);}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:var(--clay-shadow);}
+.nav-cta:active{transform:translateY(0);box-shadow:var(--clay-shadow-pressed);}
+
+@media (prefers-reduced-motion: reduce){
+  .nav-links a:hover,.lang-toggle:hover,.nav-cta:hover{transform:none;}
+}

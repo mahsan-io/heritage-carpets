@@ -1885,10 +1885,8 @@ body[data-page="home"] .hero + .section{padding-top:56px;}
 /* ---------------- navigation ----------------
    A floating rounded bar once scrolled, flush while at the top so the hero
    still runs edge to edge. */
-/* the scroll state class is `solid`, applied in script.js at 40px */
-.nav.solid,.nav.static-solid{
-  box-shadow:0 1px 0 var(--line-dark), 0 14px 34px rgba(16,14,15,0.28);
-}
+/* nav bar deliberately left as the original: the clay treatment here is
+   scoped to the links only. */
 
 /* ---------------- cards ---------------- */
 .product-card,.collection-card,.loc-card,.brand-child,.brand-parent,
@@ -2099,40 +2097,6 @@ footer .footer-top{border-radius:var(--clay-radius-lg);}
     rgba(255,255,255,0.4) 100%);
 }
 
-/* 4. Navigation as a floating clay bar.
-      At the top of the page it stays flush so the hero runs edge to edge;
-      once scrolled it lifts into a rounded, raised surface. */
-.nav.solid,.nav.static-solid{
-  background-image:linear-gradient(180deg,
-    rgba(255,255,255,0.07) 0%,
-    rgba(255,255,255,0) 55%,
-    rgba(16,14,15,0.22) 100%);
-  box-shadow:
-    0 14px 34px rgba(16,14,15,0.30),
-    0 4px 10px rgba(16,14,15,0.22),
-    inset 0 1px 0 rgba(255,255,255,0.12);
-  border-bottom:none;
-}
-.nav-links a{transition:color .3s var(--ease), transform .3s var(--ease);}
-.nav-links a:hover{transform:translateY(-1px);}
-/* the language pill and menu button read as tactile controls */
-.lang-toggle,.hamburger{
-  transition:transform var(--clay-transition), box-shadow var(--clay-transition);
-}
-.lang-toggle{
-  box-shadow:0 4px 12px rgba(16,14,15,0.28), inset 0 1px 0 rgba(255,255,255,0.14);
-}
-.lang-toggle:hover{transform:translateY(-1px);
-  box-shadow:0 8px 18px rgba(16,14,15,0.34), inset 0 1px 0 rgba(255,255,255,0.18);}
-.lang-toggle:active{transform:translateY(0);
-  box-shadow:inset 0 2px 5px rgba(16,14,15,0.4);}
-.nav-cta{box-shadow:var(--clay-shadow-sm);}
-.nav-cta:hover{transform:translateY(-2px);box-shadow:var(--clay-shadow);}
-.nav-cta:active{transform:translateY(0);box-shadow:var(--clay-shadow-pressed);}
-
-@media (prefers-reduced-motion: reduce){
-  .nav-links a:hover,.lang-toggle:hover,.nav-cta:hover{transform:none;}
-}
 
 /* ======================================================================
    CLAY — REFINEMENT PASS 2
@@ -2228,127 +2192,48 @@ body[data-page="home"] .journey-step:hover{transform:translateY(-3px);box-shadow
 }
 
 /* ======================================================================
-   NAVIGATION — CLAYMORPHISM
+   NAV LINKS — CLAYMORPHISM (links only)
    ----------------------------------------------------------------------
-   The bar becomes a floating clay slab rather than a flat full-width band.
-   Three things make it read as a solid object rather than a tinted strip:
+   The bar itself is untouched. Each link becomes a small tactile control:
+   at rest it is flat, on hover it presses into the bar, and the current
+   page stays pressed in with a faint lime wash.
 
-     1. it floats, with air on all four sides, so it casts onto the page
-     2. a vertical gradient between two existing ink shades, so the surface
-        curves rather than sitting flat
-     3. a bright inset line along the top edge and a dark one along the
-        bottom — light catching the upper lip, shade gathering under it
+   A recess rather than a raised pill is the right read here — the links
+   sit ON the bar, so pushing them into its surface is physically coherent,
+   whereas floating them above a surface they belong to is not.
 
-   Colour is unchanged: --ink, --ink-2 and --ink-3 are the greys already in
-   the palette; every shadow is the same near-black used elsewhere.
+   Colour unchanged: the wash is --brass at low alpha, the shadows are the
+   same near-black used across the clay system.
    ====================================================================== */
-.nav{padding:16px 0;}
-
-/* the slab itself */
-.nav > .container,
-.nav > .container-wide{
-  padding:12px 22px;
-  border-radius:var(--clay-radius);
-  background:linear-gradient(180deg, var(--ink-3) 0%, var(--ink) 62%, #262425 100%);
-  box-shadow:
-    0 16px 34px rgba(16,14,15,0.34),
-    0 6px 14px rgba(16,14,15,0.26),
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    inset 0 -1px 0 rgba(16,14,15,0.55);
-  -webkit-backdrop-filter:blur(14px) saturate(120%);
-  backdrop-filter:blur(14px) saturate(120%);
-  transition:padding .4s var(--ease), box-shadow .4s var(--ease), transform .4s var(--ease);
-}
-
-/* the nav element no longer paints a band — the slab carries the surface,
-   so these override the original full-width background and hairline */
-.nav.solid,.nav.static-solid{
-  padding:12px 0;
-  background:transparent;
-  box-shadow:none;
-  backdrop-filter:none;
-}
-/* once scrolled the slab sits a little tighter and presses down slightly,
-   which reads as the page moving underneath it */
-.nav.solid > .container,
-.nav.solid > .container-wide,
-.nav.static-solid > .container,
-.nav.static-solid > .container-wide{
-  padding:9px 22px;
-  box-shadow:
-    0 12px 28px rgba(16,14,15,0.40),
-    0 4px 10px rgba(16,14,15,0.30),
-    inset 0 1px 0 rgba(255,255,255,0.16),
-    inset 0 -1px 0 rgba(16,14,15,0.6);
-}
-
-/* ---- links: a soft recess on hover, not an underline ---- */
 .nav-links a{
   padding:8px 14px;
   border-radius:var(--radius-pill);
   transition:color .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
 }
+
+/* hover: pressed into the bar */
 .nav-links a:hover{
   background:rgba(255,255,255,0.06);
-  box-shadow:inset 0 1px 2px rgba(16,14,15,0.45), inset 0 -1px 0 rgba(255,255,255,0.08);
+  box-shadow:
+    inset 0 2px 4px rgba(16,14,15,0.45),
+    inset 0 -1px 0 rgba(255,255,255,0.08);
+  transform:none;              /* an earlier rule lifted links; a recess and
+                                  a lift cannot both be true */
 }
-/* the current page sits pressed in, so it reads as selected rather than
-   merely highlighted */
+
+/* current page: held pressed, with the brand accent */
 .nav-links a.current{
   background:rgba(183,204,51,0.14);
-  box-shadow:inset 0 2px 5px rgba(16,14,15,0.5), inset 0 -1px 0 rgba(255,255,255,0.10);
-}
-
-/* ---- language toggle: recessed track, raised knob ---- */
-.lang-toggle{
   box-shadow:
-    inset 0 2px 5px rgba(16,14,15,0.55),
-    inset 0 -1px 0 rgba(255,255,255,0.08) !important;
-}
-.lang-indicator{
-  box-shadow:0 2px 5px rgba(16,14,15,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+    inset 0 2px 5px rgba(16,14,15,0.5),
+    inset 0 -1px 0 rgba(255,255,255,0.10);
 }
 
-/* ---- the Book a Visit pill keeps its lime, gains a tactile press ---- */
-.nav-cta{
-  box-shadow:0 5px 12px rgba(16,14,15,0.32), inset 0 1px 0 rgba(255,255,255,0.45);
-}
-.nav-cta:hover{transform:translateY(-2px);box-shadow:0 9px 18px rgba(16,14,15,0.38), inset 0 1px 0 rgba(255,255,255,0.55);}
-.nav-cta:active{transform:translateY(0);box-shadow:inset 0 3px 6px rgba(16,14,15,0.45);}
-
-/* ---- hamburger: a raised clay button rather than three bare lines ---- */
-@media (max-width:768px){
-  .hamburger{
-    width:42px;height:42px;padding:11px 9px;
-    border-radius:var(--radius-pill);
-    background:rgba(255,255,255,0.07);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14), 0 3px 8px rgba(16,14,15,0.3);
-    transition:box-shadow .25s var(--ease), background .25s var(--ease);
-  }
-  .hamburger:active{box-shadow:inset 0 3px 6px rgba(16,14,15,0.5);}
-  /* the slab needs less inset on a narrow screen or it loses usable width */
-  .nav > .container,.nav > .container-wide,
-  .nav.solid > .container,.nav.static-solid > .container{padding:9px 14px;}
-  .nav{padding:10px 0;}
-}
-
-/* ---- mobile menu: a floating clay sheet, matching the bar ---- */
-.mobile-menu{
-  border-radius:var(--clay-radius);
-  box-shadow:0 20px 44px rgba(16,14,15,0.42), inset 0 1px 0 rgba(255,255,255,0.12);
-}
+/* The expanding underline now duplicates what the recess already says, and
+   would span the full pill rather than the word. Retired here rather than
+   edited in place, so the original rule survives if this block is removed. */
+.nav-links a::after{display:none;}
 
 @media (prefers-reduced-motion: reduce){
-  .nav > .container,.nav > .container-wide,
-  .nav-cta,.nav-cta:hover,.nav-cta:active,.nav-links a{transition:none;transform:none;}
+  .nav-links a{transition:none;}
 }
-
-/* Two earlier rules now conflict with the clay nav and are retired here
-   rather than edited in place, so the original block stays intact if this
-   layer is ever removed:
-     - the expanding underline duplicated what the recessed pill already
-       says, and spanned the full pill width rather than the word
-     - a hover lift contradicted the recess; an element cannot read as
-       pressed in and raised at the same time */
-.nav-links a::after{display:none;}
-.nav-links a:hover{transform:none;}

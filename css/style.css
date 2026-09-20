@@ -2344,3 +2344,34 @@ body[data-page="home"] .journey-step:hover{transform:translateY(-3px);box-shadow
   .btn-fill,.btn-fill:hover,.btn-fill:active,
   .nav-cta,.nav-cta:hover,.nav-cta:active{transition:none;transform:none;}
 }
+
+/* ======================================================================
+   NAV LINKS — FIT ON ONE LINE
+   ----------------------------------------------------------------------
+   Giving each link a recess meant giving it padding, and 7 links x 28px of
+   new horizontal padding pushed the row past the space available, so it
+   wrapped onto a second line.
+
+   The padding is what creates the recess, so it stays — the 36px gap is what
+   goes. With a visible pill around each label, that gap was doing the same
+   separating job twice. Trading it for the padding keeps the row the same
+   overall width as before while still reading as distinct controls.
+   ====================================================================== */
+.nav-links{
+  gap:4px;
+  flex-wrap:nowrap;
+}
+.nav-links a{
+  padding:8px 12px;
+  white-space:nowrap;   /* "Bespoke Studio" and "Our Brands" must never split */
+}
+
+/* Between roughly 900px and the mobile breakpoint the row is tight even at
+   this spacing, so the pill tightens further rather than wrapping. */
+@media (max-width:1100px){
+  .nav-links{gap:2px;}
+  .nav-links a{padding:8px 9px;font-size:12.5px;}
+}
+@media (max-width:900px){
+  .nav-links a{padding:7px 7px;font-size:12px;letter-spacing:0.02em;}
+}

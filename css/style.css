@@ -2242,48 +2242,47 @@ body[data-page="home"] .journey-step:hover{transform:translateY(-3px);box-shadow
 }
 
 /* ======================================================================
-   NAV: HIDDEN AT THE TOP, REVEALED ON SCROLL (all pages)
+   NAV: TRANSPARENT AT THE TOP, COLOURED ON SCROLL (all pages)
    ----------------------------------------------------------------------
-   The bar slides up out of view while the visitor is at the top of the page
-   and drops back in once they scroll past 40px. script.js already toggles
-   `.solid` at that threshold, so no JavaScript change is needed — the class
-   simply now controls visibility as well as appearance.
+   The bar is always present and always reachable — it simply has no surface
+   of its own until the visitor scrolls. script.js already adds `.solid` past
+   40px, so this needs no JavaScript.
 
-   `static-solid` pages (everything except the homepage) are included so the
-   behaviour is identical sitewide, as asked.
+   Every page can carry a transparent bar because each one opens on a dark
+   field: the homepage on the hero video, the rest on a --ink page header.
+   Cream nav text stays legible over both, which is what makes transparency
+   safe here rather than a contrast gamble.
    ====================================================================== */
 .nav{
-  transform:translateY(-100%);
-  opacity:0;
-  pointer-events:none;
-  transition:transform .42s var(--ease), opacity .3s var(--ease), padding .4s var(--ease);
+  background:transparent;
+  box-shadow:none;
+  -webkit-backdrop-filter:none;
+  backdrop-filter:none;
+  transition:background .4s var(--ease), box-shadow .4s var(--ease),
+             padding .4s var(--ease), backdrop-filter .4s var(--ease);
 }
+
+/* `static-solid` used to paint a surface from the first pixel. It now waits
+   for the scroll state like every other page, so behaviour is identical
+   sitewide. */
+.nav.static-solid{
+  background:transparent;
+  box-shadow:none;
+  backdrop-filter:none;
+  padding:26px 0;
+}
+
+/* scrolled: the surface fades in */
 .nav.solid{
-  transform:translateY(0);
-  opacity:1;
-  pointer-events:auto;
+  padding:16px 0;
+  background:rgba(27,23,20,0.94);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  box-shadow:0 1px 0 var(--line-dark), 0 10px 28px rgba(16,14,15,0.22);
 }
-/* Keyboard users must never lose the nav: if anything inside it takes focus
-   while it is hidden, it comes back. Without this, tabbing from the top of
-   the page moves focus into an invisible bar. */
-.nav:focus-within{
-  transform:translateY(0);
-  opacity:1;
-  pointer-events:auto;
-}
-/* An open mobile menu must keep its bar on screen regardless of scroll.
-   The menu is a SIBLING of <nav>, not a child, so :has() on the nav would
-   never match — this has to look forward from the nav instead. Without it,
-   tapping the hamburger at the top of the page opens the menu while its own
-   close button stays hidden. */
-.nav:has(~ .mobile-menu.open),
-.lang-block:has(.mobile-menu.open) .nav{
-  transform:translateY(0);
-  opacity:1;
-  pointer-events:auto;
-}
+
 @media (prefers-reduced-motion: reduce){
-  .nav{transition:opacity .2s linear;}
+  .nav{transition:background .2s linear;}
 }
 
 /* ======================================================================
@@ -2375,3 +2374,29 @@ body[data-page="home"] .journey-step:hover{transform:translateY(-3px);box-shadow
 @media (max-width:900px){
   .nav-links a{padding:7px 7px;font-size:12px;letter-spacing:0.02em;}
 }
+
+/* ----------------------------------------------------------------------
+   Legibility scrim for the transparent state.
+
+   Most pages open on a flat --ink header, but brands.html and projects.html
+   open on a VIDEO with no overlay at desktop width — and a video's top edge
+   can be any brightness, frame to frame. Cream nav text over a transparent
+   bar would be a gamble there.
+
+   A short gradient from near-black to nothing sits behind the bar whenever
+   it is transparent, so the text always has something to sit on. It fades
+   out as the solid background arrives, so the two never stack up.
+   Uses the same near-black as the rest of the clay system — no new colour.
+   ---------------------------------------------------------------------- */
+.nav::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:140px;
+  z-index:-1;
+  pointer-events:none;
+  background:linear-gradient(180deg, rgba(16,14,15,0.55) 0%, rgba(16,14,15,0.22) 45%, transparent 100%);
+  opacity:1;
+  transition:opacity .4s var(--ease);
+}
+.nav.solid::before{opacity:0;}

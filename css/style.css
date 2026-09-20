@@ -1885,10 +1885,8 @@ body[data-page="home"] .hero + .section{padding-top:56px;}
 /* ---------------- navigation ----------------
    A floating rounded bar once scrolled, flush while at the top so the hero
    still runs edge to edge. */
-/* the scroll state class is `solid`, applied in script.js at 40px */
-.nav.solid,.nav.static-solid{
-  box-shadow:0 1px 0 var(--line-dark), 0 14px 34px rgba(16,14,15,0.28);
-}
+/* nav bar deliberately left as the original: the clay treatment here is
+   scoped to the links only. */
 
 /* ---------------- cards ---------------- */
 .product-card,.collection-card,.loc-card,.brand-child,.brand-parent,
@@ -2099,37 +2097,143 @@ footer .footer-top{border-radius:var(--clay-radius-lg);}
     rgba(255,255,255,0.4) 100%);
 }
 
-/* 4. Navigation as a floating clay bar.
-      At the top of the page it stays flush so the hero runs edge to edge;
-      once scrolled it lifts into a rounded, raised surface. */
-.nav.solid,.nav.static-solid{
-  background-image:linear-gradient(180deg,
-    rgba(255,255,255,0.07) 0%,
-    rgba(255,255,255,0) 55%,
-    rgba(16,14,15,0.22) 100%);
-  box-shadow:
-    0 14px 34px rgba(16,14,15,0.30),
-    0 4px 10px rgba(16,14,15,0.22),
-    inset 0 1px 0 rgba(255,255,255,0.12);
-  border-bottom:none;
+
+/* ======================================================================
+   CLAY — REFINEMENT PASS 2
+   Raises the major-card radius into the 20–32px range, covers the four
+   components the first pass missed, and adds the micro-interactions.
+   Still no new colour: every value below is ink, white or lime.
+   ====================================================================== */
+:root{
+  --clay-radius:22px;        /* major cards — was 16px, below the intended range */
+  --clay-radius-lg:30px;     /* hero, panels, gallery */
+  --clay-radius-sm:14px;     /* inputs, chips, small controls */
 }
-.nav-links a{transition:color .3s var(--ease), transform .3s var(--ease);}
-.nav-links a:hover{transform:translateY(-1px);}
-/* the language pill and menu button read as tactile controls */
-.lang-toggle,.hamburger{
+
+/* ---------------- components the first pass missed ---------------- */
+
+/* client logos: raised discs rather than flat rings, so the marquee reads
+   as a row of physical tokens */
+.client-logo{
+  box-shadow:var(--clay-shadow-sm);
   transition:transform var(--clay-transition), box-shadow var(--clay-transition);
 }
-.lang-toggle{
-  box-shadow:0 4px 12px rgba(16,14,15,0.28), inset 0 1px 0 rgba(255,255,255,0.14);
+.client-logo:hover{transform:translateY(-3px);box-shadow:var(--clay-shadow);}
+
+/* heritage timeline: the active milestone presses in, the rest sit raised —
+   the clearest possible read of "you are here" without adding colour */
+.timeline-item{
+  border-radius:var(--clay-radius-sm);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition);
 }
-.lang-toggle:hover{transform:translateY(-1px);
-  box-shadow:0 8px 18px rgba(16,14,15,0.34), inset 0 1px 0 rgba(255,255,255,0.18);}
-.lang-toggle:active{transform:translateY(0);
-  box-shadow:inset 0 2px 5px rgba(16,14,15,0.4);}
-.nav-cta{box-shadow:var(--clay-shadow-sm);}
-.nav-cta:hover{transform:translateY(-2px);box-shadow:var(--clay-shadow);}
-.nav-cta:active{transform:translateY(0);box-shadow:var(--clay-shadow-pressed);}
+.timeline-item:hover{transform:translateY(-2px);}
+.timeline-item.active{box-shadow:var(--clay-shadow-pressed);}
+
+/* bespoke journey steps (homepage runs these on a dark band) */
+.journey-step{
+  border-radius:var(--clay-radius-sm);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition), background .3s var(--ease);
+}
+body[data-page="home"] .journey-step{box-shadow:var(--clay-shadow-dark);}
+body[data-page="home"] .journey-step:hover{transform:translateY(-3px);box-shadow:var(--clay-shadow-dark-hover);}
+
+/* highlight tags */
+.bs-highlight{box-shadow:var(--clay-shadow-sm);}
+
+/* ---------------- hero: a floating stage, not a flat band ---------------- */
+.hero-photo{box-shadow:var(--clay-shadow-dark);}
+
+/* ---------------- gentle image scaling ----------------
+   The lift belongs to the card; the photograph gets a slow, small scale so a
+   rug looks alive under the cursor without the pattern visibly swimming.
+   1.04 over 700ms is deliberately restrained — more reads as a slideshow. */
+.product-media img,.collection-card .motif img,.loc-card-visual img,
+.project-item .motif img,.stack-card-media img{
+  transition:transform .7s cubic-bezier(.22,.61,.36,1);
+}
+.product-card:hover .product-media img,
+.collection-card:hover .motif img,
+.project-item:hover .motif img{transform:scale(1.04);}
+
+/* ---------------- focus: brand accent, never a browser default ---------------- */
+.btn:focus-visible,.cat-pill:focus-visible,.loc-brand-btn:focus-visible,
+.brand-tab-btn:focus-visible,.book-brand-btn:focus-visible,.view-btn:focus-visible,
+.hc-chip:focus-visible,.date-chip:focus-visible,.slot-chip:focus-visible,
+.style-chip:focus-visible,.filter-btn:focus-visible{
+  outline:2px solid var(--brass);
+  outline-offset:3px;
+}
+
+/* ---------------- keeping flat space ----------------
+   Deliberately NOT given depth, so the page still breathes: section bands,
+   the page background, plain body copy, section headings and the nav while
+   it is at the top of the page. Listed explicitly so a later pass does not
+   quietly wrap everything in a card. */
+.section,.section-head,.container,.container-wide{box-shadow:none;}
+
+/* ---------------- responsive ---------------- */
+@media (max-width:860px){
+  :root{--clay-radius:20px;--clay-radius-lg:24px;--clay-radius-sm:12px;}
+}
+@media (max-width:560px){
+  :root{--clay-radius:18px;--clay-radius-lg:22px;--clay-radius-sm:11px;--clay-lift:-3px;}
+  /* touch targets stay comfortable regardless of the softer geometry */
+  .btn{min-height:44px;}
+  .cat-pill,.loc-brand-btn,.brand-tab-btn,.book-brand-btn{min-height:44px;}
+}
 
 @media (prefers-reduced-motion: reduce){
-  .nav-links a:hover,.lang-toggle:hover,.nav-cta:hover{transform:none;}
+  .client-logo,.client-logo:hover,.timeline-item,.timeline-item:hover,
+  .journey-step,.journey-step:hover,
+  .product-media img,.collection-card .motif img,.project-item .motif img,
+  .product-card:hover .product-media img,
+  .collection-card:hover .motif img,
+  .project-item:hover .motif img{transition:none;transform:none;}
+}
+
+/* ======================================================================
+   NAV LINKS — CLAYMORPHISM (links only)
+   ----------------------------------------------------------------------
+   The bar itself is untouched. Each link becomes a small tactile control:
+   at rest it is flat, on hover it presses into the bar, and the current
+   page stays pressed in with a faint lime wash.
+
+   A recess rather than a raised pill is the right read here — the links
+   sit ON the bar, so pushing them into its surface is physically coherent,
+   whereas floating them above a surface they belong to is not.
+
+   Colour unchanged: the wash is --brass at low alpha, the shadows are the
+   same near-black used across the clay system.
+   ====================================================================== */
+.nav-links a{
+  padding:8px 14px;
+  border-radius:var(--radius-pill);
+  transition:color .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
+}
+
+/* hover: pressed into the bar */
+.nav-links a:hover{
+  background:rgba(255,255,255,0.06);
+  box-shadow:
+    inset 0 2px 4px rgba(16,14,15,0.45),
+    inset 0 -1px 0 rgba(255,255,255,0.08);
+  transform:none;              /* an earlier rule lifted links; a recess and
+                                  a lift cannot both be true */
+}
+
+/* current page: held pressed, with the brand accent */
+.nav-links a.current{
+  background:rgba(183,204,51,0.14);
+  box-shadow:
+    inset 0 2px 5px rgba(16,14,15,0.5),
+    inset 0 -1px 0 rgba(255,255,255,0.10);
+}
+
+/* The expanding underline now duplicates what the recess already says, and
+   would span the full pill rather than the word. Retired here rather than
+   edited in place, so the original rule survives if this block is removed. */
+.nav-links a::after{display:none;}
+
+@media (prefers-reduced-motion: reduce){
+  .nav-links a{transition:none;}
 }

@@ -3173,7 +3173,8 @@ function buildCarouselMarkup(images){
       el.innerHTML = rows.map(r=>'<div class="preview-summary-row"><span>'+r[0]+'</span><span>'+r[1]+'</span></div>').join('');
     }
 
-    function goTo(step){
+    function goTo(step, opts){
+      opts = opts || {};
       if(step<0 || step>=STEP_COUNT) return;
       if(step > state.maxReached + 1) return;
       state.step = step;
@@ -3184,7 +3185,13 @@ function buildCarouselMarkup(images){
       renderStepContent();
       updateContinueState();
       renderRugPreview();
-      if(stepContainer.scrollIntoView) stepContainer.scrollIntoView({behavior: reducedMotion ? 'auto' : 'smooth', block:'start'});
+      // Scrolling to the step is for moving BETWEEN steps, so someone who has
+      // scrolled down to a Continue button lands back on the new step. On the
+      // initial render it is wrong: it dragged the page past its header and
+      // opened Bespoke Studio halfway down.
+      if(!opts.initial && stepContainer.scrollIntoView){
+        stepContainer.scrollIntoView({behavior: reducedMotion ? 'auto' : 'smooth', block:'start'});
+      }
     }
 
     progressEl.addEventListener('click', function(e){
@@ -3195,7 +3202,7 @@ function buildCarouselMarkup(images){
     backBtn.addEventListener('click', function(){ goTo(state.step-1); });
     continueBtn.addEventListener('click', function(){ if(canContinue()) goTo(state.step+1); });
 
-    goTo(0);
+    goTo(0, {initial:true});
   }
 
   document.addEventListener('DOMContentLoaded', initCommon);

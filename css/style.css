@@ -2512,3 +2512,29 @@ body[data-page="home"] .brand-child:hover::before{
   body[data-page="home"] .brand-child,
   body[data-page="home"] .brand-mark{transition:none;transform:none;}
 }
+
+/* ======================================================================
+   SHOWCASE VIDEOS — SQUARE CORNERS
+   ----------------------------------------------------------------------
+   The full-width hero on the homepage and the video headers on Projects and
+   Our Brands run edge to edge, so a radius left them looking inset and
+   clipped against the viewport. They return to square corners.
+
+   Overridden here rather than removed from the shared media rule, because
+   that same list rounds media that SHOULD stay rounded — brand photos and
+   solution images inside cards. Only the full-bleed showcases are reset.
+   ====================================================================== */
+.hero-photo,
+.hero-photo video,.hero-photo img,
+.pv-video,
+.pv-video video,.pv-video img,.pv-video iframe,
+.pv-video-header{
+  border-radius:0;
+  /* every corner set explicitly as well, so no earlier shorthand can leave a
+     single corner rounded in any browser */
+  border-top-left-radius:0;
+  border-top-right-radius:0;
+  border-bottom-left-radius:0;
+  border-bottom-right-radius:0;
+  box-shadow:none;
+}

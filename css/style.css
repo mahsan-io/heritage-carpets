@@ -2538,3 +2538,109 @@ body[data-page="home"] .brand-child:hover::before{
   border-bottom-right-radius:0;
   box-shadow:none;
 }
+
+/* ======================================================================
+   PRODUCT DETAIL PAGE — CLAYMORPHISM
+   ----------------------------------------------------------------------
+   The product page was the last untreated page: the related-product cards
+   had depth, but the product itself sat flat. Structure given to it:
+
+     image  -> raised frame, the object on display
+     thumbs -> small raised tiles; the selected one presses in
+     info   -> a single raised panel holding everything about the piece
+     specs  -> a recessed well inside that panel, like an engraved plate
+
+   Deliberately NOT wrapped in cards: the story and care blocks. They stay
+   flat text inside the info panel, divided by hairlines, so the panel reads
+   as one object rather than a stack of boxes.
+   Same palette as the rest of the clay system — no new colour.
+   ====================================================================== */
+
+/* ---- main image: the piece on display ---- */
+.pdp-main{
+  border-radius:var(--clay-radius-lg);
+  box-shadow:
+    0 26px 54px rgba(47,45,46,0.18),
+    0 8px 16px rgba(47,45,46,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.pdp-main-img{transition:opacity .5s var(--ease), transform .7s cubic-bezier(.22,.61,.36,1);}
+.pdp-main:hover .pdp-main-img.active{transform:scale(1.03);}
+
+/* ---- thumbnails: raised tiles, selected one pressed ---- */
+.pdp-thumbs{gap:12px;margin-top:16px;}
+.pdp-thumb{
+  border-radius:var(--clay-radius-sm);
+  border:2px solid transparent;
+  box-shadow:
+    0 6px 14px rgba(47,45,46,0.14),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition), border-color .25s var(--ease);
+}
+.pdp-thumb:hover{
+  transform:translateY(-3px);
+  border-color:var(--brass);
+  box-shadow:0 12px 22px rgba(47,45,46,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.pdp-thumb.active{
+  transform:translateY(0);
+  border-color:var(--madder);
+  box-shadow:inset 0 3px 8px rgba(16,14,15,0.45), 0 1px 0 rgba(255,255,255,0.7);
+}
+
+/* ---- info column: one raised panel ---- */
+.pdp-info{
+  padding:34px 34px 30px;
+  border-radius:var(--clay-radius-lg);
+  background:linear-gradient(180deg, #FFFFFF 0%, var(--parchment-2) 60%, #F4F4F2 100%);
+  border:1px solid rgba(47,45,46,0.07);
+  box-shadow:
+    0 20px 44px rgba(47,45,46,0.11),
+    0 6px 12px rgba(47,45,46,0.06),
+    inset 0 2px 0 rgba(255,255,255,1),
+    inset 0 -2px 0 rgba(47,45,46,0.06);
+}
+
+/* ---- sale badge: a small raised token ---- */
+.pdp-sale{
+  box-shadow:0 5px 12px rgba(110,124,31,0.28), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+/* ---- action buttons: sit on their own ledge ---- */
+.pdp-actions{
+  margin-top:26px;
+  padding:14px;
+  border-radius:var(--clay-radius);
+  background:rgba(47,45,46,0.035);
+  box-shadow:inset 0 2px 6px rgba(47,45,46,0.08), inset 0 -1px 0 rgba(255,255,255,0.9);
+}
+
+/* ---- specifications: a recessed, engraved plate ---- */
+.pdp-block:has(.spec-row){
+  padding:18px 22px;
+  border-top:none;
+  border-radius:var(--clay-radius);
+  background:linear-gradient(180deg, #F0F0EE 0%, #F6F6F4 100%);
+  box-shadow:
+    inset 0 3px 8px rgba(47,45,46,0.10),
+    inset 0 -1px 0 rgba(255,255,255,0.95);
+}
+.pdp-block:has(.spec-row) .spec-row{border-bottom-color:rgba(47,45,46,0.08);}
+.spec-row{transition:background .2s var(--ease);}
+.spec-row:hover{background:rgba(183,204,51,0.07);}
+.spec-key{opacity:0.62;}
+.spec-val{font-weight:600;}
+
+/* story + care: flat on purpose, divided by hairlines only */
+.pdp-story,.pdp-care{box-shadow:none;background:none;}
+
+@media (max-width:760px){
+  .pdp-info{padding:26px 22px 22px;}
+  .pdp-actions{padding:10px;}
+  .pdp-block:has(.spec-row){padding:14px 16px;}
+  .pdp-thumb{width:64px;height:64px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .pdp-thumb,.pdp-thumb:hover,.pdp-main-img,
+  .pdp-main:hover .pdp-main-img.active{transition:none;transform:none;}
+}

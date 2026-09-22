@@ -2644,3 +2644,24 @@ body[data-page="home"] .brand-child:hover::before{
   .pdp-thumb,.pdp-thumb:hover,.pdp-main-img,
   .pdp-main:hover .pdp-main-img.active{transition:none;transform:none;}
 }
+
+/* ======================================================================
+   OUR BRANDS — SPACING (homepage)
+   ----------------------------------------------------------------------
+   1. Heading-to-card gap. An earlier homepage rule set .section-head
+      margin-bottom to 0 so the heading-plus-button header rows could sit
+      flush. The brands heading is not one of those rows, but it caught the
+      same rule — so the lead paragraph ran straight into the Heritage Group
+      card. The gap is restored for this section only.
+
+   2. Section start. The homepage padding rule (76px) outranked the brands
+      section's own 48px, and it stacked on the timeline's bottom padding
+      directly above, leaving the eyebrow a long way down. Pulled up.
+   ====================================================================== */
+body[data-page="home"] .brands-section .section-head{margin-bottom:52px;}
+body[data-page="home"] .section.brands-section{padding-top:28px;}
+
+@media (max-width:860px){
+  body[data-page="home"] .brands-section .section-head{margin-bottom:38px;}
+  body[data-page="home"] .section.brands-section{padding-top:20px;}
+}

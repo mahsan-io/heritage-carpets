@@ -30,7 +30,7 @@ window.HeritageBrandShowcase = (function(){
 
     /* ---------------- 1. Heritage Group — parent company overview ---------------- */
     'heritage-group': {
-      kind:'detail', motif:'medallion', folder:'Assets/brands/heritage/', logo:'logo.png', photos:['1.jpg'],
+      kind:'detail', motif:'medallion', folder:'Assets/brands/heritage/', logo:'logo.png', photos:['1.jpg','2.jpg','3.jpg'],
       actions:[ {key:'locations', href:'locations.html'} ],
       en: {
         name:'Heritage Group',
@@ -68,7 +68,7 @@ window.HeritageBrandShowcase = (function(){
 
     /* ---------------- 2. Heritage Carpets ---------------- */
     'heritage-carpets': {
-      kind:'detail', motif:'medallion', folder:'Assets/brands/heritage/', logo:'logo.png', photos:['2.jpg'],
+      kind:'detail', motif:'medallion', folder:'Assets/brands/heritage/', logo:'logo.png', photos:['4.jpg','5.jpg','6.jpg'],
       actions:[
         {key:'products', href:'collections.html'},
         {key:'projects', href:'projects.html'},
@@ -103,7 +103,7 @@ window.HeritageBrandShowcase = (function(){
 
     /* ---------------- 4. Divano (link card -> furniture.html) ---------------- */
     divano: {
-      kind:'link', target:'furniture.html', motif:'sofa', folder:'Assets/brands/divano/', logo:'D_logo.png', photos:['D_1.jpg'],
+      kind:'link', target:'furniture.html', motif:'sofa', folder:'Assets/brands/divano/', logo:'D_logo.png', photos:['D_1.jpg','D_2.jpg','D_3.jpg'],
       en: { name:'Divano', tagline:'Contemporary home-furnishing, engineered for value.',
         intro:'The ideal choice for residential, commercial, and hospitality clients seeking contemporary home-furnishing solutions; every Divano product achieves the concept of "value for money" by offering the perfect balance between high quality and affordability.' },
       ar: { name:'ديفانو', tagline:'تأثيث منزلي معاصر، مصمم ليمنحك أفضل قيمة.',
@@ -123,7 +123,7 @@ window.HeritageBrandShowcase = (function(){
 
     /* ---------------- 6. Carpet Land (link card -> flooring.html) ---------------- */
     'carpet-land': {
-      kind:'link', target:'flooring.html', motif:'floorplan', folder:'Assets/brands/carpet_land/', logo:'logo.png', photos:['1.jpg'],
+      kind:'link', target:'flooring.html', motif:'floorplan', folder:'Assets/brands/carpet_land/', logo:'logo.png', photos:['1.jpg','2.jpg','3.jpg'],
       en: { name:'Carpet Land', tagline:'Wholesale flooring, for every facility.',
         // note: the source text read "BÓB market" — read here as "B2B market"
         // (business-to-business); flagged for confirmation.

@@ -23,7 +23,6 @@ window.HeritageProjects = (function(){
   const video = {
     // e.g. 'Assets/projects/showcase.mp4'  — leave '' until the file is supplied
     src: 'Assets/projects/HERITAGE-PROJECT.mp4',
-    poster: 'Assets/projects/heritage-poster.jpg',
     embed: ''   // e.g. 'https://www.youtube.com/embed/XXXXXXXX' — takes priority if set
   };
 

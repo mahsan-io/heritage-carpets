@@ -135,9 +135,9 @@ window.HeritageBrandShowcase = (function(){
 
   const video = {
     videos: [
-      { src: 'Assets/HERITAGE.mp4', poster: 'Assets/hcc.png' },
-      { src: 'Assets/divano.mp4',   poster: 'Assets/divano.png' },
-      { src: 'Assets/divano-1.mp4', poster: 'Assets/divano.png' }
+      { src: 'Assets/HERITAGE.mp4'},
+      { src: 'Assets/divano.mp4'},
+      { src: 'Assets/divano-1.mp4'}
     ],
     embed: ''
   };

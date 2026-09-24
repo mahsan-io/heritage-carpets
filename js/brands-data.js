@@ -123,7 +123,7 @@ window.HeritageBrandShowcase = (function(){
 
     /* ---------------- 6. Carpet Land (link card -> flooring.html) ---------------- */
     'carpet-land': {
-      kind:'link', target:'flooring.html', motif:'floorplan', folder:'Assets/brands/carpet_land/', photos:['logo.png','1.jpg','2.jpg','3.jpg'],
+      kind:'link', target:'flooring.html', motif:'floorplan', folder:'Assets/brands/carpet_land/', photos:['logo.png','1.jpg','2.jpg','3.jpg','4.jpg'],
       en: { name:'Carpet Land', tagline:'Wholesale flooring, for every facility.',
         // note: the source text read "BÓB market" — read here as "B2B market"
         // (business-to-business); flagged for confirmation.

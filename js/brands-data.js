@@ -103,7 +103,7 @@ window.HeritageBrandShowcase = (function(){
 
     /* ---------------- 4. Divano (link card -> furniture.html) ---------------- */
     divano: {
-      kind:'link', target:'furniture.html', motif:'sofa', folder:'Assets/brands/divano/', photos:['D_1.jpg','D_2.jpg','D_3.jpg'],
+      kind:'link', target:'furniture.html', motif:'sofa', folder:'Assets/brands/divano/', photos:['D_0.png','D_1.jpg','D_2.jpg','D_3.jpg'],
       en: { name:'Divano', tagline:'Contemporary home-furnishing, engineered for value.',
         intro:'The ideal choice for residential, commercial, and hospitality clients seeking contemporary home-furnishing solutions; every Divano product achieves the concept of "value for money" by offering the perfect balance between high quality and affordability.' },
       ar: { name:'ديفانو', tagline:'تأثيث منزلي معاصر، مصمم ليمنحك أفضل قيمة.',
@@ -112,7 +112,7 @@ window.HeritageBrandShowcase = (function(){
 
     /* ---------------- 5. Divano Elite (link card -> furniture.html) ---------------- */
     'divano-elite': {
-      kind:'link', target:'furniture.html', motif:'frame', folder:'Assets/brands/divano/', photos:['D_1.jpg','D_4.jpg','D_5.jpg'],
+      kind:'link', target:'furniture.html', motif:'frame', folder:'Assets/brands/divano/', photos:['D_0.png','D_4.jpg','D_5.jpg','D_6.jpg'],
       en: { name:'Divano Elite', tagline:'Italian-inspired, limited edition, unmistakably yours.',
         intro:'For those who love to stand out, Divano Elite presents exclusive, high-quality Italian-inspired home furniture and accessories available in limited editions, with more personalised services and a distinguished overall experience for customers.',
         highlights:['Interior Design Solutions','Bespoke Orders'] },

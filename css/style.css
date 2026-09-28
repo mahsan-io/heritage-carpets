@@ -2665,3 +2665,171 @@ body[data-page="home"] .section.brands-section{padding-top:28px;}
   body[data-page="home"] .brands-section .section-head{margin-bottom:38px;}
   body[data-page="home"] .section.brands-section{padding-top:20px;}
 }
+
+/* ======================================================================
+   PROJECTS PAGE — RHYTHM, COMMERCIAL, WHAT WE DELIVER, HOW WE WORK
+   ----------------------------------------------------------------------
+   Scoped to body[data-page="projects"]: .commercial-grid is also used on the
+   homepage, and none of this should reach it.
+   ====================================================================== */
+
+/* ---- rhythm: no section starts deep down the page ----
+   Every section here sat on the site-wide 120px, plus a 64px gap under each
+   heading — 184px of space before any content began. */
+body[data-page="projects"] .section{padding:72px 0;}
+body[data-page="projects"] .section-head{margin-bottom:40px;}
+/* the first section follows the video directly; it needs very little top space */
+body[data-page="projects"] .pv-commercial{padding-top:52px;padding-bottom:60px;}
+body[data-page="projects"] .pv-gallery-section{padding-bottom:56px;}
+
+/* ---- every heading on this page centred ---- */
+body[data-page="projects"] .section-head{margin-inline:auto;text-align:center;}
+body[data-page="projects"] .section-head p{margin-inline:auto;}
+body[data-page="projects"] .section-head .eyebrow{justify-content:center;}
+
+/* ======================================================================
+   COMMERCIAL SOLUTIONS — centred, compact, dark clay tiles
+   Previously five flat tiles ran edge to edge, separated by 1px lines.
+   Now they sit inside the page width as raised tiles with air between them.
+   ====================================================================== */
+body[data-page="projects"] .pv-commercial .commercial-grid{
+  max-width:1320px;margin-inline:auto;padding-inline:32px;
+  gap:14px;background:transparent;
+}
+body[data-page="projects"] .pv-commercial .commercial-card{
+  padding:26px 18px 24px;
+  border-radius:var(--clay-radius);
+  background:
+    radial-gradient(130% 120% at 50% -30%, rgba(183,204,51,0.16) 0%, transparent 60%),
+    linear-gradient(180deg, #403E3F 0%, var(--ink) 58%, #282627 100%);
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 16px 32px rgba(16,14,15,0.34),
+    0 5px 10px rgba(16,14,15,0.24),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -2px 0 rgba(16,14,15,0.5);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition), border-color .3s var(--ease);
+}
+body[data-page="projects"] .pv-commercial .commercial-card:hover{
+  transform:translateY(-5px);
+  border-color:rgba(183,204,51,0.4);
+  background:
+    radial-gradient(130% 120% at 50% -30%, rgba(183,204,51,0.24) 0%, transparent 62%),
+    linear-gradient(180deg, #454344 0%, var(--ink) 58%, #282627 100%);
+  box-shadow:
+    0 24px 44px rgba(16,14,15,0.42),
+    0 8px 16px rgba(16,14,15,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    inset 0 -2px 0 rgba(16,14,15,0.55);
+}
+/* the icon sits in a recessed well, so it reads as set into the tile */
+body[data-page="projects"] .pv-commercial .commercial-card svg{
+  width:30px;height:30px;padding:13px;box-sizing:content-box;
+  border-radius:50%;
+  background:rgba(16,14,15,0.35);
+  box-shadow:inset 0 2px 6px rgba(16,14,15,0.6), inset 0 -1px 0 rgba(255,255,255,0.08);
+}
+body[data-page="projects"] .pv-commercial .commercial-card h4{margin-top:14px;font-size:14px;}
+body[data-page="projects"] .pv-commercial .commercial-card p{margin-top:6px;font-size:12.5px;line-height:1.5;}
+
+/* ======================================================================
+   WHAT WE DELIVER — centred heading, wider measure
+   ====================================================================== */
+body[data-page="projects"] .pv-intro .section-head{max-width:880px;}
+body[data-page="projects"] .pv-intro .section-head p{max-width:72ch;}
+
+/* ======================================================================
+   HOW WE WORK — light clay cards with a stepped brand-green accent
+   ----------------------------------------------------------------------
+   The six steps were dark flat tiles edge to edge. Now: raised parchment
+   cards inside the page width, each carrying a number set in a raised
+   green disc and an accent band along the top.
+
+   The colour steps through the site's own greens, from the bright lime
+   (--brass) to the deep olive (--madder), so the sequence reads as a
+   progression 01 -> 06 without introducing any new hue. The four middle
+   tones are interpolations between those two.
+   ====================================================================== */
+body[data-page="projects"] .pv-process{
+  --step-1:#B7CC33;   /* --brass */
+  --step-2:#A8BE30;
+  --step-3:#9AAF2C;
+  --step-4:#8B9F28;
+  --step-5:#7C8E24;
+  --step-6:#6E7C1F;   /* --madder */
+}
+body[data-page="projects"] .pv-process .process-grid{
+  max-width:1320px;margin-inline:auto;padding-inline:32px;
+  gap:18px;background:transparent;
+}
+body[data-page="projects"] .pv-process .process-step{
+  --accent:var(--step-1);
+  position:relative;overflow:hidden;
+  padding:30px 26px 28px;
+  border-radius:var(--clay-radius);
+  background:linear-gradient(180deg, #FFFFFF 0%, var(--parchment) 70%, #EAEAE7 100%);
+  border:1px solid rgba(47,45,46,0.08);
+  box-shadow:
+    0 14px 30px rgba(47,45,46,0.12),
+    0 4px 8px rgba(47,45,46,0.07),
+    inset 0 2px 0 rgba(255,255,255,1),
+    inset 0 -2px 0 rgba(47,45,46,0.08);
+  transition:transform var(--clay-transition), box-shadow var(--clay-transition), border-color .3s var(--ease);
+}
+body[data-page="projects"] .pv-process .process-step:nth-child(2){--accent:var(--step-2);}
+body[data-page="projects"] .pv-process .process-step:nth-child(3){--accent:var(--step-3);}
+body[data-page="projects"] .pv-process .process-step:nth-child(4){--accent:var(--step-4);}
+body[data-page="projects"] .pv-process .process-step:nth-child(5){--accent:var(--step-5);}
+body[data-page="projects"] .pv-process .process-step:nth-child(6){--accent:var(--step-6);}
+
+/* accent band along the top edge */
+body[data-page="projects"] .pv-process .process-step::before{
+  content:"";position:absolute;inset:0 0 auto 0;height:4px;
+  background:linear-gradient(90deg, var(--accent), rgba(183,204,51,0.25));
+}
+body[data-page="projects"] .pv-process .process-step:hover{
+  transform:translateY(-6px);
+  border-color:var(--accent);
+  box-shadow:
+    0 24px 48px rgba(47,45,46,0.18),
+    0 8px 14px rgba(47,45,46,0.09),
+    inset 0 2px 0 rgba(255,255,255,1),
+    inset 0 -2px 0 rgba(47,45,46,0.1);
+}
+/* the number: a raised disc in that step's green */
+body[data-page="projects"] .pv-process .process-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:48px;height:48px;border-radius:50%;
+  font-size:18px;font-weight:600;color:var(--clay-btn-ink);
+  background:radial-gradient(120% 120% at 35% 25%, rgba(255,255,255,0.45) 0%, transparent 55%), var(--accent);
+  box-shadow:
+    0 6px 14px rgba(47,45,46,0.22),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -2px 0 rgba(16,14,15,0.18);
+}
+/* the cards are light now, so the text follows */
+body[data-page="projects"] .pv-process .process-step h4{color:var(--ink-text);margin-top:16px;}
+body[data-page="projects"] .pv-process .process-step p{color:var(--ink-text);opacity:0.72;}
+
+/* ---- responsive: breakpoints restated because the scoped rules above are
+   more specific than the site-wide ones and would otherwise hold 5/3 columns */
+@media (max-width:1100px){
+  body[data-page="projects"] .pv-commercial .commercial-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media (max-width:860px){
+  body[data-page="projects"] .section{padding:52px 0;}
+  body[data-page="projects"] .pv-commercial{padding-top:36px;}
+  body[data-page="projects"] .section-head{margin-bottom:30px;}
+  body[data-page="projects"] .pv-process .process-grid{grid-template-columns:repeat(2,1fr);}
+  body[data-page="projects"] .pv-commercial .commercial-grid,
+  body[data-page="projects"] .pv-process .process-grid{padding-inline:20px;}
+}
+@media (max-width:560px){
+  body[data-page="projects"] .pv-commercial .commercial-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  body[data-page="projects"] .pv-process .process-grid{grid-template-columns:1fr;gap:14px;}
+  body[data-page="projects"] .pv-commercial .commercial-card{padding:20px 14px;}
+}
+@media (prefers-reduced-motion: reduce){
+  body[data-page="projects"] .pv-commercial .commercial-card,
+  body[data-page="projects"] .pv-process .process-step{transition:none;transform:none;}
+}

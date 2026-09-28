@@ -508,7 +508,7 @@ function buildCarouselMarkup(images){
     if(galleryMain){
       const swatchColor = product.color==='ivory' ? '#B7CC33' : '#C9DC5E';
       galleryMain.innerHTML = motifSVG(product.motif, swatchColor) +
-        images.map((src,i)=>'<img class="pdp-main-img'+(i===0?' active':'')+'" data-index="'+i+'" src="'+src+'" alt="'+product.name+'">').join('');
+        images.map((src,i)=>'<img class="pdp-main-img'+(i===0?' active':'')+'" data-index="'+i+'"'+(i===0?'':' loading="lazy" decoding="async"')+' src="'+src+'" alt="'+product.name+'">').join('');
       if(galleryThumbs){
         galleryThumbs.innerHTML = images.map((src,i)=>
           '<button type="button" class="pdp-thumb'+(i===0?' active':'')+'" data-index="'+i+'" aria-label="'+(i+1)+'"><img src="'+src+'" alt="" loading="lazy"></button>'
@@ -578,6 +578,12 @@ function buildCarouselMarkup(images){
       push(i18n.specLabels.knots, detail.knots);
       if(product.room && product.room.length){
         push(i18n.specLabels.room, product.room.map(r=>L.room[r]).filter(Boolean).join(', '));
+      }
+      // Extra rows straight from a manufacturer spec sheet, when the product
+      // carries them (carpet tiles: pile weight, tile size, per box, backing,
+      // installation, antistatic). Supplied per language in js/data.js.
+      if(Array.isArray(product.specs)){
+        product.specs.forEach(function(r){ push(r[0], r[1]); });
       }
       specEl.innerHTML = rows.map(r=>
         '<div class="spec-row"><span class="spec-key">'+r[0]+'</span><span class="spec-val">'+r[1]+'</span></div>'
@@ -1557,7 +1563,24 @@ function buildCarouselMarkup(images){
       srcEl.addEventListener('error', onErr, {once:true});
     }
 
-    playCurrent();
+    /* Lazy start. This function runs once per language block, and the
+       inactive block is hidden — but an `autoplay` video fetches even while
+       hidden, so every page with a header video was streaming a second copy
+       of a 20–60 MB file nobody could see. The video is now only created once
+       its container is actually visible. The block on screen intersects
+       immediately and starts as before; the hidden one waits until the
+       visitor switches language, then starts on its own. */
+    if('IntersectionObserver' in window){
+      const io = new IntersectionObserver(function(entries){
+        if(entries.some(e => e.isIntersecting)){
+          io.disconnect();
+          playCurrent();
+        }
+      }, { rootMargin:'200px 0px' });
+      io.observe(videoWrap);
+    } else {
+      playCurrent();   // very old browsers: previous behaviour
+    }
   }
 
   function renderProjectsPage(config, root){
@@ -1645,7 +1668,7 @@ function buildCarouselMarkup(images){
       gal.innerHTML = slides.map((s,i)=>
         '<div class="pv-slide'+(i===0?' active':'')+'" data-index="'+i+'">'+
           motifSVG('medallion','#C9DC5E')+
-          '<img src="Assets/projects/'+s.slug+'.jpg" alt="'+s.label+'">'+
+          '<img src="Assets/projects/'+s.slug+'.jpg" alt="'+s.label+'" loading="lazy" decoding="async">'+
           '<div class="pv-slide-label">'+s.label+'</div>'+
         '</div>'
       ).join('');
@@ -1794,7 +1817,7 @@ function buildCarouselMarkup(images){
       const logoWrap = root.querySelector('[data-role="cp-story-logo"]');
       if(logoWrap){
         if(C.storyLogo){
-          logoWrap.innerHTML = '<img src="'+C.storyLogo+'" alt="">';
+          logoWrap.innerHTML = '<img src="'+C.storyLogo+'" alt="" loading="lazy" decoding="async">';
           logoWrap.querySelector('img').addEventListener('error', function(){ logoWrap.style.display = 'none'; }, {once:true});
         } else {
           // pages without a single brand logo (e.g. Flooring) shouldn't leave
@@ -1990,7 +2013,7 @@ function buildCarouselMarkup(images){
 
       const logoBlock = logoSrc ? (
         '<div class="bs-logo">'+
-          '<img src="'+logoSrc+'" alt="'+C.name+'">'+
+          '<img src="'+logoSrc+'" alt="'+C.name+'" loading="lazy" decoding="async">'+
           '<span class="bs-logo-fallback">'+C.name+'</span>'+
         '</div>'
       ) : '<h3 class="bs-name-fallback">'+C.name+'</h3>';
@@ -2490,7 +2513,8 @@ function buildCarouselMarkup(images){
         styles:['persian','turkish','oriental'] },
       { key:'machine-made', tags:['machine-made','contemporary'],
         styles:['contemporary'] },
-      { key:'commercial',   tags:['commercial'], styles:[] }
+      { key:'commercial',   tags:['commercial','carpet-tiles','crayon','mont-blanc','space-x','toscana'],
+        styles:['crayon','mont-blanc','space-x','toscana'] }
     ];
     const EXCLUDED = ['furniture','accessories'];
 

@@ -19,7 +19,7 @@
       <img class="logo-img" src="Assets/Heritage.png" alt="Heritage Carpet Company"><span class="logo-fallback-text">Heritage</span>
     </a>
     <div class="nav-links">
-      <a href="collections.html">Collections</a>
+      <a href="collections.html" class="current">Collections</a>
       <a href="furniture.html">Furniture</a>
       <a href="flooring.html">Flooring</a>
       <a href="bespoke.html">Bespoke Studio</a>
@@ -47,7 +47,7 @@
 
 <!-- ============ PAGE HEADER ============ -->
 <header class="page-header">
-  <div class="page-header-media"><img src="Assets/headers/collections.jpg" alt=""></div>
+  <div class="page-header-media"><img fetchpriority="high" src="Assets/headers/collections.jpg" alt=""></div>
   <div class="container-wide">
     <div class="breadcrumb"><a href="index.html">Home</a> / Collections</div>
     <h1>The Heritage Collection</h1>
@@ -61,7 +61,8 @@
   <div class="plp-layout">
     <main>
       <div class="category-bar" data-role="category-bar"></div>
-      <div class="style-bar" data-role="style-bar" hidden></div>
+      <div class="style-bar" data-role="category-sub-bar" hidden></div>
+      <div class="style-bar style-bar-3" data-role="style-bar" hidden></div>
       <div class="plp-toolbar">
         <div class="result-count" data-role="result-count"></div>
         <div class="plp-toolbar-controls">
@@ -100,7 +101,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <a href="index.html" class="nav-logo">
-          <img class="logo-img" src="Assets/Heritage.png" alt="Heritage Carpet Company"><span class="logo-fallback-text">Heritage</span>
+          <img class="logo-img" loading="lazy" decoding="async" src="Assets/Heritage.png" alt="Heritage Carpet Company"><span class="logo-fallback-text">Heritage</span>
         </a>
         <p>Luxury woven through generations. Saudi Arabia's home for handmade and bespoke carpets since 1975.</p>
         <div class="footer-social">
@@ -145,7 +146,7 @@
       <img class="logo-img" src="Assets/Heritage.png" alt="شركة التراث للسجاد"><span class="logo-fallback-text">التراث</span>
     </a>
     <div class="nav-links">
-      <a href="collections.html">المجموعات</a>
+      <a href="collections.html" class="current">المجموعات</a>
       <a href="furniture.html">الأثاث</a>
       <a href="flooring.html">الأرضيات</a>
       <a href="bespoke.html">التصميم الحصري</a>
@@ -173,7 +174,7 @@
 
 <!-- ============ PAGE HEADER ============ -->
 <header class="page-header">
-  <div class="page-header-media"><img src="Assets/headers/collections.jpg" alt=""></div>
+  <div class="page-header-media"><img fetchpriority="high" src="Assets/headers/collections.jpg" alt=""></div>
   <div class="container-wide">
     <div class="breadcrumb"><a href="index.html">الرئيسية</a> / المجموعات</div>
     <h1>مجموعة التراث</h1>
@@ -187,7 +188,8 @@
   <div class="plp-layout">
     <main>
       <div class="category-bar" data-role="category-bar"></div>
-      <div class="style-bar" data-role="style-bar" hidden></div>
+      <div class="style-bar" data-role="category-sub-bar" hidden></div>
+      <div class="style-bar style-bar-3" data-role="style-bar" hidden></div>
       <div class="plp-toolbar">
         <div class="result-count" data-role="result-count"></div>
         <div class="plp-toolbar-controls">
@@ -226,7 +228,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <a href="index.html" class="nav-logo">
-          <img class="logo-img" src="Assets/Heritage.png" alt="شركة التراث للسجاد"><span class="logo-fallback-text">التراث</span>
+          <img class="logo-img" loading="lazy" decoding="async" src="Assets/Heritage.png" alt="شركة التراث للسجاد"><span class="logo-fallback-text">التراث</span>
         </a>
         <p>فخامة منسوجة عبر الأجيال. بيت السجاد اليدوي والحصري في السعودية منذ 1975.</p>
         <div class="footer-social">
@@ -276,7 +278,9 @@
       viewDetails: 'View Details',
       inquire: 'Inquire',
       inquireSubjectPrefix: 'Inquiry: ',
-      resultCount: 'Showing {count} of {total} pieces'
+      resultCount: 'Showing {count} of {total} pieces',
+      allPieces: 'All',
+      shopOnDivano: 'Shop this range on Divano'
     },
     products: HeritageData.products.en
   }, document.querySelector('.lang-block[data-lang="en"]'));
@@ -289,7 +293,9 @@
       viewDetails: 'عرض التفاصيل',
       inquire: 'استفسار',
       inquireSubjectPrefix: 'استفسار: ',
-      resultCount: 'عرض {count} من أصل {total} قطعة'
+      resultCount: 'عرض {count} من أصل {total} قطعة',
+      allPieces: 'الكل',
+      shopOnDivano: 'تسوق هذه المجموعة على ديفانو'
     },
     products: HeritageData.products.ar
   }, document.querySelector('.lang-block[data-lang="ar"]'));

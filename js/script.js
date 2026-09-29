@@ -299,7 +299,7 @@ window.Heritage = (function(){
      so existing content never breaks:
        collections -> Assets/collections/{slug}.png
        projects    -> Assets/projects/{slug}.jpg
-       products    -> Assets/products/{handle}.jpg
+       products    -> Assets/products/<division>/<category>[/<sub>]/{handle}.jpg
      Markup is built as a plain HTML string (matching how every other card here is
      rendered), then initCarousels() wires up rotation/hover/dots/error-handling
      afterwards, once the HTML is actually in the DOM. -------------------------------- */
@@ -311,8 +311,33 @@ window.Heritage = (function(){
     // backward-compatible single-image fallback, matching the original naming convention
     if(kind==='collections' && item.slug) return ['Assets/collections/'+item.slug+'.png'];
     if(kind==='projects' && item.slug) return ['Assets/projects/'+item.slug+'.jpg'];
-    if(kind==='products' && item.handle) return ['Assets/products/'+item.handle+'.jpg'];
+    if(kind==='products' && item.handle) return ['Assets/products/'+productFolder(item)+item.handle+'.jpg'];
     return [];
+  }
+
+  /* Product images live in folders mirroring the product tree:
+       Assets/products/<division>/<category>[/<sub>]/<file>
+     A product that lists its images explicitly is unaffected; this only
+     builds the fallback path, so it has to follow the same shape or the
+     guess would point at a folder that no longer exists. */
+  function productFolder(item){
+    const tree = window.HeritageData && window.HeritageData.tree;
+    const cats = item.category || [];
+    if(!tree || !cats.length) return '';
+    const div = cats[0];
+    if(!tree.divisions[div]) return 'furniture/';          // off-tree items
+    // the division key is 'furniture-division' (so it cannot clash with the
+    // older 'furniture' product tag), but the folder is just 'furniture'
+    let path = (div === 'furniture-division' ? 'furniture' : div) + '/';
+    const cat = cats[1];
+    if(cat && tree.divisions[div].indexOf(cat) > -1){
+      path += cat + '/';
+      const subs = tree.subs[cat] || [];
+      for(let i = 2; i < cats.length; i++){
+        if(subs.indexOf(cats[i]) > -1){ path += cats[i] + '/'; break; }
+      }
+    }
+    return path;
   }
 
 function buildCarouselMarkup(images){
@@ -2708,7 +2733,28 @@ function buildCarouselMarkup(images){
       const resultCountEl = root.querySelector('[data-role="result-count"]');
       if(resultCountEl) resultCountEl.textContent = i18n.resultCount.replace('{count}', filtered.length).replace('{total}', PRODUCTS.length);
       const emptyEl = root.querySelector('[data-role="empty-state"]');
-      if(emptyEl) emptyEl.classList.toggle('show', filtered.length===0);
+      if(emptyEl){
+        emptyEl.classList.toggle('show', filtered.length===0);
+        /* Furniture is sold through Divano's own store, so a furniture branch
+           with nothing in this catalogue should hand the visitor onward rather
+           than leave them at a dead end. */
+        const node = [...state.subs][0] || state.category || state.division;
+        const url = filtered.length===0 && TREE.links ? TREE.links[node] : null;
+        let cta = emptyEl.querySelector('[data-role="empty-cta"]');
+        if(url){
+          if(!cta){
+            cta = document.createElement('a');
+            cta.className = 'btn btn-fill';
+            cta.setAttribute('data-role','empty-cta');
+            cta.setAttribute('target','_blank');
+            cta.setAttribute('rel','noopener');
+            emptyEl.appendChild(cta);
+          }
+          cta.href = url;
+          cta.textContent = (i18n.shopOnDivano || 'Shop this range on Divano');
+          cta.hidden = false;
+        }else if(cta){ cta.hidden = true; }
+      }
       renderChips();
     }
 

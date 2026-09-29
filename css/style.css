@@ -2833,3 +2833,30 @@ body[data-page="projects"] .pv-process .process-step p{color:var(--ink-text);opa
   body[data-page="projects"] .pv-commercial .commercial-card,
   body[data-page="projects"] .pv-process .process-step{transition:none;transform:none;}
 }
+
+/* ======================================================================
+   COLLECTIONS — three-level navigation
+   Divisions (pills) > Categories (chips with counts) > Sub-categories.
+   The second row is given slightly more presence than the third so the
+   hierarchy is readable at a glance.
+   ====================================================================== */
+[data-role="category-sub-bar"] .style-chip{
+  padding:9px 16px;font-size:13px;gap:8px;
+  display:inline-flex;align-items:center;
+}
+[data-role="category-sub-bar"] .chip-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:19px;height:19px;padding:0 5px;margin-inline-start:7px;
+  font-size:10.5px;font-weight:700;
+  background:rgba(47,45,46,0.08);border-radius:var(--radius-pill);
+}
+[data-role="category-sub-bar"] .style-chip.active .chip-count{
+  background:rgba(47,45,46,0.16);
+}
+/* a category with nothing in it yet stays visible but reads as unavailable */
+[data-role="category-sub-bar"] .style-chip.is-empty{opacity:0.45;}
+[data-role="category-sub-bar"] .style-chip.is-empty:hover{
+  opacity:0.6;border-color:var(--line-light);transform:none;
+}
+/* third row sits tighter under the second */
+.style-bar-3{margin-top:-8px;}

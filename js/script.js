@@ -2492,116 +2492,100 @@ function buildCarouselMarkup(images){
     const i18n = config.i18n;
 
     /* ---------------- category structure ----------------
-       The raw data carries nine tags, which is far too many choices to put in
-       front of a shopper. They collapse into three that match how carpets are
-       actually bought — and, usefully, onto the group's own brands:
+       Three levels, defined in js/data.js so adding a branch is a data edit:
 
-         Handmade      -> persian, turkish, oriental   (Heritage Carpets)
-         Machine-Made  -> contemporary                 (Platinum Carpets)
-         Commercial    -> contract / hospitality       (Carpet Land)
+         Division      Area Rugs | Flooring | Furniture
+         Category      Handmade Rug, Carpet Tiles, Vinyl Flooring, ...
+         Sub-category  Persian, Crayon, Toscana, ...
 
-       The old tags aren't thrown away: they become a second row of "style"
-       chips that appears only once a primary category is chosen, so an
-       existing link like ?category=persian still lands exactly where it used
-       to — on Persian pieces — rather than 404-ing a bookmark.
+       Each row of controls appears only once its parent is chosen, so the
+       page opens as three simple choices rather than twenty.
 
-       Furniture and accessories are excluded outright: this page is the rug
-       catalogue, and Divano furniture lives on furniture.html and its own
-       store. */
-    const MAJORS = [
-      { key:'handmade',     tags:['handmade','persian','turkish','oriental'],
-        styles:['persian','turkish','oriental'] },
-      { key:'machine-made', tags:['machine-made','contemporary'],
-        styles:['contemporary'] },
-      { key:'commercial',   tags:['commercial','carpet-tiles','crayon','mont-blanc','space-x','toscana'],
-        styles:['crayon','mont-blanc','space-x','toscana'] }
-    ];
+       Furniture and accessories products stay out of this page: it is the
+       rug and flooring catalogue, and Divano furniture has its own page and
+       store. The Furniture DIVISION is shown because it was asked for, and
+       currently holds nothing. */
+    const TREE = (window.HeritageData && window.HeritageData.tree) || { order:[], divisions:{}, subs:{}, legacy:{} };
     const EXCLUDED = ['furniture','accessories'];
 
-    // this page only ever lists rugs and flooring
     const PRODUCTS = config.products.filter(p =>
       !(p.category || []).some(c => EXCLUDED.indexOf(c) > -1));
 
-    /* Two commercial carpet tiles are also tagged machine-made, so a naive
-       "does it carry the tag" test put them in both buckets and the three
-       counts summed to 18 against a 16-piece catalogue. Each product is
-       therefore assigned to exactly ONE major, resolved in priority order:
-       a contract carpet tile is shopped as Commercial first, whatever it is
-       made of. MAJORS order defines that priority. */
-    const MAJOR_PRIORITY = ['commercial', 'handmade', 'machine-made'];
+    const state = { division:null, category:null, subs:new Set(),
+                    color:'', size:'', sort:'featured', view:'large' };
 
-    function majorForProduct(p){
-      for(const key of MAJOR_PRIORITY){
-        const m = MAJORS.filter(x => x.key === key)[0];
-        if(m && p.category.some(c => m.tags.indexOf(c) > -1)) return m.key;
-      }
-      return null;
-    }
-
-    const majorOf = (key) => MAJORS.filter(m => m.tags.indexOf(key) > -1)[0] || null;
-
-    /* Simplified to what actually decides a rug purchase: which family it
-       belongs to, and (once that's chosen) the style. Size and colour stay as
-       two plain dropdowns because they genuinely narrow a search; material and
-       room type were dropped — material's list was half furniture values that
-       no longer exist here, and room type barely moved the result set. */
-    const state = { major:null, style:new Set(), color:'', size:'', sort:'featured', view:'large' };
-
-    /* Remember the layout the visitor picked. Someone who prefers the list
-       almost always prefers it on the next visit too, and re-picking it every
-       time is a small irritation that adds up. Wrapped because storage can be
-       unavailable (private mode, blocked cookies) and that must not break the
-       page. */
     const VIEW_KEY = 'heritage.collections.view';
     try{
       const saved = localStorage.getItem(VIEW_KEY);
       if(saved === 'large' || saved === 'medium' || saved === 'list') state.view = saved;
     }catch(err){}
 
-    const params = new URLSearchParams(window.location.search);
-    const qCat = params.get('category');
-    if(qCat && EXCLUDED.indexOf(qCat) === -1){
-      const m = majorOf(qCat);
-      if(m){
-        state.major = m.key;
-        // a legacy style link (?category=persian) preselects that style too
-        if(m.styles.indexOf(qCat) > -1) state.style.add(qCat);
+    /* ?category= still works for every old link. The tree carries a map from
+       each retired tag to its place in the new structure. */
+    const qCat = new URLSearchParams(window.location.search).get('category');
+    if(qCat){
+      const legacy = TREE.legacy[qCat];
+      if(legacy){
+        state.division = legacy[0];
+        state.category = legacy[1];
+        if(legacy[2]) state.subs.add(legacy[2]);
+      }else if(TREE.divisions[qCat]){
+        state.division = qCat;
+      }else{
+        // a category key used directly, e.g. ?category=vinyl-flooring
+        Object.keys(TREE.divisions).forEach(d=>{
+          if(TREE.divisions[d].indexOf(qCat) > -1){ state.division = d; state.category = qCat; }
+        });
       }
     }
 
-    function countMajor(m){
-      return PRODUCTS.filter(p => majorForProduct(p) === m.key).length;
-    }
+    const inDivision = (p, d) => p.category[0] === d;
+    const inCategory = (p, c) => p.category[1] === c;
 
-    /* primary category bar — the main navigation of the page now */
+    function countDivision(d){ return PRODUCTS.filter(p => inDivision(p, d)).length; }
+    function countCategory(c){ return PRODUCTS.filter(p => inCategory(p, c)).length; }
+    function countSub(sub){ return PRODUCTS.filter(p => p.category.indexOf(sub) > 2 || p.category.slice(2).indexOf(sub) > -1).length; }
+
+    /* row 1 — divisions */
     function renderMajorBar(){
       const el = root.querySelector('[data-role="category-bar"]');
       if(!el) return;
-      const all = '<button type="button" class="cat-pill'+(state.major===null?' active':'')+'" data-major="">'+
+      const all = '<button type="button" class="cat-pill'+(state.division===null?' active':'')+'" data-division="">'+
                   (i18n.allPieces || 'All')+'<span class="cat-pill-count">'+PRODUCTS.length+'</span></button>';
-      el.innerHTML = all + MAJORS.map(m=>
-        '<button type="button" class="cat-pill'+(state.major===m.key?' active':'')+'" data-major="'+m.key+'">'+
-          (L.category[m.key] || m.key)+'<span class="cat-pill-count">'+countMajor(m)+'</span></button>'
+      el.innerHTML = all + TREE.order.map(d=>
+        '<button type="button" class="cat-pill'+(state.division===d?' active':'')+'" data-division="'+d+'">'+
+          (L.category[d] || d)+'<span class="cat-pill-count">'+countDivision(d)+'</span></button>'
       ).join('');
     }
 
-    /* style chips, shown only when the chosen category actually has styles */
+    /* row 2 — categories inside the chosen division */
+    function renderCategoryBar(){
+      const el = root.querySelector('[data-role="category-sub-bar"]');
+      if(!el) return;
+      const cats = state.division ? (TREE.divisions[state.division] || []) : [];
+      if(!cats.length){ el.innerHTML = ''; el.hidden = true; return; }
+      el.hidden = false;
+      el.innerHTML = cats.map(c=>{
+        const n = countCategory(c);
+        return '<button type="button" class="style-chip'+(state.category===c?' active':'')+
+               (n===0?' is-empty':'')+'" data-category="'+c+'">'+
+               (L.category[c] || c)+'<span class="chip-count">'+n+'</span></button>';
+      }).join('');
+    }
+
+    /* row 3 — sub-categories inside the chosen category */
     function renderStyleBar(){
       const el = root.querySelector('[data-role="style-bar"]');
       if(!el) return;
-      const m = state.major ? majorOf(state.major) : null;
-      if(!m || !m.styles.length){ el.innerHTML = ''; el.hidden = true; return; }
+      const subs = state.category ? (TREE.subs[state.category] || []) : [];
+      if(!subs.length){ el.innerHTML = ''; el.hidden = true; return; }
       el.hidden = false;
-      el.innerHTML = m.styles.map(s=>
-        '<button type="button" class="style-chip'+(state.style.has(s)?' active':'')+'" data-style="'+s+'">'+
-          (L.category[s] || s)+'</button>'
+      el.innerHTML = subs.map(sb=>
+        '<button type="button" class="style-chip'+(state.subs.has(sb)?' active':'')+'" data-style="'+sb+'">'+
+          (L.category[sb] || sb)+'</button>'
       ).join('');
     }
 
-    /* Dropdown options are built from the products actually on the page, so a
-       value can never appear that would return zero results — the old static
-       material list still offered Velvet and Solid Wood after furniture was
-       removed from this catalogue. */
     function fillSelect(role, labels, current){
       const el = root.querySelector('[data-role="'+role+'"]');
       if(!el) return;
@@ -2631,6 +2615,7 @@ function buildCarouselMarkup(images){
 
     function renderFilters(){
       renderMajorBar();
+      renderCategoryBar();
       renderStyleBar();
       applyView();
       fillSelect('filter-size-select',  L.size,  state.size);
@@ -2639,11 +2624,10 @@ function buildCarouselMarkup(images){
 
     function matches(p){
       let catOk = true;
-      if(state.major){
-        catOk = majorForProduct(p) === state.major;
-        // a chosen style narrows within the category, it doesn't replace it
-        if(catOk && state.style.size) catOk = p.category.some(c => state.style.has(c));
-      }
+      if(state.division) catOk = p.category[0] === state.division;
+      if(catOk && state.category) catOk = p.category[1] === state.category;
+      // a sub-category narrows within its category, it does not replace it
+      if(catOk && state.subs.size) catOk = p.category.slice(2).some(c => state.subs.has(c));
       const colOk  = !state.color || p.color === state.color;
       const sizeOk = !state.size  || p.size  === state.size;
       return catOk && colOk && sizeOk;
@@ -2658,16 +2642,24 @@ function buildCarouselMarkup(images){
 
     function renderChips(){
       const chips = [];
-      if(state.major){
-        chips.push('<span class="chip" data-group="major" data-val="'+state.major+'">'+
-          (L.category[state.major]||state.major)+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
+      if(state.division){
+        chips.push('<span class="chip" data-group="division" data-val="'+state.division+'">'+
+          (L.category[state.division]||state.division)+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
+      }
+      if(state.category){
+        chips.push('<span class="chip" data-group="category" data-val="'+state.category+'">'+
+          (L.category[state.category]||state.category)+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
       }
       ['color','size'].forEach(g=>{
         if(!state[g]) return;
         const lbl = (L[g][state[g]] || state[g]).split(' (')[0];
         chips.push('<span class="chip" data-group="'+g+'" data-val="'+state[g]+'">'+lbl+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
       });
-      ['style'].forEach(group=>{
+      state.subs.forEach(function(v){
+        chips.push('<span class="chip" data-group="subs" data-val="'+v+'">'+
+          (L.category[v]||v)+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
+      });
+      [].forEach(group=>{
         state[group].forEach(val=>{
           const lbl = (group==='style' ? L.category[val] : L[group][val]) || val;
           chips.push('<span class="chip" data-group="'+group+'" data-val="'+val+'">'+lbl+' <button type="button" aria-label="Remove filter">\u2715</button></span>');
@@ -2722,14 +2714,26 @@ function buildCarouselMarkup(images){
 
     function refreshAll(){ renderFilters(); renderProducts(); }
 
-    const catBar = root.querySelector('[data-role="category-bar"]');
+    const divBar = root.querySelector('[data-role="category-bar"]');
+    if(divBar){
+      divBar.addEventListener('click', function(e){
+        const b = e.target.closest('[data-division]');
+        if(!b) return;
+        const key = b.dataset.division || null;
+        if(state.division !== key){ state.category = null; state.subs.clear(); }
+        state.division = key;
+        refreshAll();
+      });
+    }
+    const catBar = root.querySelector('[data-role="category-sub-bar"]');
     if(catBar){
       catBar.addEventListener('click', function(e){
-        const b = e.target.closest('[data-major]');
+        const b = e.target.closest('[data-category]');
         if(!b) return;
-        const key = b.dataset.major || null;
-        if(state.major !== key) state.style.clear();   // styles belong to a category
-        state.major = key;
+        const key = b.dataset.category;
+        // tapping the active category clears it, so you can step back up
+        state.category = (state.category === key) ? null : key;
+        state.subs.clear();
         refreshAll();
       });
     }
@@ -2739,7 +2743,7 @@ function buildCarouselMarkup(images){
         const b = e.target.closest('[data-style]');
         if(!b) return;
         const v = b.dataset.style;
-        if(state.style.has(v)) state.style.delete(v); else state.style.add(v);
+        if(state.subs.has(v)) state.subs.delete(v); else state.subs.add(v);
         refreshAll();
       });
     }
@@ -2771,17 +2775,18 @@ function buildCarouselMarkup(images){
         if(!btn) return;
         const chip = btn.closest('.chip');
         const g = chip.dataset.group;
-        if(g === 'major'){ state.major = null; state.style.clear(); }
+        if(g === 'division'){ state.division = null; state.category = null; state.subs.clear(); }
+        else if(g === 'category'){ state.category = null; state.subs.clear(); }
+        else if(g === 'subs'){ state.subs.delete(chip.dataset.val); }
         else if(g === 'color' || g === 'size'){ state[g] = ''; }
-        else state[g].delete(chip.dataset.val);
         refreshAll();
       });
     }
     const clearBtn = root.querySelector('[data-role="clear-filters"]');
     if(clearBtn){
       clearBtn.addEventListener('click', function(){
-        state.major = null; state.color = ''; state.size = '';
-        state.style.clear();
+        state.division = null; state.category = null; state.color = ''; state.size = '';
+        state.subs.clear();
         refreshAll();
       });
     }
